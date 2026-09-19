@@ -1,0 +1,5 @@
+# per-run artifacts (never ship)
+charts/
+*_evidence.txt
+*.pyc
+__pycache__/

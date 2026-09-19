@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Cytoscape.js 3.34.3</title>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.3/dist/cytoscape.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #cy { width: 100%; height: 70vh; border: 1px solid #eee; border-radius: 6px; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="cy"></div>
+  </div>
+  <footer>chartz · Cytoscape.js 3.34.3 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "DNA damage response pathway",
+  "elements": [
+    {
+      "data": {
+        "id": "TP53",
+        "label": "TP53"
+      }
+    },
+    {
+      "data": {
+        "id": "MDM2",
+        "label": "MDM2"
+      }
+    },
+    {
+      "data": {
+        "id": "ATM",
+        "label": "ATM"
+      }
+    },
+    {
+      "data": {
+        "id": "CHEK2",
+        "label": "CHEK2"
+      }
+    },
+    {
+      "data": {
+        "id": "CDKN1A",
+        "label": "CDKN1A"
+      }
+    },
+    {
+      "data": {
+        "id": "edge1",
+        "source": "TP53",
+        "target": "MDM2",
+        "weight": 0.9
+      }
+    },
+    {
+      "data": {
+        "id": "edge2",
+        "source": "TP53",
+        "target": "ATM",
+        "weight": 0.7
+      }
+    },
+    {
+      "data": {
+        "id": "edge3",
+        "source": "ATM",
+        "target": "CHEK2",
+        "weight": 0.8
+      }
+    },
+    {
+      "data": {
+        "id": "edge4",
+        "source": "CHEK2",
+        "target": "TP53",
+        "weight": 0.6
+      }
+    },
+    {
+      "data": {
+        "id": "edge5",
+        "source": "TP53",
+        "target": "CDKN1A",
+        "weight": 0.85
+      }
+    },
+    {
+      "data": {
+        "id": "edge6",
+        "source": "MDM2",
+        "target": "CDKN1A",
+        "weight": 0.4
+      }
+    }
+  ],
+  "style": [
+    {
+      "selector": "node",
+      "style": {
+        "content": "data(label)",
+        "font-size": 12,
+        "text-valign": "center",
+        "background-color": "#0072B2",
+        "color": "#ffffff",
+        "text-outline-width": 2,
+        "text-outline-color": "#0072B2"
+      }
+    },
+    {
+      "selector": "edge",
+      "style": {
+        "width": 2,
+        "line-color": "#999999",
+        "curve-style": "bezier"
+      }
+    }
+  ],
+  "layout": {
+    "name": "cose",
+    "animate": false
+  }
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Network graph';
+cytoscape({
+  container: document.getElementById('cy'),
+  elements: SPEC.elements,
+  style: SPEC.style,
+  layout: SPEC.layout || { name: 'cose', animate: false }
+});
+</script>
+</body>
+</html>
