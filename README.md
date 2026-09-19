@@ -30,8 +30,12 @@ chartz/
 │   └── cytoscape.html  # Cytoscape.js 3.34.3
 ├── bin/
 │   └── skill-update-check.py   # git-SHA drift check (no GitHub API)
-└── examples/           # one worked demo per engine
+└── examples/           # one worked demo per engine (+ screenshots/)
 ```
+
+## Battle test
+
+All four engines verified rendering in headless Chrome (2026-09-19): CDN load ✓, canvas non-blank ✓, see `examples/screenshots/`.
 
 ## Changelog
 
