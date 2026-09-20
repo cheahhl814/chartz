@@ -171,13 +171,19 @@ document.getElementById('chart-title').textContent = SPEC.title || 'UpSet plot';
   const sets = SPEC.sets;
   const ints = SPEC.intersections;
   const nInt = ints.length;
-  const GUT_L = 170, GUT_T = 16;
+  const GUT_T = 16;
   const BAR_H = 110;                    // intersection bar area
+  const SETBAR_W = 90;                  // left set-size bar max length
   const CELL_W = Math.max(20, Math.floor(800 / nInt));
   const DOT_R = 5, ROW_H = 26;
   const MAT_W = CELL_W * nInt, MAT_H = ROW_H * sets.length;
+  // measure the widest row-label so the left gutter fits it (fixed 170
+  // clipped long set names off the left edge of the viewBox)
+  const meas = document.createElement("canvas").getContext("2d");
+  meas.font = "10px sans-serif";
+  const MAX_LABEL_W = Math.max(0, ...sets.map(s => meas.measureText(s).width));
+  const GUT_L = MAX_LABEL_W + 18 + SETBAR_W + 14;
   const MAT_X = GUT_L, MAT_Y = GUT_T + BAR_H + 18;
-  const SETBAR_W = 90;                  // left set-size bar max length
 
   const svg = document.createElementNS(NS, "svg");
   svg.setAttribute("viewBox", `0 0 ${MAT_X + MAT_W + 40} ${MAT_Y + MAT_H + 20}`);
