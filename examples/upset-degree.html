@@ -8,7 +8,10 @@
   body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
   .wrap { max-width: 1040px; margin: 2rem auto; padding: 0 1rem; }
   .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
-  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  h1 { font-size: 1rem; color: #333; margin: 0; font-weight: 600; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .dl-btn { font: inherit; font-size: 0.75rem; padding: 0.35rem 0.7rem; border: 1px solid #d0d4d9; border-radius: 6px; background: #fff; color: #333; cursor: pointer; flex-shrink: 0; }
+  .dl-btn:hover { background: #f1f3f5; }
   #chart { width: 100%; }
   footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
 </style>
@@ -16,7 +19,10 @@
 <body>
 <div class="wrap">
   <div class="card">
-    <h1 id="chart-title"></h1>
+    <div class="card-head">
+      <h1 id="chart-title"></h1>
+      <button id="dl-png" class="dl-btn" type="button">Download PNG</button>
+    </div>
     <div id="chart"></div>
   </div>
   <footer>chartz · UpSet (engine 9) · template-native SVG, zero dependencies</footer>
@@ -247,6 +253,40 @@ document.getElementById('chart-title').textContent = SPEC.title || 'UpSet plot';
   }
   document.getElementById("chart").appendChild(svg);
 })();
+document.getElementById('dl-png').addEventListener('click', function () {
+  const svgEl = document.querySelector('#chart svg');
+  if (!svgEl) return;
+  const vb = svgEl.viewBox.baseVal;
+  const w = (vb && vb.width) ? vb.width : svgEl.clientWidth;
+  const h = (vb && vb.height) ? vb.height : svgEl.clientHeight;
+  const scale = 2;
+  const clone = svgEl.cloneNode(true);
+  clone.setAttribute('width', w);
+  clone.setAttribute('height', h);
+  if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  const xml = new XMLSerializer().serializeToString(clone);
+  const svgBlob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  const img = new Image();
+  img.onload = function () {
+    const canvas = document.createElement('canvas');
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(function (blob) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = (document.getElementById('chart-title').textContent || 'chart').replace(/\s+/g, '_') + '.png';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+  };
+  img.src = url;
+});
 </script>
 </body>
 </html>
