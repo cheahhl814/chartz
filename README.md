@@ -1,15 +1,15 @@
 # chartz
 
-[![Version](https://img.shields.io/badge/version-0.6.0-blue)](#-installation)
+[![Version](https://img.shields.io/badge/version-0.7.0-blue)](#-installation)
 [![Type](https://img.shields.io/badge/type-agent%20skill-blueviolet)](#-installation)
 [![README standard](https://img.shields.io/badge/README%20per-bioinfo--skill--creator-orange)](https://github.com/cheahhl814/bioinfo-skill-creator)
 
-Render charts and graphs as self-contained HTML files from four CDN-pinned engines plus five template-native engines, chosen by chart type. One request → one portable HTML file: simple statistical charts via Chart.js, scientific/statistical plots via Plotly.js, rich interactive dashboards via ECharts, nodes+edges network graphs via Cytoscape.js, genome-browser track figures via the zero-dependency GenomeTracks SVG renderer, clustered-heatmap composites via ClusterHeat, OncoPrint mutation matrices via OncoPrint, sequence logos via SeqLogo, and set-intersection plots via UpSet — all template-native SVG. No build step, no server, no inline third-party library code.
+Render charts and graphs as self-contained HTML files from four CDN-pinned engines plus six template-native engines, chosen by chart type. One request → one portable HTML file: simple statistical charts via Chart.js, scientific/statistical plots via Plotly.js, rich interactive dashboards via ECharts, nodes+edges network graphs via Cytoscape.js, genome-browser track figures via the zero-dependency GenomeTracks SVG renderer, clustered-heatmap composites via ClusterHeat, OncoPrint mutation matrices via OncoPrint, sequence logos via SeqLogo, set-intersection plots via UpSet, and circular genome plots via Circos — all template-native SVG. No build step, no server, no inline third-party library code.
 
 **Repository**: https://github.com/cheahhl814/chartz
 
 > [!NOTE]
-> Current version: **v0.6.0** (updated 2026-09-20). v0.2.0 GenomeTracks (§5b); v0.3.0 ClusterHeat (§5c); v0.4.0 OncoPrint (§5d); v0.5.0 SeqLogo (§5e); v0.6.0 adds UpSet (§5f) for set-intersection plots at 4+ sets.
+> Current version: **v0.7.0** (updated 2026-09-20). v0.2.0 GenomeTracks (§5b); v0.3.0 ClusterHeat (§5c); v0.4.0 OncoPrint (§5d); v0.5.0 SeqLogo (§5e); v0.6.0 UpSet (§5f); v0.7.0 adds Circos (§5g) for circular genome plots.
 
 ## Contents
 
