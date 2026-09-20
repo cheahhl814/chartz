@@ -117,3 +117,5 @@ Verdicts: `UP-TO-DATE` / `LOCAL-AHEAD` (ok) · `BEHIND-BY-N` (re-sync from upstr
 ## 10. Design conventions (summary)
 
 Palette by data type (Okabe-Ito categorical, Viridis/Magma sequential, symmetric diverging for signed values); state statistical test + adjustment whenever significance is rendered; state layout/method/hyperparameters + seed for networks and embeddings; match distribution encoding (box/raincloud/violin) to N per group; report I²/τ²/Q for meta-analysis forests. Full D1–D13 design self-check and all 15 subsections (§10.1–§10.15) live in `references/conventions.md` — read it before any chart where color, thresholds, statistics, or layout carry meaning.
+
+- Colour palettes: qualitative (Okabe-Ito / Tol), sequential (Viridis), diverging (RdBu/vik), journal-style (NPG/NEJM/Lancet) — see references/palettes.md

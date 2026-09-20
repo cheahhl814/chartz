@@ -33,3 +33,4 @@ Loaded from SKILL.md §1 routing when this engine is selected.
 - **Percentages computed by the agent** with the cohort denominator and emitted as `pct`.
 - **Hypermutators**: TMB bars use **log10(tmb + 1)** values (transform upstream) — 1–2 POLE/MSI-H samples otherwise dominate the bar.
 - **Top 10–25 genes**; 50–1000 samples (above → summary panels).
+- **Alteration-class colours**: see references/palettes.md.
