@@ -547,9 +547,14 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Clustered he
   const CELL_H = Math.max(14, Math.floor(420 / nR));
   const MAT_W = CELL_W * nC, MAT_H = CELL_H * nR;
   const MAT_X = GUT_L + DEND_R + ANN_R, MAT_Y = GUT_T + DEND_C + ANN_C;
+  const legendKeyCount = new Set([
+    ...(SPEC.col_annot || []).flatMap(s => Object.keys(s.colors)),
+    ...(SPEC.row_annot || []).flatMap(s => Object.keys(s.colors)),
+  ]).size;
+  const LEGEND_H = legendKeyCount ? 40 + legendKeyCount * 14 : 30; // must match the legend loop below
 
   const svg = document.createElementNS(NS, "svg");
-  svg.setAttribute("viewBox", `0 0 ${MAT_X + MAT_W + 130} ${MAT_Y + MAT_H + 70}`);
+  svg.setAttribute("viewBox", `0 0 ${MAT_X + MAT_W + 130} ${MAT_Y + MAT_H + LEGEND_H}`);
   svg.setAttribute("style", "font-family: system-ui, sans-serif;");
   const el = (tag, attrs, text) => {
     const n = document.createElementNS(NS, tag);
@@ -582,10 +587,10 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Clustered he
 
   // labels
   M.rows.forEach((r, i) => el("text", {x: MAT_X - 6, y: MAT_Y + i * CELL_H + CELL_H / 2 + 3,
-    "text-anchor": "end", "font-size": 9.5, fill: "#333"}, r));
+    "text-anchor": "end", "font-size": 10, fill: "#333"}, r));
   M.cols.forEach((c, j) => {
     const x = MAT_X + j * CELL_W + CELL_W / 2, y = MAT_Y + MAT_H + 12;
-    el("text", {x, y, "text-anchor": "start", "font-size": 9.5, fill: "#333",
+    el("text", {x, y, "text-anchor": "start", "font-size": 10, fill: "#333",
                 transform: `rotate(-45 ${x} ${y})`}, c);
   });
 
@@ -595,9 +600,9 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Clustered he
     const v = M.zmax - (i / LG_H) * (M.zmax - M.zmin);
     el("rect", {x: LG_X, y: LG_Y + i, width: 14, height: 1, fill: colorFor(v)});
   }
-  el("text", {x: LG_X + 18, y: LG_Y + 8, "font-size": 9, fill: "#333"}, M.zmax);
-  el("text", {x: LG_X + 18, y: LG_Y + LG_H, "font-size": 9, fill: "#333"}, M.zmin);
-  if (M.legendLabel) el("text", {x: LG_X + 18, y: LG_Y + LG_H / 2, "font-size": 9, fill: "#666"}, M.legendLabel);
+  el("text", {x: LG_X + 18, y: LG_Y + 8, "font-size": 10, fill: "#333"}, M.zmax);
+  el("text", {x: LG_X + 18, y: LG_Y + LG_H, "font-size": 10, fill: "#333"}, M.zmin);
+  if (M.legendLabel) el("text", {x: LG_X + 18, y: LG_Y + LG_H / 2, "font-size": 10, fill: "#666"}, M.legendLabel);
 
   // column annotation strips (above matrix) + class legend
   let ay = MAT_Y - ANN_C;
@@ -613,7 +618,7 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Clustered he
   let ly = MAT_Y + MAT_H + 40;
   for (const [k, c] of Object.entries(legend)) {
     el("rect", {x: MAT_X + 20, y: ly - 8, width: 10, height: 10, fill: c});
-    el("text", {x: MAT_X + 34, y: ly, "font-size": 9.5, fill: "#444"}, k);
+    el("text", {x: MAT_X + 34, y: ly, "font-size": 10, fill: "#444"}, k);
     ly += 14;
   }
 

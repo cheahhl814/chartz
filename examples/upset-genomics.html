@@ -184,7 +184,7 @@ document.getElementById('chart-title').textContent = SPEC.title || 'UpSet plot';
     el("rect", {x: x + 3, y: GUT_T + (BAR_H - 16 - h), width: CELL_W - 6, height: h,
                 fill: color, opacity: 0.9});
     el("text", {x: colX(i), y: GUT_T + BAR_H - 18 - h, "text-anchor": "middle",
-                "font-size": 9.5, fill: "#333"}, it.label !== undefined ? it.label : String(it.size));
+                "font-size": 10, fill: "#333"}, it.label !== undefined ? it.label : String(it.size));
   });
   el("text", {x: 6, y: GUT_T + 12, "font-size": 10, fill: "#444", "font-weight": 600},
      "Intersection size");
@@ -221,7 +221,7 @@ document.getElementById('chart-title').textContent = SPEC.title || 'UpSet plot';
     el("rect", {x: MAT_X - 14 - w, y, width: w, height: 14, fill: "#0072B2", opacity: 0.85});
     el("text", {x: MAT_X - 18 - w, y: y + 11, "text-anchor": "end", "font-size": 10,
                 fill: "#333"}, s);
-    el("text", {x: MAT_X - 12, y: y + 11, "font-size": 9, fill: "#666"},
+    el("text", {x: MAT_X - 12, y: y + 11, "font-size": 10, fill: "#666"},
        String(SPEC.set_sizes[s] || 0));
   });
   el("text", {x: 6, y: MAT_Y - 4, "font-size": 10, fill: "#444", "font-weight": 600}, "Set size");
@@ -230,7 +230,7 @@ document.getElementById('chart-title').textContent = SPEC.title || 'UpSet plot';
   if (SPEC.degree_labels) {
     ints.forEach((it, i) => {
       el("text", {x: colX(i), y: MAT_Y + MAT_H + 16, "text-anchor": "middle",
-                  "font-size": 9, fill: "#666"}, String(it.sets.length));
+                  "font-size": 10, fill: "#666"}, String(it.sets.length));
     });
     el("text", {x: 6, y: MAT_Y + MAT_H + 16, "font-size": 10, fill: "#444"}, "Degree");
   }

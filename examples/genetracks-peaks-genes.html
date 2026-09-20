@@ -119,7 +119,7 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Genome track
   const {start, end} = SPEC.region;
   const px = p => GUTTER + ((p - start) / (end - start)) * PLOT_W;
   const svg = document.createElementNS(NS, "svg");
-  svg.setAttribute("viewBox", `0 0 ${GUTTER + PLOT_W + 40} ${AXIS_H + SPEC.tracks.reduce((a, t) => a + LABEL_GAP + t.height + GAP, 10)}`);
+  svg.setAttribute("viewBox", `0 0 ${GUTTER + PLOT_W + 60} ${AXIS_H + SPEC.tracks.reduce((a, t) => a + LABEL_GAP + t.height + GAP, 10)}`);
   svg.setAttribute("style", "font-family: system-ui, sans-serif;");
   const el = (tag, attrs, text) => {
     const n = document.createElementNS(NS, tag);
@@ -153,13 +153,13 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Genome track
         .map(b => `${px(b[0]).toFixed(1)},${Math.max(top, bot - (b[1] / max) * tr.height).toFixed(1)}`);
       el("polygon", {points: `${GUTTER},${bot} ${pts.join(" ")} ${GUTTER + PLOT_W},${bot}`,
                      fill: tr.color, opacity: 0.75, stroke: "none"});
-      el("text", {x: GUTTER + PLOT_W + 4, y: top + 8, "font-size": 9, fill: "#666"}, `max=${max}`);
+      el("text", {x: GUTTER + PLOT_W + 4, y: top + 8, "font-size": 10, fill: "#666"}, `max=${max}`);
     } else if (tr.type === "peaks") {
       for (const it of tr.items) {
         if (it.end < start || it.start > end) continue;
         el("rect", {x: px(Math.max(it.start, start)), y: top, width: Math.max(1, px(it.end) - px(it.start)),
                     height: tr.height, fill: tr.color, opacity: 0.8, rx: 2});
-        if (it.label) el("text", {x: px(it.start) + 3, y: top + tr.height - 4, "font-size": 9, fill: "#fff"}, it.label);
+        if (it.label) el("text", {x: px(it.start) + 3, y: top + tr.height - 4, "font-size": 10, fill: "#fff"}, it.label);
       }
     } else if (tr.type === "genes") {
       const rows = tr.items.length, rowH = tr.height / rows;
@@ -180,7 +180,7 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Genome track
           el("path", {d: `M ${px(ax) - w} ${mid - 3} L ${px(ax)} ${mid} L ${px(ax) - w} ${mid + 3} Z`,
                       fill: tr.color || "#3C5488"});
         }
-        el("text", {x: px(s), y: top + rowH * i + 9, "font-size": 9.5, fill: "#222"}, g.name);
+        el("text", {x: px(s), y: top + rowH * i + 9, "font-size": 10, fill: "#222"}, g.name);
       });
     } else {
       el("text", {x: GUTTER + 6, y: top + tr.height / 2, "font-size": 11, fill: "#B00"},

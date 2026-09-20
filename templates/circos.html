@@ -38,6 +38,7 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Circos';
   const NS = "http://www.w3.org/2000/svg";
   const SIZE = 760, CX = SIZE / 2, CY = SIZE / 2;
   const R_IDEOGRAM_OUT = 340, R_IDEOGRAM_IN = 322;
+  const LEGEND_W = 170; // reserved margin right of the ideogram for track-label legend text
   const startDeg = SPEC.start_degree != null ? SPEC.start_degree : 90;
   const gapDeg = SPEC.gap_degree != null ? SPEC.gap_degree : 3;
   const BIG_GAP = gapDeg * 3; // circlize convention: bigger visual break before chr1
@@ -70,7 +71,7 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Circos';
   };
 
   const svg = document.createElementNS(NS, "svg");
-  svg.setAttribute("viewBox", `0 0 ${SIZE} ${SIZE + 40}`);
+  svg.setAttribute("viewBox", `0 0 ${SIZE + LEGEND_W} ${SIZE + 40}`);
   svg.setAttribute("style", "font-family: system-ui, sans-serif;");
   const el = (tag, attrs, text) => {
     const n = document.createElementNS(NS, tag);

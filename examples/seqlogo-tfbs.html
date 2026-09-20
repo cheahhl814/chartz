@@ -194,11 +194,21 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Sequence log
     let acc = 0;                             // bits consumed from the baseline up
     for (const item of stack) {
       const hPx = (item.height / ymax) * PLOT_H;
+      if (hPx <= 0) { acc += item.height; continue; }
       const baseline = baseY - (acc / ymax) * PLOT_H;
-      const fs = Math.max(6, hPx * 1.32);    // font-size tuned so glyph box ≈ stack band
-      el("text", {x: cx, y: baseline + 2, "text-anchor": "middle",
-                  "font-size": fs, "font-weight": "bold",
-                  fill: (SPEC.colors || {})[item.letter] || "#555555"}, item.letter);
+      // Measure the glyph at a fixed reference size, then scale it to exactly fill
+      // the [colW, hPx] band — a fixed font-size-to-height multiplier overshoots for
+      // tall single-letter stacks (near-fully-conserved positions) since glyph ink
+      // bounds vary per letter/font.
+      const REF_FS = 100;
+      const g = el("text", {x: 0, y: 0, "text-anchor": "middle", "font-size": REF_FS,
+                    "font-weight": "bold",
+                    fill: (SPEC.colors || {})[item.letter] || "#555555"}, item.letter);
+      const bbox = g.getBBox();
+      const sy = hPx / (bbox.height || REF_FS);
+      const sx = Math.min(sy, (colW * 0.92) / (bbox.width || REF_FS));
+      const dy = baseline - (bbox.y + bbox.height) * sy;
+      g.setAttribute("transform", `translate(${cx} ${dy}) scale(${sx} ${sy})`);
       acc += item.height;
     }
   });
