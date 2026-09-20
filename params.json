@@ -1,0 +1,39 @@
+{
+  "skill_name": "chartz",
+  "skill_version": "0.7.0",
+  "skill_updated": "2026-09-20",
+  "skill_short_description": "Render charts and graphs as self-contained HTML files from four pinned CDN engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus six template-native SVG engines (GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos), chosen by chart type. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a portable HTML file. No build step, no server, no pixi/conda/npm.",
+  "skill_description": "Render charts and graphs as self-contained HTML files from four pinned CDN engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus six template-native SVG engines (GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos), chosen by chart type. One request → one portable HTML file. The agent classifies the request against SKILL.md §1, emits the engine's JSON spec per engines/<name>.md, fills the template's /*__SPEC__*/ slot, runs the §6 self-check, and delivers the absolute path. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a portable HTML file. No build step, no server, no inline third-party library code. Does NOT do text-to-flowchart/sequence diagrams (use Mermaid/lumen-generate_visual) and does NOT analyze data.",
+  "skill_triggers": [
+    "make a chart",
+    "plot this data",
+    "bar chart / line chart / pie chart",
+    "heatmap",
+    "box plot / violin plot / histogram",
+    "network graph / node-link diagram",
+    "dashboard from these numbers",
+    "render a chart to html",
+    "visualize this csv/json"
+  ],
+  "github_repo": "github.com/cheahhl814/chartz",
+  "skill_title": "chartz",
+  "github_org": "cheahhl814",
+  "pixi_channels": [],
+  "license": "MIT",
+  "target_tiers": ["large"],
+  "with_nextflow_runner": false,
+  "with_docs_corpus": false,
+  "with_pixi": false,
+  "docs_corpus_rationale": "Wraps no upstream CLI tools; engine spec contracts in engines/*.md + references/ + render-verified examples/ serve as the grounding corpus (stronger than --help captures).",
+  "pixi_rationale": "Local runtime is python3 (stdlib only); browser engines are version-pinned via the SKILL.md §7 CDN table + template <script> tags, which pixi/conda cannot pin.",
+  "tool_inventory": [
+    {
+      "name": "python3",
+      "version": ">=3.10",
+      "role": "stdlib only — spec JSON validation and the update check"
+    }
+  ],
+  "sub_skills": [],
+  "with_lite_tree": false,
+  "battle_test_note": "Hand-authored workflow-skill: no preflight/skill-built/battle-test-report evidence chain. De-facto battle-test = 53 example HTMLs verified non-blank with zero console errors in headless Chrome (examples/screenshots/)."
+}

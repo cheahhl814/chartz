@@ -20,7 +20,7 @@ requires:
 
 # chartz — chart & graph rendering skill
 
-> **v0.1.0.** Renders one self-contained HTML file per chart from four engines, each pinned to a CDN version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
+> **v0.7.0.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus six template-native SVG engines (GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos — §5b–§5g), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
 
 ## 0. Workflow (always all five steps)
 
@@ -104,7 +104,7 @@ Bump procedure: verify the new version on the npm registry, update the table her
 - **Mermaid / flow / sequence / ER diagrams** → out of scope; use `lumen-generate_visual` (mermaid routes) in the Pi harness.
 - **ggplot2/matplotlib fundamentals** → the R/Python tooling (cairo_pdf, tidy evaluation, ggrepel) stays out of scope, but the design layer — publication theme baseline and faceting conventions — **is imported as references/conventions.md §10.10**; faceting is rendered via Plotly subplots (engines/plotly.md), which is why no sixth template exists for it.
 - **Fgraph structured diagrams** (layered/sequence topologies) → `lumen-generate_visual type:"diagram"`.
-- chartz adds the four engines above — use it whenever the output must be a **portable data chart** the user opens in their own browser, with data the agent already holds.
+- chartz adds ten engines (four CDN-pinned + six template-native SVG) — use it whenever the output must be a **portable data chart** the user opens in their own browser, with data the agent already holds.
 
 ## 9. Update check
 
