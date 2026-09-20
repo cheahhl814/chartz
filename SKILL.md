@@ -1,7 +1,7 @@
 ---
 name: chartz
 description: 'Render charts and graphs as self-contained HTML files from four pinned CDN engines, chosen by chart type. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a file they can open in a browser — "make a bar chart", "plot this data", "heatmap of these values", "draw a network graph", "dashboard of these metrics". Engine router: Chart.js (simple statistical), Plotly.js (scientific/statistical), ECharts (rich/dashboards), Cytoscape.js (nodes + edges). Emits one single-file HTML per chart with pinned CDN versions; no build step, no server. Does NOT do text-to-flowchart/sequence diagrams (use Mermaid/lumen-generate_visual for that) and does NOT analyze data — it renders data you already have.'
-version: 0.2.0
+version: 0.7.0
 updated: "2026-09-20"
 triggers:
   - "make a chart"
@@ -41,11 +41,12 @@ requires:
 | 3   | Clustered heatmaps (matrix + attached dendrograms + annotation strips)                                                                                                                    | **ClusterHeat**                  | `templates/clusteredheatmap.html` | §5c           | `engines/clusterheat.md` |
 | 4   | OncoPrint / mutation matrices (stacked alteration cells, TMB + clinical strips)                                                                                                           | **OncoPrint**                    | `templates/oncoprint.html`        | §5d           | `engines/oncoprint.md` |
 | 5   | Sequence logos (per-position letter stacks, bits axis)                                                                                                                                    | **SeqLogo**                      | `templates/seqlogo.html`          | §5e           | `engines/seqlogo.md` |
-| 6   | UpSet set-intersection plots (dot matrix + intersection bars, 4+ sets)                                                                                                                    | **UpSet**                        | `templates/upset.html`            | §5f           | `engines/upset.md` |
-| 7   | Box plots, violin plots, histograms, **heatmaps** (better colorbar/labels), 3D surfaces, error bars, log axes, subplots, **Manhattan/Miami/QQ/locuszoom-regional/forest/funnel/lollipop** | **Plotly.js**                    | `templates/plotly.html`           | §3            | `engines/plotly.md` |
-| 8   | Treemap, sankey, sunburst, dendrogram (topology-only `tree`), large series (>10k points), dataZoom scrubbing, mixed multi-chart dashboards                                                | **ECharts**                      | `templates/echarts.html`          | §4            | `engines/echarts.md` |
-| 9   | Simple bar / line / pie / doughnut / radar / scatter / bubble (few series, shared category axis)                                                                                          | **Chart.js**                     | `templates/chartjs.html`          | §2            | `engines/chartjs.md` |
-| 10  | Anything else                                                                                                                                                                             | **ECharts** (broadest catch-all) | `templates/echarts.html`          | §4            | `engines/echarts.md` |
+| 6   | Circos circular genome plots (ideogram + concentric tracks + SV links)                                                                                                                    | **Circos**                       | `templates/circos.html`           | §5g           | `engines/circos.md` |
+| 7   | UpSet set-intersection plots (dot matrix + intersection bars, 4+ sets)                                                                                                                    | **UpSet**                        | `templates/upset.html`            | §5f           | `engines/upset.md` |
+| 8   | Box plots, violin plots, histograms, **heatmaps** (better colorbar/labels), 3D surfaces, error bars, log axes, subplots, **Manhattan/Miami/QQ/locuszoom-regional/forest/funnel/lollipop** | **Plotly.js**                    | `templates/plotly.html`           | §3            | `engines/plotly.md` |
+| 9   | Treemap, sankey, sunburst, dendrogram (topology-only `tree`), large series (>10k points), dataZoom scrubbing, mixed multi-chart dashboards                                                | **ECharts**                      | `templates/echarts.html`          | §4            | `engines/echarts.md` |
+| 10  | Simple bar / line / pie / doughnut / radar / scatter / bubble (few series, shared category axis)                                                                                          | **Chart.js**                     | `templates/chartjs.html`          | §2            | `engines/chartjs.md` |
+| 11  | Anything else                                                                                                                                                                             | **ECharts** (broadest catch-all) | `templates/echarts.html`          | §4            | `engines/echarts.md` |
 
 **Read engines/<name>.md for the full spec contract before emitting.**
 
@@ -59,7 +60,7 @@ Worked, render-verified specs live in `examples/` named `<engine>-<charttype>.ht
 [ ] 1. Spec is STRICT JSON (quote every key) and parses: python3 -c "import json; json.load(open('/tmp/spec.json'))" — the slot fill must be pure JSON, not JS-literal notation (unquoted keys fail this check; strict JSON is valid JS everywhere, the reverse is not)
 [ ] 2. Template CDN tag version matches the engine version in this SKILL.md (§ header pins)
 [ ] 3. /*__SPEC__*/ slot replaced exactly once (grep -c "__SPEC__" file == 0 after fill)
-[ ] 4. <script src> URLs reachable: curl -sI -o /dev/null -w "%{http_code}" <url> == 200 (skip when offline — note it in the delivery message; skip entirely for GenomeTracks, ClusterHeat, OncoPrint, SeqLogo and UpSet — no CDN)
+[ ] 4. <script src> URLs reachable: curl -sI -o /dev/null -w "%{http_code}" <url> == 200 (skip when offline — note it in the delivery message; skip entirely for GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet and Circos — no CDN)
 [ ] 5. No NaN/undefined/None leaked into the spec (grep -c "NaN\|undefined" spec == 0)
 [ ] 6. Title text present in the spec; file written to <workdir>/charts/<name>.html; absolute path reported
 ```
@@ -94,6 +95,7 @@ If the user has no network, say so and offer the same spec via lumen-generate_vi
 | OncoPrint    | 1 (template-native) | none — vanilla-JS SVG in `templates/oncoprint.html`                   | n/a        |
 | SeqLogo      | 1 (template-native) | none — vanilla-JS SVG in `templates/seqlogo.html`                     | n/a        |
 | UpSet        | 1 (template-native) | none — vanilla-JS SVG in `templates/upset.html`                       | n/a        |
+| Circos       | 1 (template-native) | none — vanilla-JS SVG in `templates/circos.html`                      | n/a        |
 
 Bump procedure: verify the new version on the npm registry, update the table here, then `sed` the same version string into every template, run §6, then bump this skill's version and add a README changelog line. Never float (`@latest`/`@^`) — reproducibility beats freshness.
 

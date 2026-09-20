@@ -34,4 +34,4 @@ Track types: `coverage` (`bins`: sorted `[pos, value]` pairs; optional `max` —
 - **Gene style**: UCSC-merged for dense human/mouse loci (merge transcripts before emitting); one row per gene here — emit canonical isoform only.
 - Region width: keep locus ≤ ~500 kb for legibility; >10k coverage bins → downsample before emitting.
 
-**Scope boundary:** Hi-C matrices, BedPE arcs, and sashimi plots are **out of scope** for this renderer — use pyGenomeTracks/Gviz/IGV for those and for rendering from BigWig/BAM files directly. chartz consumes coordinate data the agent already holds as arrays.
+**Scope boundary:** Hi-C matrices and sashimi plots are **out of scope** for this renderer — use pyGenomeTracks/Gviz/IGV for those and for rendering from BigWig/BAM files directly. Whole-genome/multi-chromosome adjacency views (Hi-C-style chromosome contacts, SV/translocation links, BedPE arcs at genome scale) route to **Circos** instead (engines/circos.md, §5g) — GenomeTracks is single-locus only. chartz consumes coordinate data the agent already holds as arrays.
