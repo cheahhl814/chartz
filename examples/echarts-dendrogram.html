@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · ECharts 6.1.0</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@6.1.0/dist/echarts.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · ECharts 6.1.0 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "title": {
+    "text": "Hierarchical clustering of samples (distance: 1 - Pearson r)",
+    "left": "center"
+  },
+  "tooltip": {
+    "trigger": "item"
+  },
+  "series": [
+    {
+      "type": "tree",
+      "data": [
+        {
+          "name": "root",
+          "children": [
+            {
+              "name": "C1",
+              "children": [
+                {
+                  "name": "WT-1"
+                },
+                {
+                  "name": "WT-2"
+                },
+                {
+                  "name": "WT-3"
+                }
+              ]
+            },
+            {
+              "name": "C2",
+              "children": [
+                {
+                  "name": "KO-A-1"
+                },
+                {
+                  "name": "KO-A-2"
+                },
+                {
+                  "name": "KO-B-1"
+                },
+                {
+                  "name": "KO-B-2"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "orient": "TB",
+      "edgeShape": "polyline",
+      "roam": true,
+      "expandAndCollapse": false,
+      "top": "8%",
+      "bottom": "12%",
+      "left": "12%",
+      "right": "12%",
+      "symbol": "circle",
+      "symbolSize": 8,
+      "label": {
+        "position": "bottom",
+        "fontSize": 11
+      },
+      "leaves": {
+        "label": {
+          "position": "bottom",
+          "fontSize": 11,
+          "color": "#0072B2"
+        }
+      },
+      "lineStyle": {
+        "color": "#999999",
+        "width": 1.5
+      }
+    }
+  ]
+};
+const chart = echarts.init(document.getElementById('chart'));
+chart.setOption(SPEC);
+window.addEventListener('resize', () => chart.resize());
+</script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · SeqLogo (template-native SVG)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #chart { width: 100%; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · SeqLogo (engine 8) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "TF binding motif (42 sites; bits, uniform background; small-sample corrected)",
+  "positions": [
+    [],
+    [
+      {
+        "letter": "G",
+        "height": 0.051
+      },
+      {
+        "letter": "C",
+        "height": 0.066
+      },
+      {
+        "letter": "T",
+        "height": 0.066
+      },
+      {
+        "letter": "A",
+        "height": 0.471
+      }
+    ],
+    [
+      {
+        "letter": "G",
+        "height": 0.043
+      },
+      {
+        "letter": "C",
+        "height": 0.063
+      },
+      {
+        "letter": "T",
+        "height": 0.082
+      },
+      {
+        "letter": "A",
+        "height": 0.64
+      }
+    ],
+    [
+      {
+        "letter": "C",
+        "height": 0.051
+      },
+      {
+        "letter": "A",
+        "height": 0.067
+      },
+      {
+        "letter": "G",
+        "height": 0.067
+      },
+      {
+        "letter": "T",
+        "height": 0.506
+      }
+    ],
+    [
+      {
+        "letter": "A",
+        "height": 0.056
+      },
+      {
+        "letter": "G",
+        "height": 0.056
+      },
+      {
+        "letter": "T",
+        "height": 0.056
+      },
+      {
+        "letter": "C",
+        "height": 0.904
+      }
+    ],
+    [
+      {
+        "letter": "C",
+        "height": 0.038
+      },
+      {
+        "letter": "T",
+        "height": 0.038
+      },
+      {
+        "letter": "A",
+        "height": 0.074
+      },
+      {
+        "letter": "G",
+        "height": 0.227
+      }
+    ],
+    [
+      {
+        "letter": "C",
+        "height": 0.037
+      },
+      {
+        "letter": "A",
+        "height": 0.044
+      },
+      {
+        "letter": "G",
+        "height": 0.044
+      },
+      {
+        "letter": "T",
+        "height": 0.172
+      }
+    ],
+    []
+  ],
+  "ymax": 2,
+  "ylabel": "Bits",
+  "colors": {
+    "A": "#009E73",
+    "C": "#0072B2",
+    "G": "#E69F00",
+    "T": "#D55E00"
+  }
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Sequence logo';
+
+/* SeqLogo renderer — template-native SVG, no external library.
+   Spec: { title,
+           positions: [ [ {letter, height}, ... ], ... ],  // per-position stacks, bottom-up; heights in bits
+           ymax: 2,                                        // bits axis max (2 DNA / 4.32 protein)
+           ylabel?: "Bits",
+           colors: { letter: hex },
+           xlabels?: [...] }                               // per-position labels (default 1..n)
+   The agent computes information content UPSTREAM (Schneider-Stephens 1990,
+   background-corrected, small-sample corrected) and emits per-letter heights;
+   the renderer only stacks glyphs bottom-up (Logomaker's approach). */
+(function render() {
+  const NS = "http://www.w3.org/2000/svg";
+  const GUT_L = 60, AXIS_W = 22, GUT_T = 16;
+  const PLOT_W = 860, PLOT_H = 240;
+  const n = SPEC.positions.length;
+  const colW = PLOT_W / n;
+  const ymax = SPEC.ymax || 2;
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${GUT_L + AXIS_W + PLOT_W + 30} ${GUT_T + AXIS_W + PLOT_H + 30}`);
+  svg.setAttribute("style", "font-family: system-ui, sans-serif;");
+  const el = (tag, attrs, text) => {
+    const nn = document.createElementNS(NS, tag);
+    for (const k in attrs) nn.setAttribute(k, attrs[k]);
+    if (text !== undefined) nn.textContent = text;
+    svg.appendChild(nn);
+    return nn;
+  };
+  const PX = GUT_L + AXIS_W;
+  const baseY = GUT_T + AXIS_W + PLOT_H;
+  // y axis
+  el("line", {x1: PX, x2: PX, y1: GUT_T, y2: baseY, stroke: "#333"});
+  const ticks = ymax <= 2 ? [0, 0.5, 1, 1.5, 2] : [0, 1, 2, 3, 4];
+  for (const tv of ticks) {
+    if (tv > ymax) continue;
+    const y = baseY - (tv / ymax) * PLOT_H;
+    el("line", {x1: PX - 4, x2: PX, y1: y, y2: y, stroke: "#333"});
+    el("text", {x: PX - 7, y: y + 3, "text-anchor": "end", "font-size": 10, fill: "#333"}, String(tv));
+  }
+  const yl = GUT_T + AXIS_W + PLOT_H / 2;
+  el("text", {x: PX - 40, y: yl, "font-size": 11, fill: "#333", "text-anchor": "middle",
+              transform: `rotate(-90 ${PX - 40} ${yl})`}, SPEC.ylabel || "Bits");
+  // letter stacks (bottom-up)
+  SPEC.positions.forEach((stack, i) => {
+    const cx = PX + (i + 0.5) * colW;
+    let acc = 0;                             // bits consumed from the baseline up
+    for (const item of stack) {
+      const hPx = (item.height / ymax) * PLOT_H;
+      const baseline = baseY - (acc / ymax) * PLOT_H;
+      const fs = Math.max(6, hPx * 1.32);    // font-size tuned so glyph box ≈ stack band
+      el("text", {x: cx, y: baseline + 2, "text-anchor": "middle",
+                  "font-size": fs, "font-weight": "bold",
+                  fill: (SPEC.colors || {})[item.letter] || "#555555"}, item.letter);
+      acc += item.height;
+    }
+  });
+  // x labels
+  for (let i = 0; i < n; i++) {
+    const cx = PX + (i + 0.5) * colW;
+    const lbl = SPEC.xlabels ? String(SPEC.xlabels[i]) : String(i + 1);
+    el("text", {x: cx, y: baseY + 16, "text-anchor": "middle", "font-size": 10, fill: "#333"}, lbl);
+  }
+  document.getElementById("chart").appendChild(svg);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Plotly.js 4.1.1</title>
+<script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · Plotly.js 4.1.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "data": [
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "Cortex",
+      "x": [
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High"
+      ],
+      "y": [
+        4.935,
+        4.922,
+        4.95,
+        5.316,
+        4.943,
+        4.326,
+        5.15,
+        4.88,
+        4.902,
+        5.052,
+        5.385,
+        5.804,
+        5.575,
+        5.33,
+        4.948,
+        4.823,
+        5.391,
+        5.87,
+        5.299,
+        5.232,
+        5.799,
+        4.906,
+        5.419,
+        5.781,
+        5.953,
+        5.452,
+        5.729,
+        5.672,
+        5.912,
+        5.059,
+        6.096,
+        5.158,
+        4.661,
+        5.567,
+        5.428,
+        6.234,
+        6.139,
+        5.291,
+        6.221,
+        5.389
+      ],
+      "xaxis": "x",
+      "yaxis": "y",
+      "marker": {
+        "color": "#0072B2",
+        "size": 6,
+        "opacity": 0.7
+      },
+      "showlegend": false
+    },
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "Cerebellum",
+      "x": [
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High"
+      ],
+      "y": [
+        4.161,
+        4.068,
+        4.251,
+        4.568,
+        4.487,
+        4.357,
+        4.492,
+        4.415,
+        3.918,
+        3.877,
+        4.549,
+        4.985,
+        4.647,
+        5.811,
+        4.391,
+        4.266,
+        5.106,
+        5.4,
+        4.988,
+        5.136,
+        5.962,
+        5.278,
+        4.68,
+        5.081,
+        5.749,
+        4.67,
+        5.335,
+        5.434,
+        5.178,
+        5.646,
+        6.141,
+        6.925,
+        6.159,
+        5.606,
+        5.627,
+        5.506,
+        6.309,
+        5.625,
+        5.848,
+        6.217
+      ],
+      "xaxis": "x2",
+      "yaxis": "y2",
+      "marker": {
+        "color": "#D55E00",
+        "size": 6,
+        "opacity": 0.7
+      },
+      "showlegend": false
+    },
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "Heart",
+      "x": [
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High"
+      ],
+      "y": [
+        2.774,
+        2.968,
+        2.271,
+        2.613,
+        2.845,
+        3.287,
+        3.637,
+        3.092,
+        3.218,
+        3.176,
+        3.658,
+        3.572,
+        3.293,
+        2.715,
+        3.577,
+        3.341,
+        3.722,
+        3.157,
+        4.049,
+        3.009,
+        3.957,
+        3.292,
+        3.008,
+        2.732,
+        3.172,
+        3.88,
+        3.607,
+        3.55,
+        2.171,
+        3.56,
+        3.56,
+        3.063,
+        3.028,
+        3.309,
+        4.086,
+        2.835,
+        3.117,
+        3.923,
+        3.109,
+        3.146
+      ],
+      "xaxis": "x3",
+      "yaxis": "y3",
+      "marker": {
+        "color": "#009E73",
+        "size": 6,
+        "opacity": 0.7
+      },
+      "showlegend": false
+    },
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "Liver",
+      "x": [
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Vehicle",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "Mid",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High",
+        "High"
+      ],
+      "y": [
+        2.444,
+        1.841,
+        2.499,
+        1.856,
+        2.798,
+        2.401,
+        3.428,
+        2.526,
+        3.015,
+        1.814,
+        2.03,
+        2.23,
+        2.871,
+        1.329,
+        2.531,
+        2.351,
+        2.775,
+        2.406,
+        2.108,
+        1.85,
+        1.208,
+        1.858,
+        1.684,
+        2.679,
+        1.495,
+        1.914,
+        1.064,
+        1.592,
+        1.888,
+        2.141,
+        2.107,
+        1.435,
+        0.952,
+        1.661,
+        1.688,
+        1.676,
+        1.14,
+        1.965,
+        1.495,
+        1.77
+      ],
+      "xaxis": "x4",
+      "yaxis": "y4",
+      "marker": {
+        "color": "#E69F00",
+        "size": 6,
+        "opacity": 0.7
+      },
+      "showlegend": false
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Faceted expression by tissue - fixed y scales: panels comparable"
+    },
+    "grid": {
+      "rows": 2,
+      "columns": 2,
+      "pattern": "independent"
+    },
+    "annotations": [
+      {
+        "xref": "x domain",
+        "yref": "y domain",
+        "x": 0.02,
+        "y": 0.97,
+        "text": "<b>Cortex</b>",
+        "showarrow": false,
+        "xanchor": "left",
+        "font": {
+          "size": 12
+        }
+      },
+      {
+        "xref": "x2 domain",
+        "yref": "y2 domain",
+        "x": 0.02,
+        "y": 0.97,
+        "text": "<b>Cerebellum</b>",
+        "showarrow": false,
+        "xanchor": "left",
+        "font": {
+          "size": 12
+        }
+      },
+      {
+        "xref": "x3 domain",
+        "yref": "y3 domain",
+        "x": 0.02,
+        "y": 0.97,
+        "text": "<b>Heart</b>",
+        "showarrow": false,
+        "xanchor": "left",
+        "font": {
+          "size": 12
+        }
+      },
+      {
+        "xref": "x4 domain",
+        "yref": "y4 domain",
+        "x": 0.02,
+        "y": 0.97,
+        "text": "<b>Liver</b>",
+        "showarrow": false,
+        "xanchor": "left",
+        "font": {
+          "size": 12
+        }
+      }
+    ],
+    "showlegend": false,
+    "font": {
+      "size": 12
+    },
+    "xaxis": {
+      "showgrid": false,
+      "zeroline": false,
+      "showline": true,
+      "linecolor": "#333333",
+      "ticks": "outside",
+      "tickcolor": "#333333",
+      "tickfont": {
+        "size": 10
+      },
+      "categoryorder": "array",
+      "categoryarray": [
+        "Vehicle",
+        "Low",
+        "Mid",
+        "High"
+      ]
+    },
+    "yaxis": {
+      "showgrid": false,
+      "zeroline": false,
+      "showline": true,
+      "linecolor": "#333333",
+      "ticks": "outside",
+      "tickcolor": "#333333",
+      "tickfont": {
+        "size": 10
+      },
+      "range": [
+        0.5,
+        8.5
+      ]
+    },
+    "xaxis2": {
+      "showgrid": false,
+      "zeroline": false,
+      "showline": true,
+      "linecolor": "#333333",
+      "ticks": "outside",
+      "tickcolor": "#333333",
+      "tickfont": {
+        "size": 10
+      },
+      "categoryorder": "array",
+      "categoryarray": [
+        "Vehicle",
+        "Low",
+        "Mid",
+        "High"
+      ]
+    },
+    "yaxis2": {
+      "showgrid": false,
+      "zeroline": false,
+      "showline": true,
+      "linecolor": "#333333",
+      "ticks": "outside",
+      "tickcolor": "#333333",
+      "tickfont": {
+        "size": 10
+      },
+      "range": [
+        0.5,
+        8.5
+      ]
+    },
+    "xaxis3": {
+      "showgrid": false,
+      "zeroline": false,
+      "showline": true,
+      "linecolor": "#333333",
+      "ticks": "outside",
+      "tickcolor": "#333333",
+      "tickfont": {
+        "size": 10
+      },
+      "categoryorder": "array",
+      "categoryarray": [
+        "Vehicle",
+        "Low",
+        "Mid",
+        "High"
+      ]
+    },
+    "yaxis3": {
+      "showgrid": false,
+      "zeroline": false,
+      "showline": true,
+      "linecolor": "#333333",
+      "ticks": "outside",
+      "tickcolor": "#333333",
+      "tickfont": {
+        "size": 10
+      },
+      "range": [
+        0.5,
+        8.5
+      ]
+    },
+    "xaxis4": {
+      "showgrid": false,
+      "zeroline": false,
+      "showline": true,
+      "linecolor": "#333333",
+      "ticks": "outside",
+      "tickcolor": "#333333",
+      "tickfont": {
+        "size": 10
+      },
+      "categoryorder": "array",
+      "categoryarray": [
+        "Vehicle",
+        "Low",
+        "Mid",
+        "High"
+      ]
+    },
+    "yaxis4": {
+      "showgrid": false,
+      "zeroline": false,
+      "showline": true,
+      "linecolor": "#333333",
+      "ticks": "outside",
+      "tickcolor": "#333333",
+      "tickfont": {
+        "size": 10
+      },
+      "range": [
+        0.5,
+        8.5
+      ]
+    }
+  },
+  "config": {
+    "responsive": true,
+    "displaylogo": false
+  }
+};
+const cfg = SPEC.config || { responsive: true, displaylogo: false };
+cfg.responsive = true;
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
+</script>
+</body>
+</html>

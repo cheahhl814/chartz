@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Cytoscape.js 3.34.3</title>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.3/dist/cytoscape.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #cy { width: 100%; height: 70vh; border: 1px solid #eee; border-radius: 6px; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="cy"></div>
+  </div>
+  <footer>chartz · Cytoscape.js 3.34.3 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "PPI network - node size = degree, edge width = confidence, color = module (greedy modularity); hubs labeled (degree >= 5)",
+  "elements": [
+    {
+      "data": {
+        "id": "EGFR",
+        "label": "EGFR",
+        "size": 32,
+        "community": 0
+      }
+    },
+    {
+      "data": {
+        "id": "MET",
+        "label": "MET",
+        "size": 24,
+        "community": 0
+      }
+    },
+    {
+      "data": {
+        "id": "MTOR",
+        "label": "MTOR",
+        "size": 32,
+        "community": 0
+      }
+    },
+    {
+      "data": {
+        "id": "ERBB2",
+        "label": "ERBB2",
+        "size": 24,
+        "community": 0
+      }
+    },
+    {
+      "data": {
+        "id": "MAPK1",
+        "label": "MAPK1",
+        "size": 28,
+        "community": 0
+      }
+    },
+    {
+      "data": {
+        "id": "AKT1",
+        "label": "AKT1",
+        "size": 24,
+        "community": 0
+      }
+    },
+    {
+      "data": {
+        "id": "MDM2",
+        "label": "MDM2",
+        "size": 32,
+        "community": 2
+      }
+    },
+    {
+      "data": {
+        "id": "TP53",
+        "label": "TP53",
+        "size": 36,
+        "community": 2,
+        "hub": true
+      }
+    },
+    {
+      "data": {
+        "id": "CDKN1A",
+        "label": "CDKN1A",
+        "size": 24,
+        "community": 2
+      }
+    },
+    {
+      "data": {
+        "id": "CCNE1",
+        "label": "CCNE1",
+        "size": 20,
+        "community": 2
+      }
+    },
+    {
+      "data": {
+        "id": "BRCA1",
+        "label": "BRCA1",
+        "size": 36,
+        "community": 1,
+        "hub": true
+      }
+    },
+    {
+      "data": {
+        "id": "BRCA2",
+        "label": "BRCA2",
+        "size": 28,
+        "community": 1
+      }
+    },
+    {
+      "data": {
+        "id": "CHEK2",
+        "label": "CHEK2",
+        "size": 32,
+        "community": 1
+      }
+    },
+    {
+      "data": {
+        "id": "RAD51",
+        "label": "RAD51",
+        "size": 28,
+        "community": 1
+      }
+    },
+    {
+      "data": {
+        "id": "ATM",
+        "label": "ATM",
+        "size": 20,
+        "community": 1
+      }
+    },
+    {
+      "data": {
+        "id": "CDK2",
+        "label": "CDK2",
+        "size": 20,
+        "community": 0
+      }
+    },
+    {
+      "data": {
+        "id": "e1",
+        "source": "EGFR",
+        "target": "MET",
+        "w": 0.56
+      }
+    },
+    {
+      "data": {
+        "id": "e2",
+        "source": "EGFR",
+        "target": "MTOR",
+        "w": 0.83
+      }
+    },
+    {
+      "data": {
+        "id": "e3",
+        "source": "EGFR",
+        "target": "AKT1",
+        "w": 0.52
+      }
+    },
+    {
+      "data": {
+        "id": "e4",
+        "source": "EGFR",
+        "target": "TP53",
+        "w": 0.37
+      }
+    },
+    {
+      "data": {
+        "id": "e5",
+        "source": "MET",
+        "target": "MAPK1",
+        "w": 0.88
+      }
+    },
+    {
+      "data": {
+        "id": "e6",
+        "source": "MTOR",
+        "target": "ERBB2",
+        "w": 0.65
+      }
+    },
+    {
+      "data": {
+        "id": "e7",
+        "source": "MTOR",
+        "target": "AKT1",
+        "w": 0.75
+      }
+    },
+    {
+      "data": {
+        "id": "e8",
+        "source": "MTOR",
+        "target": "MDM2",
+        "w": 0.45
+      }
+    },
+    {
+      "data": {
+        "id": "e9",
+        "source": "ERBB2",
+        "target": "MAPK1",
+        "w": 0.53
+      }
+    },
+    {
+      "data": {
+        "id": "e10",
+        "source": "MAPK1",
+        "target": "CDK2",
+        "w": 0.7
+      }
+    },
+    {
+      "data": {
+        "id": "e11",
+        "source": "MDM2",
+        "target": "TP53",
+        "w": 0.49
+      }
+    },
+    {
+      "data": {
+        "id": "e12",
+        "source": "MDM2",
+        "target": "CDKN1A",
+        "w": 0.9
+      }
+    },
+    {
+      "data": {
+        "id": "e13",
+        "source": "MDM2",
+        "target": "CHEK2",
+        "w": 0.52
+      }
+    },
+    {
+      "data": {
+        "id": "e14",
+        "source": "TP53",
+        "target": "CDKN1A",
+        "w": 0.45
+      }
+    },
+    {
+      "data": {
+        "id": "e15",
+        "source": "TP53",
+        "target": "CCNE1",
+        "w": 0.73
+      }
+    },
+    {
+      "data": {
+        "id": "e16",
+        "source": "TP53",
+        "target": "BRCA1",
+        "w": 0.56
+      }
+    },
+    {
+      "data": {
+        "id": "e17",
+        "source": "BRCA1",
+        "target": "BRCA2",
+        "w": 0.53
+      }
+    },
+    {
+      "data": {
+        "id": "e18",
+        "source": "BRCA1",
+        "target": "CHEK2",
+        "w": 0.45
+      }
+    },
+    {
+      "data": {
+        "id": "e19",
+        "source": "BRCA1",
+        "target": "RAD51",
+        "w": 0.46
+      }
+    },
+    {
+      "data": {
+        "id": "e20",
+        "source": "BRCA1",
+        "target": "ATM",
+        "w": 0.56
+      }
+    },
+    {
+      "data": {
+        "id": "e21",
+        "source": "BRCA2",
+        "target": "CHEK2",
+        "w": 0.78
+      }
+    },
+    {
+      "data": {
+        "id": "e22",
+        "source": "BRCA2",
+        "target": "RAD51",
+        "w": 0.62
+      }
+    },
+    {
+      "data": {
+        "id": "e23",
+        "source": "CHEK2",
+        "target": "RAD51",
+        "w": 0.83
+      }
+    }
+  ],
+  "style": [
+    {
+      "selector": "node",
+      "style": {
+        "width": "data(size)",
+        "height": "data(size)",
+        "content": "",
+        "background-color": "#4A78A8"
+      }
+    },
+    {
+      "selector": "node[hub]",
+      "style": {
+        "content": "data(label)",
+        "font-size": 11,
+        "text-valign": "center",
+        "color": "#ffffff",
+        "text-outline-width": 2,
+        "text-outline-color": "#333333"
+      }
+    },
+    {
+      "selector": "edge",
+      "style": {
+        "width": "data(w)",
+        "line-color": "#BBBBBB",
+        "curve-style": "bezier",
+        "opacity": 0.7
+      }
+    },
+    {
+      "selector": "node[community = 0]",
+      "style": {
+        "background-color": "#0072B2"
+      }
+    },
+    {
+      "selector": "node[community = 1]",
+      "style": {
+        "background-color": "#D55E00"
+      }
+    },
+    {
+      "selector": "node[community = 2]",
+      "style": {
+        "background-color": "#009E73"
+      }
+    }
+  ],
+  "layout": {
+    "name": "cose",
+    "animate": false
+  }
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Network graph';
+cytoscape({
+  container: document.getElementById('cy'),
+  elements: SPEC.elements,
+  style: SPEC.style,
+  layout: SPEC.layout || { name: 'cose', animate: false }
+});
+</script>
+</body>
+</html>

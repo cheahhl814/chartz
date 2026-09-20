@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Plotly.js 4.1.1</title>
+<script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · Plotly.js 4.1.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "data": [
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "Studies",
+      "x": [
+        0.305,
+        0.24,
+        0.279,
+        0.271,
+        0.32,
+        0.139,
+        0.323,
+        0.067,
+        -0.074,
+        0.178,
+        0.124,
+        0.399,
+        0.381,
+        -0.009,
+        0.449,
+        0.011,
+        0.233,
+        0.178,
+        0.286,
+        0.482,
+        0.44,
+        0.364,
+        0.459,
+        0.418
+      ],
+      "y": [
+        0.052,
+        0.057,
+        0.058,
+        0.059,
+        0.075,
+        0.095,
+        0.108,
+        0.113,
+        0.114,
+        0.115,
+        0.13,
+        0.149,
+        0.172,
+        0.197,
+        0.208,
+        0.221,
+        0.235,
+        0.238,
+        0.246,
+        0.252,
+        0.264,
+        0.284,
+        0.285,
+        0.309
+      ],
+      "marker": {
+        "color": "#0072B2",
+        "size": 7
+      }
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Contour-enhanced funnel (Peters 2008), k=24: white region = non-significant"
+    },
+    "xaxis": {
+      "title": {
+        "text": "log(OR)"
+      },
+      "range": [
+        -0.697,
+        1.2069999999999999
+      ]
+    },
+    "yaxis": {
+      "title": {
+        "text": "SE (inverted)"
+      },
+      "autorange": "reversed",
+      "range": [
+        0.34,
+        0
+      ]
+    },
+    "shapes": [
+      {
+        "type": "path",
+        "path": "M 0.255 0 L -0.6208400000000001 0.34 L 1.13084 0.34 Z",
+        "fillcolor": "#EEEEEE",
+        "line": {
+          "width": 0
+        },
+        "layer": "below"
+      },
+      {
+        "type": "path",
+        "path": "M 0.255 0 L -0.4114 0.34 L 0.9214 0.34 Z",
+        "fillcolor": "#DCDCDC",
+        "line": {
+          "width": 0
+        },
+        "layer": "below"
+      },
+      {
+        "type": "path",
+        "path": "M 0.255 0 L -0.3043 0.34 L 0.8143 0.34 Z",
+        "fillcolor": "#CCCCCC",
+        "line": {
+          "width": 0
+        },
+        "layer": "below"
+      },
+      {
+        "type": "line",
+        "x0": 0.255,
+        "x1": 0.255,
+        "yref": "paper",
+        "y0": 0,
+        "y1": 1,
+        "line": {
+          "color": "#666",
+          "width": 1
+        }
+      }
+    ],
+    "showlegend": false,
+    "font": {
+      "size": 13
+    }
+  },
+  "config": {
+    "responsive": true,
+    "displaylogo": false
+  }
+};
+const cfg = SPEC.config || { responsive: true, displaylogo: false };
+cfg.responsive = true;
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
+</script>
+</body>
+</html>

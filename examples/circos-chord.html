@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Circos (template-native SVG)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1040px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #chart { width: 100%; display: flex; justify-content: center; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · Circos (engine 10) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = {"title": "4-sector chord demo (GRCh38; translocation links, chord-diagram emphasis)", "chromosomes": [{"name": "chr1", "size": 248956422}, {"name": "chr2", "size": 242193529}, {"name": "chr3", "size": 198295559}, {"name": "chr4", "size": 190214555}], "tracks": [{"type": "scatter", "label": "Breakpoint density", "radius": [0.72, 0.88], "color": "#009E73", "max": 10, "items": [["chr1", 167035831, 5.34], ["chr1", 243451863, 3.94], ["chr1", 151502819, 6.63], ["chr1", 22534474, 6.43], ["chr1", 36426552, 8.67], ["chr1", 48782514, 0.5], ["chr1", 101764919, 3.27], ["chr1", 122057421, 3.27], ["chr1", 204341043, 8.8], ["chr1", 74693941, 7.52], ["chr1", 223317975, 4.22], ["chr1", 224119693, 0.82], ["chr2", 5203160, 7.49], ["chr2", 13981622, 10.0], ["chr2", 93941764, 2.24], ["chr2", 18419603, 7.81], ["chr2", 174954058, 0.4], ["chr2", 8329551, 9.5], ["chr2", 53515475, 8.39], ["chr2", 166788520, 1.52], ["chr2", 33882185, 4.74], ["chr2", 30706183, 5.64], ["chr2", 58509411, 4.65], ["chr2", 68784893, 7.67], ["chr3", 45040555, 6.06], ["chr3", 192832551, 1.15], ["chr3", 43960548, 9.65], ["chr3", 29017537, 5.79], ["chr3", 83740385, 5.76], ["chr3", 100745694, 3.97], ["chr3", 191935298, 1.98], ["chr3", 158940059, 6.91], ["chr3", 168374098, 2.43], ["chr3", 187151321, 7.72], ["chr3", 183679387, 6.0], ["chr3", 32495470, 7.96], ["chr4", 151916362, 7.83], ["chr4", 93201800, 5.33], ["chr4", 177575782, 3.71], ["chr4", 135817815, 6.48], ["chr4", 3396284, 8.5], ["chr4", 131587518, 1.06], ["chr4", 97224110, 6.36], ["chr4", 123410341, 7.07], ["chr4", 116900190, 1.76], ["chr4", 140055325, 9.65], ["chr4", 72499690, 6.16], ["chr4", 144464689, 7.75]]}], "links": [{"from": ["chr1", 124788603, 124793603], "to": ["chr2", 116923636, 116928636], "color": "#CC79A7", "width": 1.2}, {"from": ["chr1", 221656443, 221661443], "to": ["chr3", 196233354, 196238354], "color": "#CC79A7", "width": 1.2}, {"from": ["chr1", 159041194, 159046194], "to": ["chr4", 72046879, 72051879], "color": "#CC79A7", "width": 1.2}, {"from": ["chr2", 86517976, 86522976], "to": ["chr3", 65899606, 65904606], "color": "#CC79A7", "width": 1.2}, {"from": ["chr2", 222997658, 223002658], "to": ["chr4", 23263394, 23268394], "color": "#CC79A7", "width": 1.2}, {"from": ["chr3", 74874230, 74879230], "to": ["chr4", 121011240, 121016240], "color": "#CC79A7", "width": 1.2}, {"from": ["chr1", 65461592, 65466592], "to": ["chr2", 201454443, 201459443], "color": "#CC79A7", "width": 1.2}, {"from": ["chr2", 124744229, 124749229], "to": ["chr4", 152967849, 152972849], "color": "#CC79A7", "width": 1.2}, {"from": ["chr1", 163834669, 163839669], "to": ["chr3", 179365476, 179370476], "color": "#CC79A7", "width": 1.2}, {"from": ["chr3", 101734166, 101739166], "to": ["chr4", 90300781, 90305781], "color": "#CC79A7", "width": 1.2}], "start_degree": 90, "gap_degree": 4};
+document.getElementById('chart-title').textContent = SPEC.title || 'Circos';
+
+/* Circos renderer — template-native SVG, no external library.
+   Spec: { title, chromosomes: [{name, size}],
+           tracks: [ {type: "histogram"|"heatmap"|"scatter", label, radius: [r0, r1],
+                      color?, max?, items: [[chrom, pos, value], ...]} ],
+           links?: [ {from: [chrom, s, e], to: [chrom, s, e], color?, width?} ],
+           start_degree?: 90, gap_degree?: 3 }
+   Circular layout follows circlize convention: ideogram arcs with per-chromosome
+   gaps plus a bigger gap before the first chromosome; concentric tracks map polar
+   inside the ideogram ring; links are cubic bezier arcs through the center. */
+(function render() {
+  const NS = "http://www.w3.org/2000/svg";
+  const SIZE = 760, CX = SIZE / 2, CY = SIZE / 2;
+  const R_IDEOGRAM_OUT = 340, R_IDEOGRAM_IN = 322;
+  const startDeg = SPEC.start_degree != null ? SPEC.start_degree : 90;
+  const gapDeg = SPEC.gap_degree != null ? SPEC.gap_degree : 3;
+  const BIG_GAP = gapDeg * 3; // circlize convention: bigger visual break before chr1
+
+  const chroms = SPEC.chromosomes;
+  const totalSize = chroms.reduce((a, c) => a + c.size, 0);
+  const totalGap = gapDeg * (chroms.length - 1) + BIG_GAP;
+  const degPerBase = (360 - totalGap) / totalSize;
+
+  // precompute each chromosome's [deg0, deg1) going clockwise from startDeg
+  let cursor = startDeg + BIG_GAP;
+  const spans = chroms.map((c, i) => {
+    const d0 = cursor;
+    const d1 = d0 + c.size * degPerBase;
+    cursor = d1 + gapDeg;
+    return { name: c.name, size: c.size, d0, d1 };
+  });
+  const spanByChrom = Object.fromEntries(spans.map(s => [s.name, s]));
+
+  const toRad = d => (d * Math.PI) / 180;
+  // clockwise from 12 o'clock convention: angle measured clockwise from top
+  const polar = (deg, r) => {
+    const rad = toRad(deg - 90);
+    return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)];
+  };
+  const degForPos = (chrom, pos) => {
+    const s = spanByChrom[chrom];
+    const frac = Math.max(0, Math.min(1, pos / s.size));
+    return s.d0 + frac * (s.d1 - s.d0);
+  };
+
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${SIZE} ${SIZE + 40}`);
+  svg.setAttribute("style", "font-family: system-ui, sans-serif;");
+  const el = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    svg.appendChild(n);
+    return n;
+  };
+  const arcPath = (d0, d1, r) => {
+    const [x0, y0] = polar(d0, r), [x1, y1] = polar(d1, r);
+    const large = (d1 - d0) > 180 ? 1 : 0;
+    return `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1}`;
+  };
+  const sectorPath = (d0, d1, r0, r1) => {
+    const [ox0, oy0] = polar(d0, r1), [ox1, oy1] = polar(d1, r1);
+    const [ix1, iy1] = polar(d1, r0), [ix0, iy0] = polar(d0, r0);
+    const large = (d1 - d0) > 180 ? 1 : 0;
+    return `M ${ox0} ${oy0} A ${r1} ${r1} 0 ${large} 1 ${ox1} ${oy1} ` +
+           `L ${ix1} ${iy1} A ${r0} ${r0} 0 ${large} 0 ${ix0} ${iy0} Z`;
+  };
+  const PALETTE = ["#0072B2", "#D55E00", "#009E73", "#CC79A7", "#E69F00", "#56B4E9", "#F0E442", "#999999"];
+
+  // 1. ideogram arcs + labels
+  spans.forEach((s, i) => {
+    el("path", { d: sectorPath(s.d0, s.d1, R_IDEOGRAM_IN, R_IDEOGRAM_OUT),
+                 fill: PALETTE[i % PALETTE.length], stroke: "#fff", "stroke-width": 1 });
+    const mid = (s.d0 + s.d1) / 2;
+    const [lx, ly] = polar(mid, R_IDEOGRAM_OUT + 14);
+    el("text", { x: lx, y: ly, "text-anchor": "middle", "dominant-baseline": "middle",
+                 "font-size": 11, "font-weight": 600, fill: "#222" }, s.name);
+  });
+
+  // 2. concentric tracks, mapped inside the ideogram ring
+  (SPEC.tracks || []).forEach((tr, ti) => {
+    const r0 = tr.radius[0] * R_IDEOGRAM_IN;
+    const r1 = tr.radius[1] * R_IDEOGRAM_IN;
+    const color = tr.color || PALETTE[ti % PALETTE.length];
+    const vals = tr.items.map(it => it[2]);
+    const max = tr.max != null ? tr.max : Math.max(...vals, 1);
+    if (tr.type === "histogram") {
+      for (const [chrom, pos, val] of tr.items) {
+        const s = spanByChrom[chrom];
+        if (!s) continue;
+        const d = degForPos(chrom, pos);
+        const h = Math.max(0, Math.min(1, val / max)) * (r1 - r0);
+        el("line", { x1: polar(d, r0)[0], y1: polar(d, r0)[1],
+                     x2: polar(d, r0 + h)[0], y2: polar(d, r0 + h)[1],
+                     stroke: color, "stroke-width": 1.4, opacity: 0.85 });
+      }
+    } else if (tr.type === "heatmap") {
+      const binDeg = 0.6;
+      for (const [chrom, pos, val] of tr.items) {
+        const s = spanByChrom[chrom];
+        if (!s) continue;
+        const d = degForPos(chrom, pos);
+        const t = Math.max(0, Math.min(1, val / max));
+        el("path", { d: sectorPath(d, d + binDeg, r0, r1),
+                     fill: color, opacity: 0.25 + 0.75 * t, stroke: "none" });
+      }
+    } else if (tr.type === "scatter") {
+      for (const [chrom, pos, val] of tr.items) {
+        const s = spanByChrom[chrom];
+        if (!s) continue;
+        const d = degForPos(chrom, pos);
+        const t = Math.max(0, Math.min(1, val / max));
+        const [x, y] = polar(d, r0 + t * (r1 - r0));
+        el("circle", { cx: x, cy: y, r: 1.6, fill: color, opacity: 0.8 });
+      }
+    }
+    // track label at right side
+    el("text", { x: CX + R_IDEOGRAM_OUT + 34, y: 24 + ti * 16, "font-size": 10, fill: "#444" }, `— ${tr.label}`);
+    el("rect", { x: CX + R_IDEOGRAM_OUT + 20, y: 17 + ti * 16, width: 10, height: 10, fill: color, opacity: 0.85 });
+  });
+
+  // 3. inter-chromosomal links, cubic bezier through the center
+  for (const link of (SPEC.links || [])) {
+    const [fc, fs, fe] = link.from, [tc, ts, te] = link.to;
+    const fMid = (fs + fe) / 2, tMid = (ts + te) / 2;
+    const fs_ = spanByChrom[fc], ts_ = spanByChrom[tc];
+    if (!fs_ || !ts_) continue;
+    const d1 = degForPos(fc, fMid), d2 = degForPos(tc, tMid);
+    const R_LINK = R_IDEOGRAM_IN - ((SPEC.tracks && SPEC.tracks.length) ? R_IDEOGRAM_IN * 0.32 : 0);
+    const [x0, y0] = polar(d1, R_LINK), [x1, y1] = polar(d2, R_LINK);
+    el("path", { d: `M ${x0} ${y0} Q ${CX} ${CY} ${x1} ${y1}`,
+                 fill: "none", stroke: link.color || "#888888", "stroke-width": link.width || 0.8,
+                 opacity: 0.35 });
+  }
+
+  document.getElementById("chart").appendChild(svg);
+})();
+</script>
+</body>
+</html>

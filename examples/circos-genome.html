@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Circos (template-native SVG)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1040px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #chart { width: 100%; display: flex; justify-content: center; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · Circos (engine 10) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = {"title": "8-chromosome demo genome (GRCh38 coordinates; gene density + CNV log2 ratio, RPKM-normalized; 15 inter-chromosomal SV links)", "chromosomes": [{"name": "chr1", "size": 248956422}, {"name": "chr2", "size": 242193529}, {"name": "chr3", "size": 198295559}, {"name": "chr4", "size": 190214555}, {"name": "chr5", "size": 181538259}, {"name": "chr6", "size": 170805979}, {"name": "chr7", "size": 159345973}, {"name": "chr8", "size": 145138636}], "tracks": [{"type": "histogram", "label": "Gene density", "radius": [0.7, 0.86], "color": "#0072B2", "max": 40, "items": [["chr1", 171644825, 6.0], ["chr1", 65737657, 10.0], ["chr1", 181650134, 28.7], ["chr1", 158509126, 17.2], ["chr1", 58690184, 10.4], ["chr1", 150658074, 9.2], ["chr1", 146281615, 17.1], ["chr1", 74676249, 31.1], ["chr1", 216310459, 7.7], ["chr1", 74590520, 7.6], ["chr1", 90353911, 5.7], ["chr1", 96362792, 32.5], ["chr1", 216661847, 3.6], ["chr1", 33507767, 37.0], ["chr1", 148187279, 12.6], ["chr1", 237686642, 33.0], ["chr1", 189132063, 4.5], ["chr1", 207518952, 12.4], ["chr1", 62489327, 33.2], ["chr1", 121711401, 24.9], ["chr2", 99369696, 14.8], ["chr2", 188393455, 35.7], ["chr2", 163512359, 24.9], ["chr2", 65715932, 7.9], ["chr2", 171798626, 26.8], ["chr2", 87048983, 32.3], ["chr2", 61484623, 31.6], ["chr2", 107686853, 11.6], ["chr2", 152251235, 33.5], ["chr2", 175942977, 20.0], ["chr2", 172564235, 18.5], ["chr2", 66203567, 28.8], ["chr2", 200524992, 23.0], ["chr2", 107213257, 15.0], ["chr2", 37133144, 20.3], ["chr2", 12647705, 33.0], ["chr2", 42944840, 30.5], ["chr2", 17053089, 15.9], ["chr2", 125641184, 21.0], ["chr2", 231063790, 35.9], ["chr3", 30749748, 26.5], ["chr3", 71625340, 29.7], ["chr3", 78785840, 17.7], ["chr3", 193835111, 33.5], ["chr3", 134375061, 29.4], ["chr3", 28564437, 33.3], ["chr3", 171516698, 20.3], ["chr3", 100371734, 29.5], ["chr3", 142365729, 35.1], ["chr3", 131159096, 2.7], ["chr3", 82547695, 10.6], ["chr3", 152298718, 36.1], ["chr3", 130457070, 31.4], ["chr3", 142997222, 29.6], ["chr3", 127582641, 36.1], ["chr3", 141646352, 33.4], ["chr3", 56854146, 35.4], ["chr3", 185184933, 9.2], ["chr3", 180304595, 25.4], ["chr3", 138935707, 18.3], ["chr4", 17186821, 14.2], ["chr4", 61770953, 23.2], ["chr4", 190009606, 24.7], ["chr4", 8432351, 32.9], ["chr4", 63888882, 12.0], ["chr4", 144749507, 6.8], ["chr4", 153288213, 22.7], ["chr4", 126962706, 31.1], ["chr4", 26019666, 25.7], ["chr4", 110354427, 18.8], ["chr4", 180754918, 25.5], ["chr4", 16270590, 16.5], ["chr4", 29331682, 11.0], ["chr4", 120423783, 7.0], ["chr4", 124185777, 11.0], ["chr4", 118952003, 31.1], ["chr4", 26282174, 3.8], ["chr4", 3961530, 36.9], ["chr4", 63452636, 8.0], ["chr4", 57377352, 33.1], ["chr5", 44194440, 15.6], ["chr5", 71189903, 35.4], ["chr5", 76571007, 17.2], ["chr5", 149187923, 25.8], ["chr5", 50975320, 12.7], ["chr5", 155472524, 28.5], ["chr5", 84182651, 4.1], ["chr5", 134982870, 35.1], ["chr5", 15268494, 36.6], ["chr5", 49882009, 4.5], ["chr5", 63137065, 16.5], ["chr5", 152921079, 10.9], ["chr5", 166263958, 5.0], ["chr5", 151726947, 20.8], ["chr5", 54830411, 26.1], ["chr5", 71300353, 16.2], ["chr5", 80529852, 18.5], ["chr5", 19473144, 2.3], ["chr5", 151127454, 37.9], ["chr5", 57218174, 20.2], ["chr6", 93686345, 33.7], ["chr6", 99194173, 12.3], ["chr6", 145818960, 27.3], ["chr6", 141986436, 2.3], ["chr6", 80363870, 35.5], ["chr6", 36048496, 11.5], ["chr6", 148504841, 7.6], ["chr6", 56540466, 27.8], ["chr6", 170251954, 32.7], ["chr6", 67409847, 34.6], ["chr6", 24776180, 24.8], ["chr6", 11834450, 2.1], ["chr6", 70318081, 7.8], ["chr6", 114806332, 22.2], ["chr6", 40011455, 21.6], ["chr6", 156366221, 21.9], ["chr6", 11228349, 13.1], ["chr6", 10709198, 34.4], ["chr6", 66982628, 26.0], ["chr6", 150292587, 33.8], ["chr7", 41487595, 35.3], ["chr7", 43621235, 37.1], ["chr7", 110674438, 2.9], ["chr7", 89170356, 30.2], ["chr7", 66616886, 11.6], ["chr7", 29016698, 15.8], ["chr7", 126349890, 10.0], ["chr7", 123561709, 14.6], ["chr7", 61094699, 10.0], ["chr7", 106962397, 13.8], ["chr7", 74927045, 14.6], ["chr7", 143939314, 13.9], ["chr7", 70119420, 8.4], ["chr7", 71260584, 3.4], ["chr7", 92794676, 28.2], ["chr7", 137284082, 6.2], ["chr7", 51023882, 11.2], ["chr7", 453998, 20.7], ["chr7", 52891215, 15.1], ["chr7", 88637396, 24.4], ["chr8", 33453853, 27.9], ["chr8", 83022969, 26.0], ["chr8", 79364338, 22.0], ["chr8", 101776035, 26.4], ["chr8", 80785617, 16.6], ["chr8", 81570811, 12.3], ["chr8", 86503119, 18.7], ["chr8", 57365033, 20.4], ["chr8", 45551186, 25.7], ["chr8", 89976413, 5.4], ["chr8", 63047058, 26.2], ["chr8", 53453534, 7.3], ["chr8", 127543440, 24.0], ["chr8", 122249846, 16.9], ["chr8", 52193310, 27.9], ["chr8", 107280998, 10.8], ["chr8", 1488424, 34.1], ["chr8", 28611809, 30.0], ["chr8", 139038225, 18.7], ["chr8", 32576951, 18.4]]}, {"type": "heatmap", "label": "CNV log2 ratio", "radius": [0.5, 0.66], "color": "#D55E00", "max": 2, "items": [["chr1", 171644825, 0.97], ["chr1", 65737657, 0.95], ["chr1", 181650134, 0.18], ["chr1", 158509126, -1.88], ["chr1", 58690184, 0.41], ["chr1", 150658074, 0.6], ["chr1", 146281615, -0.2], ["chr1", 74676249, -1.97], ["chr1", 216310459, -0.31], ["chr1", 74590520, 1.83], ["chr1", 90353911, -0.48], ["chr1", 96362792, 0.41], ["chr1", 216661847, -0.16], ["chr1", 33507767, -0.49], ["chr1", 148187279, 0.51], ["chr1", 237686642, 0.31], ["chr1", 189132063, 0.65], ["chr1", 207518952, -1.68], ["chr1", 62489327, -0.48], ["chr1", 121711401, -0.54], ["chr2", 99369696, 0.68], ["chr2", 188393455, 0.59], ["chr2", 163512359, 0.14], ["chr2", 65715932, -0.48], ["chr2", 171798626, -1.12], ["chr2", 87048983, 1.1], ["chr2", 61484623, 1.22], ["chr2", 107686853, -1.16], ["chr2", 152251235, -0.74], ["chr2", 175942977, 1.54], ["chr2", 172564235, -0.94], ["chr2", 66203567, 0.16], ["chr2", 200524992, 1.59], ["chr2", 107213257, 1.99], ["chr2", 37133144, -1.64], ["chr2", 12647705, -1.39], ["chr2", 42944840, -0.31], ["chr2", 17053089, 0.38], ["chr2", 125641184, 1.88], ["chr2", 231063790, 0.72], ["chr3", 30749748, 0.15], ["chr3", 71625340, -0.64], ["chr3", 78785840, -0.19], ["chr3", 193835111, -0.95], ["chr3", 134375061, 0.03], ["chr3", 28564437, -0.81], ["chr3", 171516698, -1.2], ["chr3", 100371734, 0.16], ["chr3", 142365729, 0.4], ["chr3", 131159096, 1.72], ["chr3", 82547695, -1.04], ["chr3", 152298718, -1.66], ["chr3", 130457070, 1.91], ["chr3", 142997222, -1.49], ["chr3", 127582641, -1.34], ["chr3", 141646352, -0.31], ["chr3", 56854146, 1.02], ["chr3", 185184933, -0.75], ["chr3", 180304595, -0.25], ["chr3", 138935707, -1.01], ["chr4", 17186821, 0.35], ["chr4", 61770953, -1.97], ["chr4", 190009606, -1.08], ["chr4", 8432351, -1.72], ["chr4", 63888882, -0.06], ["chr4", 144749507, 1.74], ["chr4", 153288213, -1.03], ["chr4", 126962706, -1.24], ["chr4", 26019666, -0.58], ["chr4", 110354427, 0.92], ["chr4", 180754918, 0.58], ["chr4", 16270590, -0.64], ["chr4", 29331682, -1.24], ["chr4", 120423783, -1.27], ["chr4", 124185777, 1.69], ["chr4", 118952003, 1.42], ["chr4", 26282174, 2.0], ["chr4", 3961530, 1.71], ["chr4", 63452636, -0.06], ["chr4", 57377352, 1.61], ["chr5", 44194440, 1.94], ["chr5", 71189903, 1.14], ["chr5", 76571007, 1.83], ["chr5", 149187923, -0.05], ["chr5", 50975320, 1.87], ["chr5", 155472524, -1.76], ["chr5", 84182651, 0.34], ["chr5", 134982870, 0.12], ["chr5", 15268494, -1.68], ["chr5", 49882009, -1.73], ["chr5", 63137065, 1.77], ["chr5", 152921079, 0.38], ["chr5", 166263958, 0.63], ["chr5", 151726947, 1.74], ["chr5", 54830411, -0.74], ["chr5", 71300353, 0.69], ["chr5", 80529852, 1.72], ["chr5", 19473144, 0.48], ["chr5", 151127454, -1.71], ["chr5", 57218174, -1.47], ["chr6", 93686345, 1.52], ["chr6", 99194173, -0.25], ["chr6", 145818960, 0.45], ["chr6", 141986436, 1.27], ["chr6", 80363870, -1.59], ["chr6", 36048496, 1.56], ["chr6", 148504841, -0.87], ["chr6", 56540466, -1.19], ["chr6", 170251954, 0.02], ["chr6", 67409847, 1.38], ["chr6", 24776180, 1.32], ["chr6", 11834450, 1.08], ["chr6", 70318081, -0.23], ["chr6", 114806332, -1.55], ["chr6", 40011455, 1.34], ["chr6", 156366221, -0.28], ["chr6", 11228349, 1.6], ["chr6", 10709198, -1.16], ["chr6", 66982628, -0.59], ["chr6", 150292587, -0.37], ["chr7", 41487595, -1.05], ["chr7", 43621235, 1.24], ["chr7", 110674438, 0.95], ["chr7", 89170356, -0.35], ["chr7", 66616886, 1.15], ["chr7", 29016698, -1.85], ["chr7", 126349890, 1.27], ["chr7", 123561709, 1.28], ["chr7", 61094699, 0.64], ["chr7", 106962397, 1.46], ["chr7", 74927045, 0.04], ["chr7", 143939314, -1.89], ["chr7", 70119420, 1.85], ["chr7", 71260584, 0.39], ["chr7", 92794676, -0.75], ["chr7", 137284082, 1.6], ["chr7", 51023882, 0.84], ["chr7", 453998, 1.23], ["chr7", 52891215, -1.72], ["chr7", 88637396, 0.65], ["chr8", 33453853, -0.8], ["chr8", 83022969, -0.7], ["chr8", 79364338, -1.23], ["chr8", 101776035, 1.61], ["chr8", 80785617, 1.33], ["chr8", 81570811, -0.28], ["chr8", 86503119, -0.23], ["chr8", 57365033, 1.17], ["chr8", 45551186, -0.86], ["chr8", 89976413, 1.81], ["chr8", 63047058, -1.1], ["chr8", 53453534, -1.82], ["chr8", 127543440, 1.07], ["chr8", 122249846, 0.52], ["chr8", 52193310, -0.46], ["chr8", 107280998, 0.62], ["chr8", 1488424, 1.44], ["chr8", 28611809, -1.12], ["chr8", 139038225, 0.23], ["chr8", 32576951, 1.21]]}], "links": [{"from": ["chr6", 118802399, 118807399], "to": ["chr7", 135500356, 135505356], "color": "#0072B2", "width": 0.8}, {"from": ["chr8", 127419448, 127424448], "to": ["chr2", 120814681, 120819681], "color": "#0072B2", "width": 0.8}, {"from": ["chr4", 171170938, 171175938], "to": ["chr7", 74440198, 74445198], "color": "#009E73", "width": 0.8}, {"from": ["chr8", 64222073, 64227073], "to": ["chr6", 73711690, 73716690], "color": "#0072B2", "width": 0.8}, {"from": ["chr2", 76699567, 76704567], "to": ["chr6", 62946391, 62951391], "color": "#0072B2", "width": 0.8}, {"from": ["chr6", 144996008, 145001008], "to": ["chr3", 21629900, 21634900], "color": "#D55E00", "width": 0.8}, {"from": ["chr3", 102820253, 102825253], "to": ["chr2", 186280735, 186285735], "color": "#D55E00", "width": 0.8}, {"from": ["chr4", 111365253, 111370253], "to": ["chr1", 109414123, 109419123], "color": "#0072B2", "width": 0.8}, {"from": ["chr8", 16714325, 16719325], "to": ["chr4", 55521683, 55526683], "color": "#0072B2", "width": 0.8}, {"from": ["chr7", 156787623, 156792623], "to": ["chr8", 5243068, 5248068], "color": "#009E73", "width": 0.8}, {"from": ["chr7", 1582716, 1587716], "to": ["chr4", 94424535, 94429535], "color": "#0072B2", "width": 0.8}, {"from": ["chr7", 112480168, 112485168], "to": ["chr8", 144477482, 144482482], "color": "#009E73", "width": 0.8}, {"from": ["chr4", 58900547, 58905547], "to": ["chr8", 73265515, 73270515], "color": "#0072B2", "width": 0.8}, {"from": ["chr8", 104383060, 104388060], "to": ["chr1", 90229086, 90234086], "color": "#009E73", "width": 0.8}, {"from": ["chr7", 44303857, 44308857], "to": ["chr6", 125464087, 125469087], "color": "#D55E00", "width": 0.8}], "start_degree": 90, "gap_degree": 3};
+document.getElementById('chart-title').textContent = SPEC.title || 'Circos';
+
+/* Circos renderer — template-native SVG, no external library.
+   Spec: { title, chromosomes: [{name, size}],
+           tracks: [ {type: "histogram"|"heatmap"|"scatter", label, radius: [r0, r1],
+                      color?, max?, items: [[chrom, pos, value], ...]} ],
+           links?: [ {from: [chrom, s, e], to: [chrom, s, e], color?, width?} ],
+           start_degree?: 90, gap_degree?: 3 }
+   Circular layout follows circlize convention: ideogram arcs with per-chromosome
+   gaps plus a bigger gap before the first chromosome; concentric tracks map polar
+   inside the ideogram ring; links are cubic bezier arcs through the center. */
+(function render() {
+  const NS = "http://www.w3.org/2000/svg";
+  const SIZE = 760, CX = SIZE / 2, CY = SIZE / 2;
+  const R_IDEOGRAM_OUT = 340, R_IDEOGRAM_IN = 322;
+  const startDeg = SPEC.start_degree != null ? SPEC.start_degree : 90;
+  const gapDeg = SPEC.gap_degree != null ? SPEC.gap_degree : 3;
+  const BIG_GAP = gapDeg * 3; // circlize convention: bigger visual break before chr1
+
+  const chroms = SPEC.chromosomes;
+  const totalSize = chroms.reduce((a, c) => a + c.size, 0);
+  const totalGap = gapDeg * (chroms.length - 1) + BIG_GAP;
+  const degPerBase = (360 - totalGap) / totalSize;
+
+  // precompute each chromosome's [deg0, deg1) going clockwise from startDeg
+  let cursor = startDeg + BIG_GAP;
+  const spans = chroms.map((c, i) => {
+    const d0 = cursor;
+    const d1 = d0 + c.size * degPerBase;
+    cursor = d1 + gapDeg;
+    return { name: c.name, size: c.size, d0, d1 };
+  });
+  const spanByChrom = Object.fromEntries(spans.map(s => [s.name, s]));
+
+  const toRad = d => (d * Math.PI) / 180;
+  // clockwise from 12 o'clock convention: angle measured clockwise from top
+  const polar = (deg, r) => {
+    const rad = toRad(deg - 90);
+    return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)];
+  };
+  const degForPos = (chrom, pos) => {
+    const s = spanByChrom[chrom];
+    const frac = Math.max(0, Math.min(1, pos / s.size));
+    return s.d0 + frac * (s.d1 - s.d0);
+  };
+
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${SIZE} ${SIZE + 40}`);
+  svg.setAttribute("style", "font-family: system-ui, sans-serif;");
+  const el = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    svg.appendChild(n);
+    return n;
+  };
+  const arcPath = (d0, d1, r) => {
+    const [x0, y0] = polar(d0, r), [x1, y1] = polar(d1, r);
+    const large = (d1 - d0) > 180 ? 1 : 0;
+    return `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1}`;
+  };
+  const sectorPath = (d0, d1, r0, r1) => {
+    const [ox0, oy0] = polar(d0, r1), [ox1, oy1] = polar(d1, r1);
+    const [ix1, iy1] = polar(d1, r0), [ix0, iy0] = polar(d0, r0);
+    const large = (d1 - d0) > 180 ? 1 : 0;
+    return `M ${ox0} ${oy0} A ${r1} ${r1} 0 ${large} 1 ${ox1} ${oy1} ` +
+           `L ${ix1} ${iy1} A ${r0} ${r0} 0 ${large} 0 ${ix0} ${iy0} Z`;
+  };
+  const PALETTE = ["#0072B2", "#D55E00", "#009E73", "#CC79A7", "#E69F00", "#56B4E9", "#F0E442", "#999999"];
+
+  // 1. ideogram arcs + labels
+  spans.forEach((s, i) => {
+    el("path", { d: sectorPath(s.d0, s.d1, R_IDEOGRAM_IN, R_IDEOGRAM_OUT),
+                 fill: PALETTE[i % PALETTE.length], stroke: "#fff", "stroke-width": 1 });
+    const mid = (s.d0 + s.d1) / 2;
+    const [lx, ly] = polar(mid, R_IDEOGRAM_OUT + 14);
+    el("text", { x: lx, y: ly, "text-anchor": "middle", "dominant-baseline": "middle",
+                 "font-size": 11, "font-weight": 600, fill: "#222" }, s.name);
+  });
+
+  // 2. concentric tracks, mapped inside the ideogram ring
+  (SPEC.tracks || []).forEach((tr, ti) => {
+    const r0 = tr.radius[0] * R_IDEOGRAM_IN;
+    const r1 = tr.radius[1] * R_IDEOGRAM_IN;
+    const color = tr.color || PALETTE[ti % PALETTE.length];
+    const vals = tr.items.map(it => it[2]);
+    const max = tr.max != null ? tr.max : Math.max(...vals, 1);
+    if (tr.type === "histogram") {
+      for (const [chrom, pos, val] of tr.items) {
+        const s = spanByChrom[chrom];
+        if (!s) continue;
+        const d = degForPos(chrom, pos);
+        const h = Math.max(0, Math.min(1, val / max)) * (r1 - r0);
+        el("line", { x1: polar(d, r0)[0], y1: polar(d, r0)[1],
+                     x2: polar(d, r0 + h)[0], y2: polar(d, r0 + h)[1],
+                     stroke: color, "stroke-width": 1.4, opacity: 0.85 });
+      }
+    } else if (tr.type === "heatmap") {
+      const binDeg = 0.6;
+      for (const [chrom, pos, val] of tr.items) {
+        const s = spanByChrom[chrom];
+        if (!s) continue;
+        const d = degForPos(chrom, pos);
+        const t = Math.max(0, Math.min(1, val / max));
+        el("path", { d: sectorPath(d, d + binDeg, r0, r1),
+                     fill: color, opacity: 0.25 + 0.75 * t, stroke: "none" });
+      }
+    } else if (tr.type === "scatter") {
+      for (const [chrom, pos, val] of tr.items) {
+        const s = spanByChrom[chrom];
+        if (!s) continue;
+        const d = degForPos(chrom, pos);
+        const t = Math.max(0, Math.min(1, val / max));
+        const [x, y] = polar(d, r0 + t * (r1 - r0));
+        el("circle", { cx: x, cy: y, r: 1.6, fill: color, opacity: 0.8 });
+      }
+    }
+    // track label at right side
+    el("text", { x: CX + R_IDEOGRAM_OUT + 34, y: 24 + ti * 16, "font-size": 10, fill: "#444" }, `— ${tr.label}`);
+    el("rect", { x: CX + R_IDEOGRAM_OUT + 20, y: 17 + ti * 16, width: 10, height: 10, fill: color, opacity: 0.85 });
+  });
+
+  // 3. inter-chromosomal links, cubic bezier through the center
+  for (const link of (SPEC.links || [])) {
+    const [fc, fs, fe] = link.from, [tc, ts, te] = link.to;
+    const fMid = (fs + fe) / 2, tMid = (ts + te) / 2;
+    const fs_ = spanByChrom[fc], ts_ = spanByChrom[tc];
+    if (!fs_ || !ts_) continue;
+    const d1 = degForPos(fc, fMid), d2 = degForPos(tc, tMid);
+    const R_LINK = R_IDEOGRAM_IN - ((SPEC.tracks && SPEC.tracks.length) ? R_IDEOGRAM_IN * 0.32 : 0);
+    const [x0, y0] = polar(d1, R_LINK), [x1, y1] = polar(d2, R_LINK);
+    el("path", { d: `M ${x0} ${y0} Q ${CX} ${CY} ${x1} ${y1}`,
+                 fill: "none", stroke: link.color || "#888888", "stroke-width": link.width || 0.8,
+                 opacity: 0.35 });
+  }
+
+  document.getElementById("chart").appendChild(svg);
+})();
+</script>
+</body>
+</html>

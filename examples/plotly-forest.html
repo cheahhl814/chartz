@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Plotly.js 4.1.1</title>
+<script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · Plotly.js 4.1.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "data": [
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "Study OR (95% CI, size = weight)",
+      "x": [
+        1.419,
+        1.185,
+        1.632,
+        1.051
+      ],
+      "y": [
+        "SMITH-2019",
+        "JONES-2020",
+        "WANG-2021",
+        "GARCIA-2022"
+      ],
+      "marker": {
+        "color": "#0072B2",
+        "symbol": "square",
+        "size": [
+          9.5,
+          7.2,
+          14.0,
+          6.0
+        ]
+      },
+      "error_x": {
+        "type": "data",
+        "symmetric": false,
+        "array": [
+          0.681,
+          0.788,
+          0.558,
+          0.917
+        ],
+        "arrayminus": [
+          0.46,
+          0.473,
+          0.416,
+          0.49
+        ]
+      }
+    },
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "Pooled (REML random-effects)",
+      "x": [
+        1.29
+      ],
+      "y": [
+        "Pooled"
+      ],
+      "marker": {
+        "color": "#D55E00",
+        "size": 14,
+        "symbol": "diamond"
+      },
+      "error_x": {
+        "type": "data",
+        "symmetric": false,
+        "array": [
+          0.25
+        ],
+        "arrayminus": [
+          0.21
+        ]
+      }
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Forest plot - SNP x outcome (REML random-effects; OR 1.29 [1.08-1.54]; I2=42%, tau2=0.03, Q p=0.18)"
+    },
+    "xaxis": {
+      "title": {
+        "text": "Odds ratio (log scale)"
+      },
+      "type": "log",
+      "range": [
+        -0.3979400086720376,
+        0.47712125471966244
+      ],
+      "tickvals": [
+        0.25,
+        0.5,
+        1,
+        2,
+        4
+      ]
+    },
+    "yaxis": {
+      "autorange": "reversed"
+    },
+    "shapes": [
+      {
+        "type": "line",
+        "x0": 1,
+        "x1": 1,
+        "yref": "paper",
+        "y0": 0,
+        "y1": 1,
+        "line": {
+          "dash": "dash",
+          "color": "#666",
+          "width": 1
+        }
+      },
+      {
+        "type": "rect",
+        "xref": "x",
+        "yref": "y",
+        "x0": 1.02,
+        "x1": 1.632,
+        "y0": 3.55,
+        "y1": 4.45,
+        "fillcolor": "#DDDDDD",
+        "opacity": 0.45,
+        "line": {
+          "width": 0
+        }
+      }
+    ],
+    "annotations": [
+      {
+        "xref": "x",
+        "yref": "y",
+        "x": 0.52,
+        "y": 4.0,
+        "text": "95% prediction interval",
+        "xanchor": "left",
+        "showarrow": false,
+        "font": {
+          "size": 10,
+          "color": "#666"
+        }
+      }
+    ],
+    "showlegend": false,
+    "font": {
+      "size": 13
+    },
+    "margin": {
+      "l": 100
+    }
+  },
+  "config": {
+    "responsive": true,
+    "displaylogo": false
+  }
+};
+const cfg = SPEC.config || { responsive: true, displaylogo: false };
+cfg.responsive = true;
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
+</script>
+</body>
+</html>

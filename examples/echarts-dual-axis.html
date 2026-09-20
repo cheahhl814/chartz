@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · ECharts 6.1.0</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@6.1.0/dist/echarts.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · ECharts 6.1.0 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "title": {
+    "text": "Sequencing dashboard: volume vs quality",
+    "left": "center"
+  },
+  "tooltip": {
+    "trigger": "axis"
+  },
+  "legend": {
+    "data": [
+      "Samples processed",
+      "Mean Q30 (%)"
+    ],
+    "top": "8%"
+  },
+  "color": [
+    "#0072B2",
+    "#E69F00"
+  ],
+  "xAxis": [
+    {
+      "type": "category",
+      "data": [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun"
+      ]
+    }
+  ],
+  "yAxis": [
+    {
+      "type": "value",
+      "name": "Samples",
+      "position": "left"
+    },
+    {
+      "type": "value",
+      "name": "Q30 (%)",
+      "position": "right",
+      "min": 90,
+      "max": 100
+    }
+  ],
+  "grid": {
+    "top": "20%"
+  },
+  "series": [
+    {
+      "name": "Samples processed",
+      "type": "bar",
+      "data": [
+        182,
+        214,
+        198,
+        240,
+        265,
+        289
+      ]
+    },
+    {
+      "name": "Mean Q30 (%)",
+      "type": "line",
+      "yAxisIndex": 1,
+      "data": [
+        93.4,
+        94.1,
+        93.8,
+        94.6,
+        95.0,
+        95.3
+      ],
+      "smooth": true
+    }
+  ]
+};
+const chart = echarts.init(document.getElementById('chart'));
+chart.setOption(SPEC);
+window.addEventListener('resize', () => chart.resize());
+</script>
+</body>
+</html>

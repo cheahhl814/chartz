@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Plotly.js 4.1.1</title>
+<script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · Plotly.js 4.1.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "data": [
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "WT",
+      "x": [
+        -4.231,
+        -4.277,
+        -4.178,
+        -2.877,
+        -4.204,
+        -6.396,
+        -3.468,
+        -4.428,
+        -4.347,
+        -3.815,
+        -3.628,
+        -2.138,
+        -2.949,
+        -3.823,
+        -5.181,
+        -5.623,
+        -3.606,
+        -1.902,
+        -3.933,
+        -4.17,
+        -3.149,
+        -6.326,
+        -4.5,
+        -3.215,
+        -2.603,
+        -4.385,
+        -3.397,
+        -3.603,
+        -2.748,
+        -5.781
+      ],
+      "y": [
+        -1.591,
+        -4.923,
+        -6.692,
+        -3.471,
+        -3.965,
+        -1.098,
+        -1.437,
+        -4.451,
+        -1.144,
+        -4.104,
+        -2.638,
+        -2.97,
+        -2.317,
+        -1.19,
+        -1.479,
+        -1.94,
+        -1.46,
+        -1.734,
+        -3.503,
+        -3.648,
+        -3.252,
+        -1.701,
+        -2.9,
+        1.237,
+        -3.811,
+        -4.258,
+        -1.27,
+        -0.225,
+        -1.691,
+        -1.163
+      ],
+      "marker": {
+        "color": "#0072B2",
+        "size": 7,
+        "opacity": 0.75
+      }
+    },
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "KO",
+      "x": [
+        5.782,
+        3.35,
+        1.223,
+        2.649,
+        5.025,
+        1.19,
+        3.554,
+        3.905,
+        2.995,
+        4.658,
+        4.429,
+        7.214,
+        4.492,
+        2.525,
+        2.601,
+        2.169,
+        5.024,
+        2.593,
+        3.388,
+        4.699,
+        2.342,
+        3.03,
+        0.554,
+        1.768,
+        2.592,
+        4.165,
+        5.41,
+        3.47,
+        3.918,
+        3.769
+      ],
+      "y": [
+        4.736,
+        4.429,
+        3.438,
+        1.382,
+        4.445,
+        3.61,
+        4.963,
+        2.952,
+        6.125,
+        2.426,
+        5.549,
+        3.184,
+        2.174,
+        1.194,
+        2.758,
+        5.277,
+        4.306,
+        4.102,
+        -0.801,
+        4.138,
+        3.889,
+        2.12,
+        1.996,
+        2.996,
+        5.76,
+        1.312,
+        2.316,
+        5.179,
+        2.286,
+        2.417
+      ],
+      "marker": {
+        "color": "#D55E00",
+        "size": 7,
+        "opacity": 0.75
+      }
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "PCA biplot - PC1 vs PC2 with top-5 loadings (vst counts, scaled)"
+    },
+    "xaxis": {
+      "title": {
+        "text": "PC1 (41% variance)"
+      },
+      "range": [
+        -9,
+        9
+      ],
+      "zeroline": true,
+      "zerolinewidth": 1,
+      "zerolinecolor": "#CCCCCC"
+    },
+    "yaxis": {
+      "title": {
+        "text": "PC2 (23% variance)"
+      },
+      "range": [
+        -8,
+        8
+      ],
+      "zeroline": true,
+      "zerolinewidth": 1,
+      "zerolinecolor": "#CCCCCC",
+      "scaleanchor": "x"
+    },
+    "shapes": [
+      {
+        "type": "line",
+        "x0": 0,
+        "y0": 0,
+        "x1": -3.264,
+        "y1": -0.448,
+        "line": {
+          "color": "#009E73",
+          "width": 2
+        }
+      },
+      {
+        "type": "line",
+        "x0": 0,
+        "y0": 0,
+        "x1": 2.752,
+        "y1": 2.272,
+        "line": {
+          "color": "#009E73",
+          "width": 2
+        }
+      },
+      {
+        "type": "line",
+        "x0": 0,
+        "y0": 0,
+        "x1": -1.344,
+        "y1": -1.856,
+        "line": {
+          "color": "#009E73",
+          "width": 2
+        }
+      },
+      {
+        "type": "line",
+        "x0": 0,
+        "y0": 0,
+        "x1": -1.952,
+        "y1": 1.408,
+        "line": {
+          "color": "#009E73",
+          "width": 2
+        }
+      },
+      {
+        "type": "line",
+        "x0": 0,
+        "y0": 0,
+        "x1": 0.992,
+        "y1": -3.04,
+        "line": {
+          "color": "#009E73",
+          "width": 2
+        }
+      }
+    ],
+    "annotations": [
+      {
+        "xref": "x",
+        "yref": "y",
+        "x": -3.656,
+        "y": -0.502,
+        "text": "IMMUNE_RESPONSE",
+        "showarrow": false,
+        "font": {
+          "size": 10,
+          "color": "#009E73"
+        }
+      },
+      {
+        "xref": "x",
+        "yref": "y",
+        "x": 3.082,
+        "y": 2.545,
+        "text": "CELL_CYCLE",
+        "showarrow": false,
+        "font": {
+          "size": 10,
+          "color": "#009E73"
+        }
+      },
+      {
+        "xref": "x",
+        "yref": "y",
+        "x": -1.505,
+        "y": -2.079,
+        "text": "METABOLISM",
+        "showarrow": false,
+        "font": {
+          "size": 10,
+          "color": "#009E73"
+        }
+      },
+      {
+        "xref": "x",
+        "yref": "y",
+        "x": -2.186,
+        "y": 1.577,
+        "text": "RIBOSOME",
+        "showarrow": false,
+        "font": {
+          "size": 10,
+          "color": "#009E73"
+        }
+      },
+      {
+        "xref": "x",
+        "yref": "y",
+        "x": 1.111,
+        "y": -3.405,
+        "text": "ECM_REMODELING",
+        "showarrow": false,
+        "font": {
+          "size": 10,
+          "color": "#009E73"
+        }
+      }
+    ],
+    "font": {
+      "size": 13
+    }
+  },
+  "config": {
+    "responsive": true,
+    "displaylogo": false
+  }
+};
+const cfg = SPEC.config || { responsive: true, displaylogo: false };
+cfg.responsive = true;
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
+</script>
+</body>
+</html>

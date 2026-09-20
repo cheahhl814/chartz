@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Plotly.js 4.1.1</title>
+<script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · Plotly.js 4.1.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "data": [
+    {
+      "type": "violin",
+      "name": "WT",
+      "x": [
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT",
+        "WT"
+      ],
+      "y": [
+        5.135,
+        5.122,
+        5.15,
+        5.516,
+        5.143,
+        4.526,
+        5.35,
+        5.08,
+        5.102,
+        5.252,
+        5.305,
+        5.724,
+        5.495,
+        5.25,
+        4.868,
+        4.743,
+        5.311,
+        5.79,
+        5.219,
+        5.152,
+        5.439,
+        4.546,
+        5.059,
+        5.421,
+        5.593,
+        5.092,
+        5.369,
+        5.312,
+        5.552,
+        4.699,
+        5.456,
+        4.518,
+        4.021,
+        4.927,
+        4.788,
+        5.594,
+        5.499,
+        4.651,
+        5.581,
+        4.749
+      ],
+      "points": false,
+      "meanline": {
+        "visible": true
+      },
+      "line": {
+        "color": "#0072B2"
+      }
+    },
+    {
+      "type": "violin",
+      "name": "HET",
+      "x": [
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET",
+        "HET"
+      ],
+      "y": [
+        4.861,
+        4.768,
+        4.951,
+        5.268,
+        5.187,
+        5.057,
+        5.192,
+        5.115,
+        4.618,
+        4.577,
+        4.689,
+        5.125,
+        4.787,
+        5.951,
+        4.531,
+        4.406,
+        5.246,
+        5.54,
+        5.128,
+        5.276,
+        5.542,
+        4.858,
+        4.26,
+        4.661,
+        5.329,
+        4.25,
+        4.915,
+        5.014,
+        4.758,
+        5.226,
+        5.161,
+        5.945,
+        5.179,
+        4.626,
+        4.647,
+        4.526,
+        5.329,
+        4.645,
+        4.868,
+        5.237
+      ],
+      "points": false,
+      "meanline": {
+        "visible": true
+      },
+      "line": {
+        "color": "#D55E00"
+      }
+    },
+    {
+      "type": "violin",
+      "name": "KO-A",
+      "x": [
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A",
+        "KO-A"
+      ],
+      "y": [
+        3.274,
+        3.468,
+        2.771,
+        3.113,
+        3.345,
+        3.787,
+        4.137,
+        3.592,
+        3.718,
+        3.676,
+        4.088,
+        4.002,
+        3.723,
+        3.145,
+        4.007,
+        3.771,
+        4.152,
+        3.587,
+        4.479,
+        3.439,
+        4.317,
+        3.652,
+        3.368,
+        3.092,
+        3.532,
+        4.24,
+        3.967,
+        3.91,
+        2.531,
+        3.92,
+        3.85,
+        3.353,
+        3.318,
+        3.599,
+        4.376,
+        3.125,
+        3.407,
+        4.213,
+        3.399,
+        3.436
+      ],
+      "points": false,
+      "meanline": {
+        "visible": true
+      },
+      "line": {
+        "color": "#D55E00"
+      }
+    },
+    {
+      "type": "violin",
+      "name": "KO-B",
+      "x": [
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B",
+        "KO-B"
+      ],
+      "y": [
+        3.244,
+        2.641,
+        3.299,
+        2.656,
+        3.598,
+        3.201,
+        4.228,
+        3.326,
+        3.815,
+        2.614,
+        3.145,
+        3.345,
+        3.986,
+        2.444,
+        3.646,
+        3.466,
+        3.89,
+        3.521,
+        3.223,
+        2.965,
+        2.638,
+        3.288,
+        3.114,
+        4.109,
+        2.925,
+        3.344,
+        2.494,
+        3.022,
+        3.318,
+        3.571,
+        3.852,
+        3.18,
+        2.697,
+        3.406,
+        3.433,
+        3.421,
+        2.885,
+        3.71,
+        3.24,
+        3.515
+      ],
+      "points": false,
+      "meanline": {
+        "visible": true
+      },
+      "line": {
+        "color": "#D55E00"
+      }
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Expression by genotype - Wilcoxon rank-sum, Holm-adjusted; median difference WT vs KO-B = 1.98 log2 TPM"
+    },
+    "xaxis": {
+      "title": {
+        "text": "Genotype"
+      }
+    },
+    "yaxis": {
+      "title": {
+        "text": "log2 TPM"
+      },
+      "range": [
+        1.5,
+        8.4
+      ]
+    },
+    "violinmode": "group",
+    "font": {
+      "size": 13
+    },
+    "shapes": [
+      {
+        "type": "line",
+        "x0": "WT",
+        "x1": "WT",
+        "y0": 6.42,
+        "y1": 6.6,
+        "line": {
+          "color": "#333",
+          "width": 1.2
+        }
+      },
+      {
+        "type": "line",
+        "x0": "WT",
+        "x1": "KO-A",
+        "y0": 6.6,
+        "y1": 6.6,
+        "line": {
+          "color": "#333",
+          "width": 1.2
+        }
+      },
+      {
+        "type": "line",
+        "x0": "KO-A",
+        "x1": "KO-A",
+        "y0": 6.42,
+        "y1": 6.6,
+        "line": {
+          "color": "#333",
+          "width": 1.2
+        }
+      },
+      {
+        "type": "line",
+        "x0": "WT",
+        "x1": "WT",
+        "y0": 7.42,
+        "y1": 7.6,
+        "line": {
+          "color": "#333",
+          "width": 1.2
+        }
+      },
+      {
+        "type": "line",
+        "x0": "WT",
+        "x1": "KO-B",
+        "y0": 7.6,
+        "y1": 7.6,
+        "line": {
+          "color": "#333",
+          "width": 1.2
+        }
+      },
+      {
+        "type": "line",
+        "x0": "KO-B",
+        "x1": "KO-B",
+        "y0": 7.42,
+        "y1": 7.6,
+        "line": {
+          "color": "#333",
+          "width": 1.2
+        }
+      }
+    ],
+    "annotations": [
+      {
+        "xref": "x",
+        "x": 1.0,
+        "yref": "y",
+        "y": 6.75,
+        "text": "**",
+        "showarrow": false,
+        "font": {
+          "size": 13
+        }
+      },
+      {
+        "xref": "x",
+        "x": 1.5,
+        "yref": "y",
+        "y": 7.75,
+        "text": "***",
+        "showarrow": false,
+        "font": {
+          "size": 13
+        }
+      },
+      {
+        "xref": "paper",
+        "x": 0.01,
+        "yref": "paper",
+        "y": 1.03,
+        "text": "Kruskal-Wallis omnibus p = 3.1e-09",
+        "showarrow": false,
+        "xanchor": "left",
+        "font": {
+          "size": 10,
+          "color": "#666"
+        }
+      }
+    ]
+  },
+  "config": {
+    "responsive": true,
+    "displaylogo": false
+  }
+};
+const cfg = SPEC.config || { responsive: true, displaylogo: false };
+cfg.responsive = true;
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
+</script>
+</body>
+</html>

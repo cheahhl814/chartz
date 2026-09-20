@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Cytoscape.js 3.34.3</title>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.3/dist/cytoscape.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #cy { width: 100%; height: 70vh; border: 1px solid #eee; border-radius: 6px; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="cy"></div>
+  </div>
+  <footer>chartz · Cytoscape.js 3.34.3 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "Central carbon metabolism (central hubs in orange)",
+  "elements": [
+    {
+      "data": {
+        "id": "GLU",
+        "label": "GLU"
+      }
+    },
+    {
+      "data": {
+        "id": "G6P",
+        "label": "G6P"
+      }
+    },
+    {
+      "data": {
+        "id": "F6P",
+        "label": "F6P"
+      }
+    },
+    {
+      "data": {
+        "id": "F1,6BP",
+        "label": "F1,6BP"
+      }
+    },
+    {
+      "data": {
+        "id": "GAP",
+        "label": "GAP"
+      }
+    },
+    {
+      "data": {
+        "id": "PEP",
+        "label": "PEP"
+      }
+    },
+    {
+      "data": {
+        "id": "PYR",
+        "label": "PYR"
+      }
+    },
+    {
+      "data": {
+        "id": "ACA",
+        "label": "ACA"
+      }
+    },
+    {
+      "data": {
+        "id": "TCA1",
+        "label": "TCA1"
+      }
+    },
+    {
+      "data": {
+        "id": "TCA2",
+        "label": "TCA2"
+      }
+    },
+    {
+      "data": {
+        "id": "OXI",
+        "label": "OXI",
+        "hub": true
+      }
+    },
+    {
+      "data": {
+        "id": "ETF",
+        "label": "ETF"
+      }
+    },
+    {
+      "data": {
+        "id": "NADH",
+        "label": "NADH",
+        "hub": true
+      }
+    },
+    {
+      "data": {
+        "id": "ATP",
+        "label": "ATP",
+        "hub": true
+      }
+    },
+    {
+      "data": {
+        "id": "edge1",
+        "source": "GLU",
+        "target": "G6P"
+      }
+    },
+    {
+      "data": {
+        "id": "edge2",
+        "source": "G6P",
+        "target": "F6P"
+      }
+    },
+    {
+      "data": {
+        "id": "edge3",
+        "source": "F6P",
+        "target": "F1,6BP"
+      }
+    },
+    {
+      "data": {
+        "id": "edge4",
+        "source": "F1,6BP",
+        "target": "GAP"
+      }
+    },
+    {
+      "data": {
+        "id": "edge5",
+        "source": "GAP",
+        "target": "PEP"
+      }
+    },
+    {
+      "data": {
+        "id": "edge6",
+        "source": "PEP",
+        "target": "PYR"
+      }
+    },
+    {
+      "data": {
+        "id": "edge7",
+        "source": "PYR",
+        "target": "ACA"
+      }
+    },
+    {
+      "data": {
+        "id": "edge8",
+        "source": "ACA",
+        "target": "TCA1"
+      }
+    },
+    {
+      "data": {
+        "id": "edge9",
+        "source": "TCA1",
+        "target": "TCA2"
+      }
+    },
+    {
+      "data": {
+        "id": "edge10",
+        "source": "TCA2",
+        "target": "OXI"
+      }
+    },
+    {
+      "data": {
+        "id": "edge11",
+        "source": "ETF",
+        "target": "OXI"
+      }
+    },
+    {
+      "data": {
+        "id": "edge12",
+        "source": "PYR",
+        "target": "ETF"
+      }
+    },
+    {
+      "data": {
+        "id": "edge13",
+        "source": "OXI",
+        "target": "NADH"
+      }
+    },
+    {
+      "data": {
+        "id": "edge14",
+        "source": "NADH",
+        "target": "ATP"
+      }
+    },
+    {
+      "data": {
+        "id": "edge15",
+        "source": "GAP",
+        "target": "NADH"
+      }
+    }
+  ],
+  "style": [
+    {
+      "selector": "node",
+      "style": {
+        "content": "data(label)",
+        "font-size": 12,
+        "text-valign": "center",
+        "background-color": "#4A78A8",
+        "color": "#ffffff",
+        "text-outline-width": 2,
+        "text-outline-color": "#4A78A8"
+      }
+    },
+    {
+      "selector": "edge",
+      "style": {
+        "width": 2,
+        "line-color": "#BBBBBB",
+        "curve-style": "bezier",
+        "target-arrow-shape": "triangle",
+        "target-arrow-color": "#BBBBBB"
+      }
+    },
+    {
+      "selector": "node[?hub]",
+      "style": {
+        "background-color": "#D55E00",
+        "text-outline-color": "#D55E00"
+      }
+    }
+  ],
+  "layout": {
+    "name": "cose",
+    "animate": false
+  }
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Network graph';
+cytoscape({
+  container: document.getElementById('cy'),
+  elements: SPEC.elements,
+  style: SPEC.style,
+  layout: SPEC.layout || { name: 'cose', animate: false }
+});
+</script>
+</body>
+</html>

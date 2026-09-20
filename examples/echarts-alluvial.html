@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · ECharts 6.1.0</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@6.1.0/dist/echarts.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · ECharts 6.1.0 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "title": {
+    "text": "Cell-state transitions across 3 timepoints (alluvial-style; ribbon color = ORIGIN state)",
+    "left": "center",
+    "top": "3%"
+  },
+  "tooltip": {
+    "trigger": "item"
+  },
+  "series": [
+    {
+      "type": "sankey",
+      "emphasis": {
+        "focus": "adjacency"
+      },
+      "nodeGap": 14,
+      "nodeWidth": 14,
+      "data": [
+        {
+          "name": "t1\u00b7Pro",
+          "itemStyle": {
+            "color": "#D55E00"
+          }
+        },
+        {
+          "name": "t1\u00b7Neu",
+          "itemStyle": {
+            "color": "#0072B2"
+          }
+        },
+        {
+          "name": "t1\u00b7Gli",
+          "itemStyle": {
+            "color": "#009E73"
+          }
+        },
+        {
+          "name": "t2\u00b7Pro",
+          "itemStyle": {
+            "color": "#D55E00"
+          }
+        },
+        {
+          "name": "t2\u00b7Neu",
+          "itemStyle": {
+            "color": "#0072B2"
+          }
+        },
+        {
+          "name": "t2\u00b7Gli",
+          "itemStyle": {
+            "color": "#009E73"
+          }
+        },
+        {
+          "name": "t3\u00b7Pro",
+          "itemStyle": {
+            "color": "#D55E00"
+          }
+        },
+        {
+          "name": "t3\u00b7Neu",
+          "itemStyle": {
+            "color": "#0072B2"
+          }
+        },
+        {
+          "name": "t3\u00b7Gli",
+          "itemStyle": {
+            "color": "#009E73"
+          }
+        }
+      ],
+      "links": [
+        {
+          "source": "t1\u00b7Pro",
+          "target": "t2\u00b7Pro",
+          "value": 120
+        },
+        {
+          "source": "t1\u00b7Pro",
+          "target": "t2\u00b7Neu",
+          "value": 60
+        },
+        {
+          "source": "t1\u00b7Pro",
+          "target": "t2\u00b7Gli",
+          "value": 20
+        },
+        {
+          "source": "t1\u00b7Neu",
+          "target": "t2\u00b7Neu",
+          "value": 90
+        },
+        {
+          "source": "t1\u00b7Neu",
+          "target": "t2\u00b7Gli",
+          "value": 10
+        },
+        {
+          "source": "t1\u00b7Gli",
+          "target": "t2\u00b7Gli",
+          "value": 80
+        },
+        {
+          "source": "t1\u00b7Gli",
+          "target": "t2\u00b7Neu",
+          "value": 10
+        },
+        {
+          "source": "t2\u00b7Pro",
+          "target": "t3\u00b7Pro",
+          "value": 70
+        },
+        {
+          "source": "t2\u00b7Pro",
+          "target": "t3\u00b7Neu",
+          "value": 40
+        },
+        {
+          "source": "t2\u00b7Pro",
+          "target": "t3\u00b7Gli",
+          "value": 10
+        },
+        {
+          "source": "t2\u00b7Neu",
+          "target": "t3\u00b7Neu",
+          "value": 140
+        },
+        {
+          "source": "t2\u00b7Neu",
+          "target": "t3\u00b7Gli",
+          "value": 20
+        },
+        {
+          "source": "t2\u00b7Gli",
+          "target": "t3\u00b7Gli",
+          "value": 100
+        },
+        {
+          "source": "t2\u00b7Gli",
+          "target": "t3\u00b7Neu",
+          "value": 10
+        }
+      ],
+      "label": {
+        "fontSize": 11
+      },
+      "lineStyle": {
+        "color": "source",
+        "opacity": 0.35
+      }
+    }
+  ]
+};
+const chart = echarts.init(document.getElementById('chart'));
+chart.setOption(SPEC);
+window.addEventListener('resize', () => chart.resize());
+</script>
+</body>
+</html>

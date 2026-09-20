@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Plotly.js 4.1.1</title>
+<script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · Plotly.js 4.1.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "data": [
+    {
+      "type": "heatmap",
+      "z": [
+        [
+          3.2846168490713077,
+          4.0069569779731795,
+          4.89003136518563,
+          6.137688425822769
+        ],
+        [
+          4.08626723632071,
+          5.525003387524058,
+          4.805499354693187,
+          5.107331853700493
+        ],
+        [
+          4.011077989057549,
+          6.481345239219851,
+          5.300663153160712,
+          5.52858614274458
+        ],
+        [
+          4.543521539095207,
+          6.492816038736595,
+          3.924221162205756,
+          6.213732135748316
+        ],
+        [
+          4.466315277240704,
+          2.9170617238900016,
+          5.909296261129158,
+          8.823634586354217
+        ],
+        [
+          2.6657306908307628,
+          3.191502647259477,
+          6.498789694238846,
+          7.953433431900326
+        ],
+        [
+          2.3664394591648756,
+          4.186247339318868,
+          5.179323577432732,
+          5.526111166323888
+        ],
+        [
+          5.941150407904543,
+          4.679864556470109,
+          4.991098467501443,
+          6.756207730915998
+        ],
+        [
+          5.384509102985602,
+          4.949539053613389,
+          4.560967470812088,
+          6.7458981544836725
+        ],
+        [
+          3.9993185806529667,
+          4.9305846578010595,
+          5.722330639169298,
+          7.404219028197047
+        ],
+        [
+          3.0935788393089405,
+          3.683215183641707,
+          6.072001363940127,
+          7.95146005256837
+        ],
+        [
+          4.935954402154292,
+          3.799339587522369,
+          4.081418288080622,
+          6.5867489982206635
+        ]
+      ],
+      "x": [
+        "Control",
+        "Low-dose",
+        "Mid-dose",
+        "High-dose"
+      ],
+      "y": [
+        "GENE01",
+        "GENE02",
+        "GENE03",
+        "GENE04",
+        "GENE05",
+        "GENE06",
+        "GENE07",
+        "GENE08",
+        "GENE09",
+        "GENE10",
+        "GENE11",
+        "GENE12"
+      ],
+      "colorscale": "Viridis",
+      "zmin": 2.37,
+      "zmax": 7.95,
+      "colorbar": {
+        "title": {
+          "text": "log2 TPM"
+        }
+      }
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Expression heatmap (raw log2 TPM; 1-99% clipped bounds)"
+    },
+    "xaxis": {
+      "title": {
+        "text": "Condition"
+      }
+    },
+    "yaxis": {
+      "title": {
+        "text": "Gene"
+      }
+    },
+    "font": {
+      "size": 13
+    }
+  },
+  "config": {
+    "responsive": true,
+    "displaylogo": false
+  }
+};
+const cfg = SPEC.config || { responsive: true, displaylogo: false };
+cfg.responsive = true;
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
+</script>
+</body>
+</html>

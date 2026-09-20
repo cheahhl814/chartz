@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · ClusterHeat (template-native SVG)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1060px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #chart { width: 100%; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · ClusterHeat (engine 6) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "Row z-scored expression, 24 genes x 8 samples (distance: euclidean; linkage: ward.D2; OLO applied)",
+  "matrix": {
+    "rows": [
+      "GENE14",
+      "GENE16",
+      "GENE20",
+      "GENE24",
+      "GENE19",
+      "GENE18",
+      "GENE21",
+      "GENE17",
+      "GENE13",
+      "GENE23",
+      "GENE22",
+      "GENE15",
+      "GENE03",
+      "GENE02",
+      "GENE04",
+      "GENE11",
+      "GENE10",
+      "GENE12",
+      "GENE06",
+      "GENE05",
+      "GENE08",
+      "GENE07",
+      "GENE01",
+      "GENE09"
+    ],
+    "cols": [
+      "S3",
+      "S4",
+      "S1",
+      "S2",
+      "S6",
+      "S7",
+      "S8",
+      "S5"
+    ],
+    "z": [
+      [
+        -0.095,
+        0.071,
+        0.589,
+        -1.027,
+        -1.078,
+        -1.171,
+        -1.034,
+        -2.117
+      ],
+      [
+        0.346,
+        -0.131,
+        0.691,
+        -0.614,
+        -0.61,
+        -1.053,
+        -0.861,
+        -1.833
+      ],
+      [
+        0.396,
+        -0.471,
+        0.027,
+        -0.279,
+        -0.607,
+        -1.497,
+        -1.529,
+        -1.25
+      ],
+      [
+        0.013,
+        -0.487,
+        -0.28,
+        -0.405,
+        -0.676,
+        -1.841,
+        -1.701,
+        -1.157
+      ],
+      [
+        0.331,
+        -0.119,
+        0.698,
+        0.176,
+        -1.047,
+        -0.8,
+        -1.623,
+        -1.261
+      ],
+      [
+        0.471,
+        0.176,
+        0.233,
+        0.693,
+        -1.092,
+        -1.545,
+        -1.259,
+        -1.106
+      ],
+      [
+        0.468,
+        0.3,
+        0.313,
+        -0.076,
+        -0.862,
+        -1.195,
+        -0.668,
+        -1.119
+      ],
+      [
+        -0.134,
+        0.52,
+        -0.025,
+        -0.421,
+        -0.874,
+        -0.773,
+        -1.107,
+        -1.428
+      ],
+      [
+        -0.101,
+        0.061,
+        -0.117,
+        -0.041,
+        -1.075,
+        -0.738,
+        -0.956,
+        -1.468
+      ],
+      [
+        0.604,
+        0.255,
+        -0.469,
+        -0.207,
+        -2.001,
+        -0.558,
+        -1.383,
+        -1.282
+      ],
+      [
+        -0.629,
+        -0.027,
+        0.728,
+        0.292,
+        -0.863,
+        -0.978,
+        -0.269,
+        -0.857
+      ],
+      [
+        -0.703,
+        0.131,
+        0.118,
+        -0.149,
+        -2.025,
+        -1.436,
+        -0.964,
+        -0.554
+      ],
+      [
+        0.036,
+        0.258,
+        0.135,
+        0.563,
+        0.731,
+        1.053,
+        1.337,
+        2.362
+      ],
+      [
+        -0.002,
+        -0.065,
+        0.257,
+        -0.158,
+        0.685,
+        0.761,
+        1.935,
+        2.052
+      ],
+      [
+        -0.337,
+        -0.488,
+        -0.82,
+        -0.019,
+        0.805,
+        1.102,
+        1.511,
+        1.891
+      ],
+      [
+        -0.292,
+        -0.262,
+        0.126,
+        0.482,
+        0.502,
+        1.571,
+        1.382,
+        1.392
+      ],
+      [
+        -0.585,
+        -0.236,
+        -0.341,
+        -0.115,
+        0.755,
+        1.676,
+        1.305,
+        0.895
+      ],
+      [
+        -0.425,
+        -0.212,
+        -0.859,
+        -0.065,
+        1.011,
+        1.305,
+        1.221,
+        0.756
+      ],
+      [
+        -0.131,
+        0.401,
+        0.012,
+        -0.194,
+        1.093,
+        1.293,
+        0.978,
+        1.105
+      ],
+      [
+        0.366,
+        -0.531,
+        -0.351,
+        -0.134,
+        1.05,
+        1.146,
+        0.65,
+        1.374
+      ],
+      [
+        0.071,
+        -0.434,
+        -0.09,
+        0.097,
+        1.2,
+        0.911,
+        1.327,
+        1.221
+      ],
+      [
+        -0.062,
+        -0.278,
+        0.215,
+        0.535,
+        1.605,
+        1.262,
+        1.341,
+        1.389
+      ],
+      [
+        -0.443,
+        -0.358,
+        -0.153,
+        0.585,
+        1.162,
+        0.497,
+        0.613,
+        0.849
+      ],
+      [
+        1.007,
+        0.751,
+        0.036,
+        0.091,
+        2.037,
+        1.829,
+        1.354,
+        1.161
+      ]
+    ],
+    "scale": [
+      [
+        0,
+        "#0072B2"
+      ],
+      [
+        0.5,
+        "#FFFFFF"
+      ],
+      [
+        1,
+        "#D55E00"
+      ]
+    ],
+    "zmin": -2,
+    "zmax": 2,
+    "legendLabel": "row z-score"
+  },
+  "row_dend": {
+    "merge": [
+      [
+        19,
+        23,
+        0.646
+      ],
+      [
+        16,
+        12,
+        0.656
+      ],
+      [
+        9,
+        11,
+        0.726
+      ],
+      [
+        7,
+        6,
+        0.801
+      ],
+      [
+        13,
+        15,
+        0.872
+      ],
+      [
+        17,
+        20,
+        1.067
+      ],
+      [
+        2,
+        1,
+        1.087
+      ],
+      [
+        5,
+        4,
+        1.206
+      ],
+      [
+        18,
+        29,
+        1.228
+      ],
+      [
+        31,
+        27,
+        1.252
+      ],
+      [
+        3,
+        10,
+        1.334
+      ],
+      [
+        34,
+        26,
+        1.417
+      ],
+      [
+        33,
+        0,
+        1.481
+      ],
+      [
+        25,
+        22,
+        1.602
+      ],
+      [
+        21,
+        14,
+        1.653
+      ],
+      [
+        32,
+        37,
+        1.842
+      ],
+      [
+        35,
+        36,
+        1.9
+      ],
+      [
+        28,
+        24,
+        2.197
+      ],
+      [
+        41,
+        39,
+        2.29
+      ],
+      [
+        30,
+        40,
+        2.429
+      ],
+      [
+        42,
+        38,
+        2.587
+      ],
+      [
+        43,
+        8,
+        2.711
+      ],
+      [
+        44,
+        45,
+        16.553
+      ]
+    ],
+    "height": 80
+  },
+  "col_dend": {
+    "merge": [
+      [
+        2,
+        3,
+        2.217
+      ],
+      [
+        6,
+        7,
+        2.291
+      ],
+      [
+        8,
+        0,
+        2.566
+      ],
+      [
+        10,
+        1,
+        2.99
+      ],
+      [
+        9,
+        4,
+        3.033
+      ],
+      [
+        5,
+        12,
+        3.466
+      ],
+      [
+        11,
+        13,
+        12.201
+      ]
+    ],
+    "height": 60
+  },
+  "col_annot": [
+    {
+      "label": "Condition",
+      "height": 14,
+      "values": [
+        "Control",
+        "Control",
+        "Control",
+        "Control",
+        "Treated",
+        "Treated",
+        "Treated",
+        "Treated"
+      ],
+      "colors": {
+        "Control": "#0072B2",
+        "Treated": "#D55E00"
+      }
+    },
+    {
+      "label": "Batch",
+      "height": 14,
+      "values": [
+        "B2",
+        "B2",
+        "B1",
+        "B1",
+        "B1",
+        "B2",
+        "B2",
+        "B1"
+      ],
+      "colors": {
+        "B1": "#BBBBBB",
+        "B2": "#E69F00"
+      }
+    }
+  ]
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Clustered heatmap';
+
+/* ClusterHeat renderer — template-native SVG, no external library.
+   Spec: { title,
+           matrix: {rows, cols, z, scale (normalized stops), zmin, zmax, legendLabel?},
+           row_dend?: {merge: [[a,b,h]...], height?},   // left side
+           col_dend?: {merge: [[a,b,h]...], height?},   // top side
+           col_annot?: [{label, height?, values, colors}],
+           row_annot?: [{label, height?, values, colors}] }
+   The matrix is emitted ALREADY ordered — the agent clusters upstream
+   (scipy 'ward' / R 'ward.D2') and passes the linkage merge list.
+   merge indices: leaves are 0..n-1 in matrix order; the internal node
+   created by merge k is n+k. Branch depth is PROPORTIONAL to merge height
+   (unlike ECharts tree). */
+(function render() {
+  const NS = "http://www.w3.org/2000/svg";
+  const M = SPEC.matrix;
+  const nR = M.rows.length, nC = M.cols.length;
+  const GUT_L = 150, GUT_T = 20;
+  const DEND_R = SPEC.row_dend ? (SPEC.row_dend.height || 70) : 0;
+  const DEND_C = SPEC.col_dend ? (SPEC.col_dend.height || 70) : 0;
+  const ANN_R = SPEC.row_annot ? SPEC.row_annot.reduce((a, s) => a + (s.height || 14), 0) : 0;
+  const ANN_C = SPEC.col_annot ? SPEC.col_annot.reduce((a, s) => a + (s.height || 14), 0) : 0;
+  const CELL_W = Math.max(14, Math.floor(760 / nC));
+  const CELL_H = Math.max(14, Math.floor(420 / nR));
+  const MAT_W = CELL_W * nC, MAT_H = CELL_H * nR;
+  const MAT_X = GUT_L + DEND_R + ANN_R, MAT_Y = GUT_T + DEND_C + ANN_C;
+
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${MAT_X + MAT_W + 130} ${MAT_Y + MAT_H + 70}`);
+  svg.setAttribute("style", "font-family: system-ui, sans-serif;");
+  const el = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    svg.appendChild(n);
+    return n;
+  };
+
+  // colorscale interpolation over normalized stops [[0, hex], ..., [1, hex]]
+  const hex2rgb = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  const stops = M.scale.map(s => [s[0], hex2rgb(s[1])]);
+  const colorFor = v => {
+    let t = Math.max(0, Math.min(1, (v - M.zmin) / (M.zmax - M.zmin)));
+    for (let i = 1; i < stops.length; i++) {
+      if (t <= stops[i][0]) {
+        const f = (t - stops[i - 1][0]) / ((stops[i][0] - stops[i - 1][0]) || 1);
+        const c = stops[i - 1][1].map((a, k) => Math.round(a + f * (stops[i][1][k] - a)));
+        return `rgb(${c[0]},${c[1]},${c[2]})`;
+      }
+    }
+    return `rgb(${stops[stops.length - 1][1].join(",")})`;
+  };
+
+  // cell grid
+  for (let r = 0; r < nR; r++)
+    for (let c = 0; c < nC; c++)
+      el("rect", {x: MAT_X + c * CELL_W, y: MAT_Y + r * CELL_H,
+                  width: CELL_W - 1, height: CELL_H - 1, fill: colorFor(M.z[r][c])});
+
+  // labels
+  M.rows.forEach((r, i) => el("text", {x: MAT_X - 6, y: MAT_Y + i * CELL_H + CELL_H / 2 + 3,
+    "text-anchor": "end", "font-size": 9.5, fill: "#333"}, r));
+  M.cols.forEach((c, j) => {
+    const x = MAT_X + j * CELL_W + CELL_W / 2, y = MAT_Y + MAT_H + 12;
+    el("text", {x, y, "text-anchor": "start", "font-size": 9.5, fill: "#333",
+                transform: `rotate(-45 ${x} ${y})`}, c);
+  });
+
+  // color legend
+  const LG_H = 90, LG_X = MAT_X + MAT_W + 30, LG_Y = MAT_Y;
+  for (let i = 0; i < LG_H; i++) {
+    const v = M.zmax - (i / LG_H) * (M.zmax - M.zmin);
+    el("rect", {x: LG_X, y: LG_Y + i, width: 14, height: 1, fill: colorFor(v)});
+  }
+  el("text", {x: LG_X + 18, y: LG_Y + 8, "font-size": 9, fill: "#333"}, M.zmax);
+  el("text", {x: LG_X + 18, y: LG_Y + LG_H, "font-size": 9, fill: "#333"}, M.zmin);
+  if (M.legendLabel) el("text", {x: LG_X + 18, y: LG_Y + LG_H / 2, "font-size": 9, fill: "#666"}, M.legendLabel);
+
+  // column annotation strips (above matrix) + class legend
+  let ay = MAT_Y - ANN_C;
+  if (SPEC.col_annot) for (const s of SPEC.col_annot) {
+    el("text", {x: 6, y: ay + s.height - 3, "font-size": 10, fill: "#444", "font-weight": 600}, s.label);
+    s.values.forEach((v, j) => el("rect", {x: MAT_X + j * CELL_W, y: ay,
+      width: CELL_W - 1, height: s.height, fill: s.colors[v] || "#DDDDDD"}));
+    ay += s.height;
+  }
+  const legend = {};
+  (SPEC.col_annot || []).forEach(s => Object.entries(s.colors).forEach(([k, c]) => legend[k] = c));
+  (SPEC.row_annot || []).forEach(s => Object.entries(s.colors).forEach(([k, c]) => legend[k] = c));
+  let ly = MAT_Y + MAT_H + 40;
+  for (const [k, c] of Object.entries(legend)) {
+    el("rect", {x: MAT_X + 20, y: ly - 8, width: 10, height: 10, fill: c});
+    el("text", {x: MAT_X + 34, y: ly, "font-size": 9.5, fill: "#444"}, k);
+    ly += 14;
+  }
+
+  // row annotation strips (left of matrix, vertical)
+  let ax = GUT_L + DEND_R;
+  if (SPEC.row_annot) for (const s of SPEC.row_annot) {
+    s.values.forEach((v, i) => el("rect", {x: ax, y: MAT_Y + i * CELL_H,
+      width: s.height, height: CELL_H - 1, fill: s.colors[v] || "#DDDDDD"}));
+    const tx = ax + s.height / 2, ty = MAT_Y - 6;
+    el("text", {x: tx, y: ty, "text-anchor": "start", "font-size": 10, fill: "#444",
+                "font-weight": 600, transform: `rotate(-45 ${tx} ${ty})`}, s.label);
+    ax += s.height;
+  }
+
+  // dendrograms: merge list -> U-shaped segments; branch depth ∝ merge height
+  function dendro(merge, nLeaves) {
+    const pos = [], hgt = [];
+    for (let i = 0; i < nLeaves; i++) { pos[i] = i + 0.5; hgt[i] = 0; }
+    const maxH = Math.max(...merge.map(m => m[2])) || 1;
+    const us = [];
+    merge.forEach((m, k) => {
+      const [a, b, h] = m;
+      us.push({pa: pos[a], ha: hgt[a], pb: pos[b], hb: hgt[b], h});
+      pos[nLeaves + k] = (pos[a] + pos[b]) / 2;
+      hgt[nLeaves + k] = h;
+    });
+    return {us, maxH};
+  }
+  if (SPEC.col_dend) {
+    const d = dendro(SPEC.col_dend.merge, nC), H = SPEC.col_dend.height || 70;
+    const baseY = MAT_Y - ANN_C;   // dendrogram sits ABOVE the annotation strips
+    for (const u of d.us) {
+      const x1 = MAT_X + u.pa * CELL_W, x2 = MAT_X + u.pb * CELL_W;
+      const yU = baseY - (u.h / d.maxH) * H;
+      const ya = baseY - (u.ha / d.maxH) * H, yb = baseY - (u.hb / d.maxH) * H;
+      el("path", {d: `M ${x1} ${ya} L ${x1} ${yU} L ${x2} ${yU} L ${x2} ${yb}`,
+                  fill: "none", stroke: "#555", "stroke-width": 1});
+    }
+  }
+  if (SPEC.row_dend) {
+    const d = dendro(SPEC.row_dend.merge, nR), H = SPEC.row_dend.height || 70;
+    const baseX = MAT_X - ANN_R;   // dendrogram sits LEFT of the annotation strips
+    for (const u of d.us) {
+      const y1 = MAT_Y + u.pa * CELL_H, y2 = MAT_Y + u.pb * CELL_H;
+      const xU = baseX - (u.h / d.maxH) * H;
+      const xa = baseX - (u.ha / d.maxH) * H, xb = baseX - (u.hb / d.maxH) * H;
+      el("path", {d: `M ${xa} ${y1} L ${xU} ${y1} L ${xU} ${y2} L ${xb} ${y2}`,
+                  fill: "none", stroke: "#555", "stroke-width": 1});
+    }
+  }
+  document.getElementById("chart").appendChild(svg);
+})();
+</script>
+</body>
+</html>
