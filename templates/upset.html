@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · UpSet (template-native SVG)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1040px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #chart { width: 100%; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · UpSet (engine 9) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = /*__SPEC__*/;
+document.getElementById('chart-title').textContent = SPEC.title || 'UpSet plot';
+
+/* UpSet renderer — template-native SVG, no external library.
+   Spec: { title,
+           sets: [names...],                       // matrix rows (columns of the plot), agent-sorted
+           set_sizes: {name: total},               // left bars
+           intersections: [ {sets: [idx...], size: n, label?: "n", color?: hex}, ... ] }  // agent-sorted (cardinality or degree)
+   The agent computes intersections UPSTREAM (deduplicated elements, chosen
+   sort, n_intersections cap); the renderer only draws. Dot matrix shows set
+   membership per intersection; bars above = intersection size; bars left =
+   per-set total size (Lex 2014). */
+(function render() {
+  const NS = "http://www.w3.org/2000/svg";
+  const sets = SPEC.sets;
+  const ints = SPEC.intersections;
+  const nInt = ints.length;
+  const GUT_L = 170, GUT_T = 16;
+  const BAR_H = 110;                    // intersection bar area
+  const CELL_W = Math.max(20, Math.floor(800 / nInt));
+  const DOT_R = 5, ROW_H = 26;
+  const MAT_W = CELL_W * nInt, MAT_H = ROW_H * sets.length;
+  const MAT_X = GUT_L, MAT_Y = GUT_T + BAR_H + 18;
+  const SETBAR_W = 90;                  // left set-size bar max length
+
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${MAT_X + MAT_W + 40} ${MAT_Y + MAT_H + 20}`);
+  svg.setAttribute("style", "font-family: system-ui, sans-serif;");
+  const el = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    svg.appendChild(n);
+    return n;
+  };
+  const colX = i => MAT_X + (i + 0.5) * CELL_W;
+  const maxInt = Math.max(...ints.map(i => i.size)) || 1;
+  const maxSet = Math.max(...sets.map(s => SPEC.set_sizes[s] || 0)) || 1;
+
+  // intersection bars (top)
+  ints.forEach((it, i) => {
+    const x = MAT_X + i * CELL_W;
+    const h = (it.size / maxInt) * (BAR_H - 16);
+    const color = it.color || "#0072B2";
+    el("rect", {x: x + 3, y: GUT_T + (BAR_H - 16 - h), width: CELL_W - 6, height: h,
+                fill: color, opacity: 0.9});
+    el("text", {x: colX(i), y: GUT_T + BAR_H - 18 - h, "text-anchor": "middle",
+                "font-size": 9.5, fill: "#333"}, it.label !== undefined ? it.label : String(it.size));
+  });
+  el("text", {x: 6, y: GUT_T + 12, "font-size": 10, fill: "#444", "font-weight": 600},
+     "Intersection size");
+
+  // dot matrix
+  sets.forEach((s, r) => {
+    const y = MAT_Y + r * ROW_H + ROW_H / 2;
+    ints.forEach((it, i) => {
+      if (it.sets.includes(r)) {
+        const color = it.color || "#0072B2";
+        el("circle", {cx: colX(i), cy: y, r: DOT_R, fill: color});
+      }
+    });
+    if (r < sets.length - 1) {
+      // guide line between rows
+      el("line", {x1: MAT_X, x2: MAT_X + MAT_W, y1: MAT_Y + (r + 1) * ROW_H,
+                  y2: MAT_Y + (r + 1) * ROW_H, stroke: "#EEEEEE"});
+    }
+  });
+  // connect dots within each intersection column (vertical line through member dots)
+  ints.forEach((it, i) => {
+    const rows = it.sets;
+    if (rows.length < 2) return;
+    const yTop = MAT_Y + Math.min(...rows) * ROW_H + ROW_H / 2;
+    const yBot = MAT_Y + Math.max(...rows) * ROW_H + ROW_H / 2;
+    el("line", {x1: colX(i), x2: colX(i), y1: yTop, y2: yBot,
+                stroke: it.color || "#0072B2", "stroke-width": 1.2});
+  });
+
+  // set-size bars (left) + labels
+  sets.forEach((s, r) => {
+    const y = MAT_Y + r * ROW_H + ROW_H / 2 - 7;
+    const w = ((SPEC.set_sizes[s] || 0) / maxSet) * SETBAR_W;
+    el("rect", {x: MAT_X - 14 - w, y, width: w, height: 14, fill: "#0072B2", opacity: 0.85});
+    el("text", {x: MAT_X - 18 - w, y: y + 11, "text-anchor": "end", "font-size": 10,
+                fill: "#333"}, s);
+    el("text", {x: MAT_X - 12, y: y + 11, "font-size": 9, fill: "#666"},
+       String(SPEC.set_sizes[s] || 0));
+  });
+  el("text", {x: 6, y: MAT_Y - 4, "font-size": 10, fill: "#444", "font-weight": 600}, "Set size");
+
+  // degree guide (optional label row at bottom)
+  if (SPEC.degree_labels) {
+    ints.forEach((it, i) => {
+      el("text", {x: colX(i), y: MAT_Y + MAT_H + 16, "text-anchor": "middle",
+                  "font-size": 9, fill: "#666"}, String(it.sets.length));
+    });
+    el("text", {x: 6, y: MAT_Y + MAT_H + 16, "font-size": 10, fill: "#444"}, "Degree");
+  }
+  document.getElementById("chart").appendChild(svg);
+})();
+</script>
+</body>
+</html>

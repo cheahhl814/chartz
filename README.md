@@ -1,15 +1,15 @@
 # chartz
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue)](#-installation)
+[![Version](https://img.shields.io/badge/version-0.6.0-blue)](#-installation)
 [![Type](https://img.shields.io/badge/type-agent%20skill-blueviolet)](#-installation)
 [![README standard](https://img.shields.io/badge/README%20per-bioinfo--skill--creator-orange)](https://github.com/cheahhl814/bioinfo-skill-creator)
 
-Render charts and graphs as self-contained HTML files from four CDN-pinned engines, chosen by chart type. One request → one portable HTML file: simple statistical charts via Chart.js, scientific/statistical plots via Plotly.js, rich interactive dashboards via ECharts, and nodes+edges network graphs via Cytoscape.js. No build step, no server, no inline library code.
+Render charts and graphs as self-contained HTML files from four CDN-pinned engines plus five template-native engines, chosen by chart type. One request → one portable HTML file: simple statistical charts via Chart.js, scientific/statistical plots via Plotly.js, rich interactive dashboards via ECharts, nodes+edges network graphs via Cytoscape.js, genome-browser track figures via the zero-dependency GenomeTracks SVG renderer, clustered-heatmap composites via ClusterHeat, OncoPrint mutation matrices via OncoPrint, sequence logos via SeqLogo, and set-intersection plots via UpSet — all template-native SVG. No build step, no server, no inline third-party library code.
 
 **Repository**: https://github.com/cheahhl814/chartz
 
 > [!NOTE]
-> Current version: **v0.1.0** (updated 2026-09-19).
+> Current version: **v0.6.0** (updated 2026-09-20). v0.2.0 GenomeTracks (§5b); v0.3.0 ClusterHeat (§5c); v0.4.0 OncoPrint (§5d); v0.5.0 SeqLogo (§5e); v0.6.0 adds UpSet (§5f) for set-intersection plots at 4+ sets.
 
 ## Contents
 
@@ -17,6 +17,7 @@ Render charts and graphs as self-contained HTML files from four CDN-pinned engin
 - [Usage](#-usage)
 - [Engine routing overview](#-engine-routing-overview)
 - [Engines](#-engines)
+- [Design conventions](#-design-conventions)
 - [Update check](#-update-check)
 - [Repository layout](#-repository-layout)
 - [Hard guarantees](#-hard-guarantees)
@@ -68,6 +69,7 @@ To render an example without an agent:
 git clone https://github.com/cheahhl814/chartz.git
 cd chartz/examples
 # open any demo in a browser — each is a self-contained HTML file
+# e.g. plotly-heatmap.html, echarts-treemap.html, cytoscape-dependency-tree.html
 ```
 
 > [!IMPORTANT]
@@ -77,29 +79,45 @@ cd chartz/examples
 
 The routing table in `SKILL.md` §1 maps request shape → engine (first match wins). Each engine has a spec contract with worked example and pitfalls in `SKILL.md` §2–§5.
 
-| # | Request shape | Engine | Template |
-|:--|:--------------|:-------|:---------|
-| 1 | Nodes + edges (pathways, networks, dependency graphs) | Cytoscape.js | `templates/cytoscape.html` |
-| 2 | Box/violin/histogram/**heatmap**/3D/error bars/log axes/subplots | Plotly.js | `templates/plotly.html` |
-| 3 | Treemap/sankey/sunburst/large series/dataZoom/mixed dashboards | ECharts | `templates/echarts.html` |
-| 4 | Simple bar/line/pie/doughnut/radar/scatter/bubble | Chart.js | `templates/chartjs.html` |
-| 5 | Anything else | ECharts (catch-all) | `templates/echarts.html` |
+| #   | Request shape                                                    | Engine              | Template                   |
+|:--- |:---------------------------------------------------------------- |:------------------- |:-------------------------- |
+| 1   | Nodes + edges (pathways, networks, dependency graphs)            | Cytoscape.js        | `templates/cytoscape.html` |
+| 2   | Genome-browser tracks (coverage, peaks, gene models on a locus)  | GenomeTracks        | `templates/genetracks.html` |
+| 3   | Clustered heatmap (matrix + dendrograms + annotation strips)     | ClusterHeat         | `templates/clusteredheatmap.html` |
+| 4   | OncoPrint (stacked mutation cells, TMB + clinical strips)        | OncoPrint           | `templates/oncoprint.html`  |
+| 5   | Sequence logo (per-position letter stacks, bits axis)            | SeqLogo             | `templates/seqlogo.html`    |
+| 6   | UpSet set intersections (dot matrix + bars, 4+ sets)             | UpSet               | `templates/upset.html`      |
+| 7   | Box/violin/histogram/**heatmap**/3D/error bars/log axes/subplots, **Manhattan/Miami/QQ/forest/funnel/lollipop** | Plotly.js | `templates/plotly.html`    |
+| 8   | Treemap/sankey/alluvial/sunburst/dendrogram/large series/dataZoom/mixed dashboards | ECharts | `templates/echarts.html`   |
+| 9   | Simple bar/line/pie/doughnut/radar/scatter/bubble                | Chart.js            | `templates/chartjs.html`   |
+| 10  | Anything else                                                    | ECharts (catch-all) | `templates/echarts.html`   |
 
 > [!TIP]
 > Read `SKILL.md` §6 before every delivery: spec strict-JSON check, CDN pin coherence, slot-fill verification, reachability probe, NaN/undefined hygiene, and output-path reporting. When a request matches no row and the data shape is ambiguous, the agent surfaces an *Evidence + Recommend + Options* stop point instead of guessing.
 
 ## 🧰 Engines
 
-All libraries are loaded from pinned CDN URLs at render time — no local installs, no version conflicts.
+All libraries are loaded from pinned CDN URLs at render time — no local installs, no version conflicts. GenomeTracks (SKILL.md §5b), ClusterHeat (§5c), OncoPrint (§5d), SeqLogo (§5e), and UpSet (§5f) are the exceptions: template-native vanilla-JS SVG renderers with no CDN dependency, which also makes them the only offline-capable engines.
 
-| Engine | Pinned version | Role | License |
-|:-------|:---------------|:-----|:--------|
-| [Chart.js](https://www.chartjs.org/) | 4.5.1 | Simple statistical charts | MIT |
-| [Plotly.js](https://plotly.com/javascript/) | 4.1.1 | Scientific/statistical charts | MIT |
-| [ECharts](https://echarts.apache.org/) | 6.1.0 | Rich interactive charts, dashboards, catch-all | Apache-2.0 |
-| [Cytoscape.js](https://js.cytoscape.org/) | 3.34.3 | Network/graph rendering | MIT |
+| Engine                                      | Pinned version | Role                                           | License    |
+|:------------------------------------------- |:-------------- |:---------------------------------------------- |:---------- |
+| [Chart.js](https://www.chartjs.org/)        | 4.5.1          | Simple statistical charts                      | MIT        |
+| [Plotly.js](https://plotly.com/javascript/) | 4.1.1          | Scientific/statistical charts                  | MIT        |
+| [ECharts](https://echarts.apache.org/)      | 6.1.0          | Rich interactive charts, dashboards, catch-all | Apache-2.0 |
+| [Cytoscape.js](https://js.cytoscape.org/)   | 3.34.3         | Network/graph rendering                        | MIT        |
+| [GenomeTracks](#-engines)                   | template v1    | Genome-browser track figures (SVG, no CDN)     | n/a        |
+| [ClusterHeat](#-engines)                    | template v1    | Clustered heatmaps + dendrograms (SVG, no CDN) | n/a        |
+| [OncoPrint](#-engines)                      | template v1    | Stacked-cell mutation matrices (SVG, no CDN)   | n/a        |
+| [SeqLogo](#-engines)                        | template v1    | Sequence logos (SVG, no CDN)                   | n/a        |
+| [UpSet](#-engines)                          | template v1    | Set-intersection plots (SVG, no CDN)           | n/a        |
 
 Engine version pins are single-sourced in `SKILL.md` §7 and mirrored into every template. Never float (`@latest`).
+
+## 🎨 Design conventions
+
+`SKILL.md` §10 encodes the **design decisions that come before the spec**: palette type by data type (Okabe-Ito categorical, viridis-family sequential, symmetric diverging), volcano/MA conventions (shrunken LFC, class coloring, dashed thresholds, selective labeling), heatmap scaling (row z-score, robust quantile bounds), statistical-annotation rules (asterisk levels, test disclosure), Cytoscape layout selection, dimensionality-reduction disclosure rules (variance % on PCA axes, hyperparameters + seed in titles, Chari-Pachter interpretation limits), and distribution-plot encoding by N (raincloud/box+jitter/violin, KDE-bandwidth honesty, no bar-of-mean — Weissgerber 2015), and flow-plot rules (Sankey-vs-alluvial story choice, ribbon color by origin/destination, flow conservation, CONSORT structure), and meta-analysis rigor for forest/funnel plots (I²/τ²/Q reporting, weight-coded markers, prediction intervals, contour-enhanced funnels, Egger k≥10, no pooled diamond at k<3), and publication-theme + faceting conventions (theme_classic baseline, facet fixed-vs-free scales, mapping-vs-constant, explicit discrete ordering). A `D1–D10` design self-check extends the §6 delivery check.
+
+Conventions are adapted from the published literature they cite (Wong 2011 *Nat Methods*, Nuñez 2018 *PLOS ONE*, Crameri 2020 *Nat Commun*, Wasserstein-Lazar 2016); chartz consumes engine-agnostic JSON specs, so tool-specific implementations (ggplot2, matplotlib, ComplexHeatmap) are out of scope.
 
 ## 🔄 Update check
 
@@ -109,13 +127,13 @@ chartz ships a self-update check that compares the deployed git SHA against this
 python3 bin/skill-update-check.py
 ```
 
-| Verdict | Exit | Meaning |
-|:--------|:-----|:--------|
-| `UP-TO-DATE` | 0 | Local HEAD matches origin/HEAD |
-| `LOCAL-AHEAD` | 0 | Unpushed local commits; no action needed |
-| `BEHIND-BY-N` | 1 | Upstream is N commits ahead → re-pull from this repo |
-| `OFFLINE` | 2 | `git fetch` failed; informational only |
-| `NO-ORIGIN` | 2 | No `origin` remote configured; informational only |
+| Verdict       | Exit | Meaning                                              |
+|:------------- |:---- |:---------------------------------------------------- |
+| `UP-TO-DATE`  | 0    | Local HEAD matches origin/HEAD                       |
+| `LOCAL-AHEAD` | 0    | Unpushed local commits; no action needed             |
+| `BEHIND-BY-N` | 1    | Upstream is N commits ahead → re-pull from this repo |
+| `OFFLINE`     | 2    | `git fetch` failed; informational only               |
+| `NO-ORIGIN`   | 2    | No `origin` remote configured; informational only    |
 
 ## 📁 Repository layout
 
@@ -128,11 +146,22 @@ chartz/
 │   ├── plotly.html
 │   ├── echarts.html
 │   └── cytoscape.html
-├── examples/                # One worked demo per engine
-│   └── screenshots/         # Headless-Chrome render proof for all four engines
+├── examples/                # 51 worked demos: 4 v0.1.0 base demos + 47 engine/chart-type demos
+│   ├── chartjs.html · plotly.html · echarts.html · cytoscape.html   # one per engine
+│   ├── plotly-heatmap/volcano/violin/3d-surface/heatmap-zscore/violin-signif.html
+│   ├── plotly-manhattan/miami/qq/locuszoom/forest/forest-subgroup/funnel/lollipop/lollipop-two-cohort/pca-biplot.html
+│   ├── plotly-raincloud/boxstrip/splitviolin/facets/facets-free/multipanel.html
+│   ├── echarts-treemap/sunburst/dual-axis/dendrogram/alluvial.html
+│   ├── chartjs-radar/scatter/doughnut/scree/umap.html
+│   ├── cytoscape-pathway-network/dependency-tree/consort/ppi-degree/ppi-preset.html
+│   ├── genetracks-locus/peaks-genes.html · clusterheat-annotated/simple.html
+│   ├── oncoprint-cohort/simple.html · seqlogo-tfbs/kinase.html · upset-genomics/degree.html
+│   └── screenshots/         # Headless-Chrome render proof for every demo
 └── bin/
     └── skill-update-check.py  # Self-update check
 ```
+
+Example naming convention: `<engine>-<charttype>.html`; the four base-named demos (`chartjs.html`, etc.) are the canonical one-per-engine demos from v0.1.0.
 
 ## 🔒 Hard guarantees
 
@@ -141,7 +170,8 @@ chartz/
 - **Signature-library debugging** — silent failures (blank canvas, missing edges, squashed charts) are catalogued as S1–S10 with cause → fix, not rediscovered ad hoc.
 - **Explicit stop points** — ambiguous requests surface *Evidence + Recommend + Options*, not auto-picked choices.
 - **No machine-specific paths** — output goes to the working directory; the skill ships no local dependencies and no user-specific configuration.
-- **Render-verified examples** — all four example demos were executed in headless Chrome and verified non-blank (see `examples/screenshots/`).
+- **Render-verified examples** — all fifty-one example demos were executed in headless Chrome, verified non-blank with zero console errors (see `examples/screenshots/`).
+- **Offline-capable template-native engines** — GenomeTracks (5), ClusterHeat (6), OncoPrint (7), SeqLogo (8), and UpSet (9) are template-native SVG with no CDN dependency; they render even with no network (the only engines whose §6.4 reachability probe is skipped).
 
 ## Provenance
 

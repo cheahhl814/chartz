@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · SeqLogo (template-native SVG)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #chart { width: 100%; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · SeqLogo (engine 8) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "Kinase substrate motif (120 sites; protein alphabet, max 4.32 bits; phospho-acceptors vermillion, basic blue, hydrophobic green)",
+  "positions": [
+    [
+      {
+        "letter": "H",
+        "height": 0.002
+      },
+      {
+        "letter": "I",
+        "height": 0.002
+      },
+      {
+        "letter": "L",
+        "height": 0.002
+      },
+      {
+        "letter": "V",
+        "height": 0.002
+      },
+      {
+        "letter": "M",
+        "height": 0.002
+      },
+      {
+        "letter": "K",
+        "height": 0.027
+      },
+      {
+        "letter": "R",
+        "height": 0.027
+      },
+      {
+        "letter": "D",
+        "height": 0.027
+      },
+      {
+        "letter": "A",
+        "height": 0.027
+      },
+      {
+        "letter": "E",
+        "height": 0.027
+      },
+      {
+        "letter": "S",
+        "height": 0.052
+      },
+      {
+        "letter": "T",
+        "height": 0.052
+      },
+      {
+        "letter": "Y",
+        "height": 2.716
+      }
+    ],
+    [
+      {
+        "letter": "H",
+        "height": 0.022
+      },
+      {
+        "letter": "M",
+        "height": 0.022
+      },
+      {
+        "letter": "L",
+        "height": 0.022
+      },
+      {
+        "letter": "I",
+        "height": 0.022
+      },
+      {
+        "letter": "V",
+        "height": 0.042
+      },
+      {
+        "letter": "D",
+        "height": 0.042
+      },
+      {
+        "letter": "E",
+        "height": 0.042
+      },
+      {
+        "letter": "A",
+        "height": 0.042
+      },
+      {
+        "letter": "R",
+        "height": 0.053
+      },
+      {
+        "letter": "Y",
+        "height": 0.063
+      },
+      {
+        "letter": "S",
+        "height": 0.063
+      },
+      {
+        "letter": "K",
+        "height": 0.073
+      },
+      {
+        "letter": "T",
+        "height": 0.748
+      }
+    ],
+    [
+      {
+        "letter": "H",
+        "height": 0.019
+      },
+      {
+        "letter": "M",
+        "height": 0.019
+      },
+      {
+        "letter": "L",
+        "height": 0.019
+      },
+      {
+        "letter": "I",
+        "height": 0.019
+      },
+      {
+        "letter": "V",
+        "height": 0.037
+      },
+      {
+        "letter": "Y",
+        "height": 0.037
+      },
+      {
+        "letter": "D",
+        "height": 0.037
+      },
+      {
+        "letter": "E",
+        "height": 0.037
+      },
+      {
+        "letter": "A",
+        "height": 0.045
+      },
+      {
+        "letter": "R",
+        "height": 0.054
+      },
+      {
+        "letter": "T",
+        "height": 0.09
+      },
+      {
+        "letter": "K",
+        "height": 0.09
+      },
+      {
+        "letter": "S",
+        "height": 0.592
+      }
+    ],
+    [
+      {
+        "letter": "T",
+        "height": 0.015
+      },
+      {
+        "letter": "Y",
+        "height": 0.015
+      },
+      {
+        "letter": "S",
+        "height": 0.029
+      },
+      {
+        "letter": "E",
+        "height": 0.029
+      },
+      {
+        "letter": "D",
+        "height": 0.029
+      },
+      {
+        "letter": "I",
+        "height": 0.029
+      },
+      {
+        "letter": "L",
+        "height": 0.029
+      },
+      {
+        "letter": "V",
+        "height": 0.029
+      },
+      {
+        "letter": "M",
+        "height": 0.029
+      },
+      {
+        "letter": "A",
+        "height": 0.043
+      },
+      {
+        "letter": "H",
+        "height": 0.043
+      },
+      {
+        "letter": "R",
+        "height": 0.172
+      },
+      {
+        "letter": "K",
+        "height": 0.386
+      }
+    ],
+    [
+      {
+        "letter": "T",
+        "height": 0.012
+      },
+      {
+        "letter": "Y",
+        "height": 0.012
+      },
+      {
+        "letter": "S",
+        "height": 0.024
+      },
+      {
+        "letter": "E",
+        "height": 0.024
+      },
+      {
+        "letter": "D",
+        "height": 0.024
+      },
+      {
+        "letter": "M",
+        "height": 0.024
+      },
+      {
+        "letter": "I",
+        "height": 0.046
+      },
+      {
+        "letter": "L",
+        "height": 0.046
+      },
+      {
+        "letter": "H",
+        "height": 0.058
+      },
+      {
+        "letter": "V",
+        "height": 0.058
+      },
+      {
+        "letter": "A",
+        "height": 0.081
+      },
+      {
+        "letter": "K",
+        "height": 0.138
+      },
+      {
+        "letter": "R",
+        "height": 0.822
+      }
+    ],
+    [
+      {
+        "letter": "H",
+        "height": 0.004
+      },
+      {
+        "letter": "K",
+        "height": 0.008
+      },
+      {
+        "letter": "R",
+        "height": 0.008
+      },
+      {
+        "letter": "T",
+        "height": 0.015
+      },
+      {
+        "letter": "Y",
+        "height": 0.015
+      },
+      {
+        "letter": "D",
+        "height": 0.022
+      },
+      {
+        "letter": "E",
+        "height": 0.022
+      },
+      {
+        "letter": "M",
+        "height": 0.04
+      },
+      {
+        "letter": "S",
+        "height": 0.044
+      },
+      {
+        "letter": "V",
+        "height": 0.044
+      },
+      {
+        "letter": "I",
+        "height": 0.044
+      },
+      {
+        "letter": "L",
+        "height": 0.044
+      },
+      {
+        "letter": "A",
+        "height": 0.131
+      }
+    ]
+  ],
+  "ymax": 4.32,
+  "ylabel": "Bits",
+  "colors": {
+    "S": "#D55E00",
+    "T": "#D55E00",
+    "Y": "#D55E00",
+    "K": "#0072B2",
+    "R": "#0072B2",
+    "H": "#0072B2",
+    "D": "#CC79A7",
+    "E": "#CC79A7",
+    "A": "#009E73",
+    "V": "#009E73",
+    "L": "#009E73",
+    "I": "#009E73",
+    "M": "#009E73"
+  },
+  "xlabels": [
+    "-2",
+    "-1",
+    "0",
+    "+1",
+    "+2",
+    "+3"
+  ]
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Sequence logo';
+
+/* SeqLogo renderer — template-native SVG, no external library.
+   Spec: { title,
+           positions: [ [ {letter, height}, ... ], ... ],  // per-position stacks, bottom-up; heights in bits
+           ymax: 2,                                        // bits axis max (2 DNA / 4.32 protein)
+           ylabel?: "Bits",
+           colors: { letter: hex },
+           xlabels?: [...] }                               // per-position labels (default 1..n)
+   The agent computes information content UPSTREAM (Schneider-Stephens 1990,
+   background-corrected, small-sample corrected) and emits per-letter heights;
+   the renderer only stacks glyphs bottom-up (Logomaker's approach). */
+(function render() {
+  const NS = "http://www.w3.org/2000/svg";
+  const GUT_L = 60, AXIS_W = 22, GUT_T = 16;
+  const PLOT_W = 860, PLOT_H = 240;
+  const n = SPEC.positions.length;
+  const colW = PLOT_W / n;
+  const ymax = SPEC.ymax || 2;
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${GUT_L + AXIS_W + PLOT_W + 30} ${GUT_T + AXIS_W + PLOT_H + 30}`);
+  svg.setAttribute("style", "font-family: system-ui, sans-serif;");
+  const el = (tag, attrs, text) => {
+    const nn = document.createElementNS(NS, tag);
+    for (const k in attrs) nn.setAttribute(k, attrs[k]);
+    if (text !== undefined) nn.textContent = text;
+    svg.appendChild(nn);
+    return nn;
+  };
+  const PX = GUT_L + AXIS_W;
+  const baseY = GUT_T + AXIS_W + PLOT_H;
+  // y axis
+  el("line", {x1: PX, x2: PX, y1: GUT_T, y2: baseY, stroke: "#333"});
+  const ticks = ymax <= 2 ? [0, 0.5, 1, 1.5, 2] : [0, 1, 2, 3, 4];
+  for (const tv of ticks) {
+    if (tv > ymax) continue;
+    const y = baseY - (tv / ymax) * PLOT_H;
+    el("line", {x1: PX - 4, x2: PX, y1: y, y2: y, stroke: "#333"});
+    el("text", {x: PX - 7, y: y + 3, "text-anchor": "end", "font-size": 10, fill: "#333"}, String(tv));
+  }
+  const yl = GUT_T + AXIS_W + PLOT_H / 2;
+  el("text", {x: PX - 40, y: yl, "font-size": 11, fill: "#333", "text-anchor": "middle",
+              transform: `rotate(-90 ${PX - 40} ${yl})`}, SPEC.ylabel || "Bits");
+  // letter stacks (bottom-up)
+  SPEC.positions.forEach((stack, i) => {
+    const cx = PX + (i + 0.5) * colW;
+    let acc = 0;                             // bits consumed from the baseline up
+    for (const item of stack) {
+      const hPx = (item.height / ymax) * PLOT_H;
+      const baseline = baseY - (acc / ymax) * PLOT_H;
+      const fs = Math.max(6, hPx * 1.32);    // font-size tuned so glyph box ≈ stack band
+      el("text", {x: cx, y: baseline + 2, "text-anchor": "middle",
+                  "font-size": fs, "font-weight": "bold",
+                  fill: (SPEC.colors || {})[item.letter] || "#555555"}, item.letter);
+      acc += item.height;
+    }
+  });
+  // x labels
+  for (let i = 0; i < n; i++) {
+    const cx = PX + (i + 0.5) * colW;
+    const lbl = SPEC.xlabels ? String(SPEC.xlabels[i]) : String(i + 1);
+    el("text", {x: cx, y: baseY + 16, "text-anchor": "middle", "font-size": 10, fill: "#333"}, lbl);
+  }
+  document.getElementById("chart").appendChild(svg);
+})();
+</script>
+</body>
+</html>

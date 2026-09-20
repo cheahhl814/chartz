@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Plotly.js 4.1.1</title>
+<script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · Plotly.js 4.1.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "data": [
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "ER-positive",
+      "x": [
+        1.246,
+        1.105,
+        1.507
+      ],
+      "y": [
+        "TRIAL-A",
+        "TRIAL-B",
+        "TRIAL-C"
+      ],
+      "marker": {
+        "color": "#0072B2",
+        "symbol": "square",
+        "size": [
+          14.0,
+          6.0,
+          8.1
+        ]
+      },
+      "error_x": {
+        "type": "data",
+        "symmetric": false,
+        "array": [
+          0.748,
+          0.885,
+          1.102
+        ],
+        "arrayminus": [
+          0.468,
+          0.491,
+          0.636
+        ]
+      },
+      "showlegend": false
+    },
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "ER-positive pooled",
+      "x": [
+        1.271
+      ],
+      "y": [
+        "ER-positive pooled"
+      ],
+      "marker": {
+        "color": "#D55E00",
+        "symbol": "diamond",
+        "size": 13
+      },
+      "error_x": {
+        "type": "data",
+        "symmetric": false,
+        "array": [
+          0.251
+        ],
+        "arrayminus": [
+          0.209
+        ]
+      },
+      "showlegend": false
+    },
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "ER-negative",
+      "x": [
+        0.705,
+        0.887,
+        1.221
+      ],
+      "y": [
+        "TRIAL-D",
+        "TRIAL-E",
+        "TRIAL-F"
+      ],
+      "marker": {
+        "color": "#0072B2",
+        "symbol": "square",
+        "size": [
+          6.0,
+          14.0,
+          8.2
+        ]
+      },
+      "error_x": {
+        "type": "data",
+        "symmetric": false,
+        "array": [
+          0.695,
+          0.679,
+          1.111
+        ],
+        "arrayminus": [
+          0.35,
+          0.385,
+          0.582
+        ]
+      },
+      "showlegend": false
+    },
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "name": "ER-negative pooled",
+      "x": [
+        0.896
+      ],
+      "y": [
+        "ER-negative pooled"
+      ],
+      "marker": {
+        "color": "#D55E00",
+        "symbol": "diamond",
+        "size": 13
+      },
+      "error_x": {
+        "type": "data",
+        "symmetric": false,
+        "array": [
+          0.177
+        ],
+        "arrayminus": [
+          0.148
+        ]
+      },
+      "showlegend": false
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Subgroup forest - HR by ER status (REML per subgroup; log scale)"
+    },
+    "xaxis": {
+      "title": {
+        "text": "Hazard ratio (log scale)"
+      },
+      "type": "log",
+      "range": [
+        -0.5228787452803376,
+        0.47712125471966244
+      ],
+      "tickvals": [
+        0.25,
+        0.5,
+        1,
+        2
+      ]
+    },
+    "yaxis": {
+      "autorange": "reversed",
+      "tickvals": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "ticktext": [
+        "TRIAL-A",
+        "TRIAL-B",
+        "TRIAL-C",
+        "ER-positive (pooled)",
+        "TRIAL-D",
+        "TRIAL-E",
+        "TRIAL-F",
+        "ER-negative (pooled)"
+      ]
+    },
+    "shapes": [
+      {
+        "type": "line",
+        "xref": "paper",
+        "x0": 0,
+        "x1": 1,
+        "y0": 2.5,
+        "y1": 2.5,
+        "line": {
+          "color": "#CCCCCC",
+          "width": 1
+        }
+      },
+      {
+        "type": "line",
+        "x0": 1,
+        "x1": 1,
+        "yref": "paper",
+        "y0": 0,
+        "y1": 1,
+        "line": {
+          "dash": "dash",
+          "color": "#666",
+          "width": 1
+        }
+      }
+    ],
+    "annotations": [
+      {
+        "xref": "paper",
+        "x": 0.01,
+        "yref": "paper",
+        "y": 1.02,
+        "text": "treatment x subgroup interaction p = 0.31 (no significant effect modification)",
+        "showarrow": false,
+        "font": {
+          "size": 11,
+          "color": "#666"
+        },
+        "xanchor": "left"
+      }
+    ],
+    "showlegend": false,
+    "font": {
+      "size": 13
+    },
+    "margin": {
+      "l": 110
+    }
+  },
+  "config": {
+    "responsive": true,
+    "displaylogo": false
+  }
+};
+const cfg = SPEC.config || { responsive: true, displaylogo: false };
+cfg.responsive = true;
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
+</script>
+</body>
+</html>

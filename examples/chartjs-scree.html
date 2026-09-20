@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Chart.js 4.5.1</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  .canvas-box { position: relative; height: 60vh; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div class="canvas-box"><canvas id="chart"></canvas></div>
+  </div>
+  <footer>chartz · Chart.js 4.5.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "type": "bar",
+  "data": {
+    "labels": [
+      "PC1",
+      "PC2",
+      "PC3",
+      "PC4",
+      "PC5",
+      "PC6",
+      "PC7",
+      "PC8"
+    ],
+    "datasets": [
+      {
+        "label": "Variance explained (%)",
+        "data": [
+          41.2,
+          23.4,
+          11.8,
+          8.1,
+          5.6,
+          4.3,
+          3.2,
+          2.4
+        ],
+        "backgroundColor": "#0072B2"
+      },
+      {
+        "label": "Cumulative (%)",
+        "type": "line",
+        "data": [
+          41.2,
+          64.6,
+          76.4,
+          84.5,
+          90.1,
+          94.4,
+          97.6,
+          100.0
+        ],
+        "borderColor": "#E69F00",
+        "backgroundColor": "#E69F00",
+        "yAxisID": "y1",
+        "tension": 0.3
+      }
+    ]
+  },
+  "options": {
+    "responsive": true,
+    "maintainAspectRatio": false,
+    "plugins": {
+      "title": {
+        "display": false,
+        "text": "PCA scree plot - variance explained per component"
+      },
+      "legend": {
+        "position": "bottom"
+      }
+    },
+    "scales": {
+      "y": {
+        "beginAtZero": true,
+        "max": 50,
+        "title": {
+          "display": true,
+          "text": "Variance explained (%)"
+        }
+      },
+      "y1": {
+        "position": "right",
+        "beginAtZero": true,
+        "max": 100,
+        "grid": {
+          "drawOnChartArea": false
+        },
+        "title": {
+          "display": true,
+          "text": "Cumulative (%)"
+        }
+      }
+    }
+  }
+};
+document.getElementById('chart-title').textContent =
+  (SPEC.options && SPEC.options.plugins && SPEC.options.plugins.title && SPEC.options.plugins.title.text) || '';
+new Chart(document.getElementById('chart'), SPEC);
+</script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Cytoscape.js 3.34.3</title>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.3/dist/cytoscape.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #cy { width: 100%; height: 70vh; border: 1px solid #eee; border-radius: 6px; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="cy"></div>
+  </div>
+  <footer>chartz · Cytoscape.js 3.34.3 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "CONSORT-style trial flow (vertical; counts sum at every stage)",
+  "elements": [
+    {
+      "data": {
+        "id": "assessed",
+        "label": "Assessed for eligibility (n=200)"
+      }
+    },
+    {
+      "data": {
+        "id": "excluded",
+        "label": "Excluded (n=50)",
+        "side": true
+      }
+    },
+    {
+      "data": {
+        "id": "randomized",
+        "label": "Randomized (n=150)"
+      }
+    },
+    {
+      "data": {
+        "id": "arm-int",
+        "label": "Allocated to intervention (n=75)"
+      }
+    },
+    {
+      "data": {
+        "id": "arm-ctl",
+        "label": "Allocated to control (n=75)"
+      }
+    },
+    {
+      "data": {
+        "id": "fu-int",
+        "label": "Completed follow-up (n=70)"
+      }
+    },
+    {
+      "data": {
+        "id": "fu-ctl",
+        "label": "Completed follow-up (n=73)"
+      }
+    },
+    {
+      "data": {
+        "id": "ana-int",
+        "label": "Analysed (n=70)"
+      }
+    },
+    {
+      "data": {
+        "id": "ana-ctl",
+        "label": "Analysed (n=73)"
+      }
+    },
+    {
+      "data": {
+        "id": "edge1",
+        "source": "assessed",
+        "target": "excluded"
+      }
+    },
+    {
+      "data": {
+        "id": "edge2",
+        "source": "assessed",
+        "target": "randomized"
+      }
+    },
+    {
+      "data": {
+        "id": "edge3",
+        "source": "randomized",
+        "target": "arm-int"
+      }
+    },
+    {
+      "data": {
+        "id": "edge4",
+        "source": "randomized",
+        "target": "arm-ctl"
+      }
+    },
+    {
+      "data": {
+        "id": "edge5",
+        "source": "arm-int",
+        "target": "fu-int"
+      }
+    },
+    {
+      "data": {
+        "id": "edge6",
+        "source": "arm-ctl",
+        "target": "fu-ctl"
+      }
+    },
+    {
+      "data": {
+        "id": "edge7",
+        "source": "fu-int",
+        "target": "ana-int"
+      }
+    },
+    {
+      "data": {
+        "id": "edge8",
+        "source": "fu-ctl",
+        "target": "ana-ctl"
+      }
+    }
+  ],
+  "style": [
+    {
+      "selector": "node",
+      "style": {
+        "content": "data(label)",
+        "font-size": 11,
+        "text-valign": "center",
+        "text-halign": "center",
+        "text-wrap": "wrap",
+        "text-max-width": 120,
+        "width": 150,
+        "height": 44,
+        "shape": "round-rectangle",
+        "background-color": "#0072B2",
+        "color": "#ffffff",
+        "text-outline-width": 2,
+        "text-outline-color": "#0072B2"
+      }
+    },
+    {
+      "selector": "node[?side]",
+      "style": {
+        "width": 110,
+        "height": 40,
+        "background-color": "#999999",
+        "text-outline-color": "#999999",
+        "font-size": 10
+      }
+    },
+    {
+      "selector": "edge",
+      "style": {
+        "width": 2,
+        "line-color": "#BBBBBB",
+        "curve-style": "bezier",
+        "target-arrow-shape": "triangle",
+        "target-arrow-color": "#BBBBBB"
+      }
+    }
+  ],
+  "layout": {
+    "name": "breadthfirst",
+    "directed": true,
+    "animate": false,
+    "spacingFactor": 1.4
+  }
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Network graph';
+cytoscape({
+  container: document.getElementById('cy'),
+  elements: SPEC.elements,
+  style: SPEC.style,
+  layout: SPEC.layout || { name: 'cose', animate: false }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Chart.js 4.5.1</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  .canvas-box { position: relative; height: 60vh; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div class="canvas-box"><canvas id="chart"></canvas></div>
+  </div>
+  <footer>chartz · Chart.js 4.5.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "type": "radar",
+  "data": {
+    "labels": [
+      "Completeness",
+      "Contiguity (N50)",
+      "Accuracy (QV)",
+      "Gene BUSCO",
+      "rRNA completeness",
+      "No. misassemblies"
+    ],
+    "datasets": [
+      {
+        "label": "Assembly A (short-read)",
+        "data": [
+          96,
+          72,
+          92,
+          94,
+          88,
+          90
+        ],
+        "borderColor": "#0072B2",
+        "backgroundColor": "rgba(0,114,178,0.2)"
+      },
+      {
+        "label": "Assembly B (hybrid)",
+        "data": [
+          99,
+          95,
+          94,
+          97,
+          96,
+          97
+        ],
+        "borderColor": "#009E73",
+        "backgroundColor": "rgba(0,158,115,0.2)"
+      }
+    ]
+  },
+  "options": {
+    "responsive": true,
+    "maintainAspectRatio": false,
+    "plugins": {
+      "title": {
+        "display": false,
+        "text": "Genome assembly quality (0-100 normalized)"
+      },
+      "legend": {
+        "position": "bottom"
+      }
+    },
+    "scales": {
+      "r": {
+        "beginAtZero": true,
+        "max": 100
+      }
+    }
+  }
+};
+document.getElementById('chart-title').textContent =
+  (SPEC.options && SPEC.options.plugins && SPEC.options.plugins.title && SPEC.options.plugins.title.text) || '';
+new Chart(document.getElementById('chart'), SPEC);
+</script>
+</body>
+</html>

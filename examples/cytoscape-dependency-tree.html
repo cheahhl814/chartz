@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Cytoscape.js 3.34.3</title>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.34.3/dist/cytoscape.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #cy { width: 100%; height: 70vh; border: 1px solid #eee; border-radius: 6px; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="cy"></div>
+  </div>
+  <footer>chartz · Cytoscape.js 3.34.3 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "Variant-calling pipeline DAG (breadthfirst layout)",
+  "elements": [
+    {
+      "data": {
+        "id": "raw-fastq",
+        "label": "raw-fastq",
+        "tier": 0
+      }
+    },
+    {
+      "data": {
+        "id": "qc-fastqc",
+        "label": "qc-fastqc",
+        "tier": 1
+      }
+    },
+    {
+      "data": {
+        "id": "trim",
+        "label": "trim",
+        "tier": 1
+      }
+    },
+    {
+      "data": {
+        "id": "qc-trim",
+        "label": "qc-trim",
+        "tier": 2
+      }
+    },
+    {
+      "data": {
+        "id": "align",
+        "label": "align",
+        "tier": 2
+      }
+    },
+    {
+      "data": {
+        "id": "sort-index",
+        "label": "sort-index",
+        "tier": 3
+      }
+    },
+    {
+      "data": {
+        "id": "markdup",
+        "label": "markdup",
+        "tier": 3
+      }
+    },
+    {
+      "data": {
+        "id": "call-snv",
+        "label": "call-snv",
+        "tier": 4
+      }
+    },
+    {
+      "data": {
+        "id": "call-sv",
+        "label": "call-sv",
+        "tier": 4
+      }
+    },
+    {
+      "data": {
+        "id": "filter",
+        "label": "filter",
+        "tier": 5
+      }
+    },
+    {
+      "data": {
+        "id": "annotate",
+        "label": "annotate",
+        "tier": 5
+      }
+    },
+    {
+      "data": {
+        "id": "report",
+        "label": "report",
+        "tier": 6
+      }
+    },
+    {
+      "data": {
+        "id": "edge2",
+        "source": "raw-fastq",
+        "target": "qc-fastqc"
+      }
+    },
+    {
+      "data": {
+        "id": "edge3",
+        "source": "raw-fastq",
+        "target": "trim"
+      }
+    },
+    {
+      "data": {
+        "id": "edge4",
+        "source": "trim",
+        "target": "qc-trim"
+      }
+    },
+    {
+      "data": {
+        "id": "edge4",
+        "source": "qc-fastqc",
+        "target": "qc-trim"
+      }
+    },
+    {
+      "data": {
+        "id": "edge5",
+        "source": "trim",
+        "target": "align"
+      }
+    },
+    {
+      "data": {
+        "id": "edge6",
+        "source": "align",
+        "target": "sort-index"
+      }
+    },
+    {
+      "data": {
+        "id": "edge7",
+        "source": "sort-index",
+        "target": "markdup"
+      }
+    },
+    {
+      "data": {
+        "id": "edge8",
+        "source": "markdup",
+        "target": "call-snv"
+      }
+    },
+    {
+      "data": {
+        "id": "edge9",
+        "source": "markdup",
+        "target": "call-sv"
+      }
+    },
+    {
+      "data": {
+        "id": "edge10",
+        "source": "call-snv",
+        "target": "filter"
+      }
+    },
+    {
+      "data": {
+        "id": "edge10",
+        "source": "call-sv",
+        "target": "filter"
+      }
+    },
+    {
+      "data": {
+        "id": "edge11",
+        "source": "filter",
+        "target": "annotate"
+      }
+    },
+    {
+      "data": {
+        "id": "edge12",
+        "source": "annotate",
+        "target": "report"
+      }
+    },
+    {
+      "data": {
+        "id": "edge12",
+        "source": "qc-trim",
+        "target": "report"
+      }
+    }
+  ],
+  "style": [
+    {
+      "selector": "node",
+      "style": {
+        "content": "data(label)",
+        "font-size": 12,
+        "text-valign": "center",
+        "width": "label",
+        "padding": "8px",
+        "shape": "round-rectangle",
+        "color": "#ffffff",
+        "text-outline-width": 2,
+        "text-outline-color": "#4A78A8",
+        "background-color": "#4A78A8"
+      }
+    },
+    {
+      "selector": "node[tier = 6]",
+      "style": {
+        "background-color": "#D55E00",
+        "text-outline-color": "#D55E00"
+      }
+    },
+    {
+      "selector": "node[tier >= 5]",
+      "style": {
+        "background-color": "#E69F00",
+        "text-outline-color": "#E69F00"
+      }
+    },
+    {
+      "selector": "edge",
+      "style": {
+        "width": 2,
+        "line-color": "#BBBBBB",
+        "curve-style": "bezier",
+        "target-arrow-shape": "triangle",
+        "target-arrow-color": "#BBBBBB"
+      }
+    }
+  ],
+  "layout": {
+    "name": "breadthfirst",
+    "directed": true,
+    "animate": false
+  }
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Network graph';
+cytoscape({
+  container: document.getElementById('cy'),
+  elements: SPEC.elements,
+  style: SPEC.style,
+  layout: SPEC.layout || { name: 'cose', animate: false }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · OncoPrint (template-native SVG)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1080px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0 0 1rem; font-weight: 600; }
+  #chart { width: 100%; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1 id="chart-title"></h1>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · OncoPrint (engine 7) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = /*__SPEC__*/;
+document.getElementById('chart-title').textContent = SPEC.title || 'OncoPrint';
+
+/* OncoPrint renderer — template-native SVG, no external library.
+   Spec: { title, genes: [...], samples: [...],
+           cells: { gene: { sample: ["Missense","Amp", ...] } },   // sparse; only altered cells
+           alter_colors: { class: hex },                            // class -> color
+           stack_order: [class, ...],                               // draw order within a cell (bottom-up)
+           show_pct: true,                                          // gene frequency % at right (agent-computed, cohort denominator)
+           pct: { gene: "62%" },
+           tmb?: { label, values: { sample: log10TMB }, max },      // log10-transformed upstream (hypermutator rule)
+           top_annot?: [{label, height?, values: {sample: class}, colors: {class: hex}}] }
+   Genes and samples are emitted ALREADY ORDERED by the agent (memoSort /
+   burden sort upstream); renderer draws in spec order. */
+(function render() {
+  const NS = "http://www.w3.org/2000/svg";
+  const genes = SPEC.genes, samples = SPEC.samples;
+  const GUT_L = 170, GUT_T = 16;
+  const CELL_W = Math.max(11, Math.floor(780 / samples.length));
+  const CELL_H = Math.max(14, Math.floor(360 / genes.length));
+  const TMB_H = SPEC.tmb ? 46 : 0;
+  const ANN_H = SPEC.top_annot ? SPEC.top_annot.reduce((a, s) => a + (s.height || 14), 0) : 0;
+  const MAT_W = CELL_W * samples.length, MAT_H = CELL_H * genes.length;
+  const MAT_X = GUT_L, MAT_Y = GUT_T + TMB_H + ANN_H + 14;
+
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${MAT_X + MAT_W + 90} ${MAT_Y + MAT_H + 70}`);
+  svg.setAttribute("style", "font-family: system-ui, sans-serif;");
+  const el = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    svg.appendChild(n);
+    return n;
+  };
+
+  // cells (background + stacked alteration bands, bottom-up in stack_order)
+  const order = SPEC.stack_order || Object.keys(SPEC.alter_colors);
+  genes.forEach((g, r) => {
+    samples.forEach((s, c) => {
+      const x = MAT_X + c * CELL_W, y = MAT_Y + r * CELL_H;
+      el("rect", {x, y, width: CELL_W - 1, height: CELL_H - 1, fill: "#EEEEEE"});
+      const alts = ((SPEC.cells[g] || {})[s] || []);
+      if (alts.length) {
+        const bandH = (CELL_H - 1) / alts.length;
+        // draw in stack_order so classes layer consistently
+        const sorted = order.filter(a => alts.includes(a)).concat(alts.filter(a => !order.includes(a)));
+        sorted.forEach((a, k) => {
+          el("rect", {x, y: y + (CELL_H - 1) - (k + 1) * bandH, width: CELL_W - 1,
+                      height: bandH, fill: (SPEC.alter_colors[a] || "#666666")});
+        });
+      }
+    });
+  });
+
+  // gene labels + pct (right)
+  genes.forEach((g, r) => {
+    el("text", {x: MAT_X - 6, y: MAT_Y + r * CELL_H + CELL_H / 2 + 3,
+                "text-anchor": "end", "font-size": 9.5, fill: "#333"}, g);
+    if (SPEC.show_pct && SPEC.pct && SPEC.pct[g])
+      el("text", {x: MAT_X + MAT_W + 6, y: MAT_Y + r * CELL_H + CELL_H / 2 + 3,
+                  "font-size": 9, fill: "#666"}, SPEC.pct[g]);
+  });
+
+  // TMB bar (log10 values supplied by agent)
+  if (SPEC.tmb) {
+    const tTop = GUT_T, tBottom = GUT_T + TMB_H;
+    const tmax = SPEC.tmb.max || Math.max(...Object.values(SPEC.tmb.values)) || 1;
+    el("text", {x: 6, y: tTop + 10, "font-size": 10, fill: "#444", "font-weight": 600}, SPEC.tmb.label);
+    samples.forEach((s, c) => {
+      const v = (SPEC.tmb.values || {})[s];
+      if (v === undefined) return;
+      const h = (v / tmax) * TMB_H;
+      el("rect", {x: MAT_X + c * CELL_W, y: tBottom - h, width: CELL_W - 1, height: h,
+                  fill: "#333333", opacity: 0.85});
+    });
+    el("text", {x: MAT_X + MAT_W + 6, y: tBottom, "font-size": 9, fill: "#666"}, "0");
+    el("text", {x: MAT_X + MAT_W + 6, y: tTop + 10, "font-size": 9, fill: "#666"}, tmax);
+  }
+
+  // top annotation strips (above matrix, below TMB)
+  let ay = MAT_Y - ANN_H;
+  if (SPEC.top_annot) for (const s of SPEC.top_annot) {
+    el("text", {x: 6, y: ay + s.height - 3, "font-size": 10, fill: "#444", "font-weight": 600}, s.label);
+    samples.forEach((sm, c) => {
+      const v = (s.values || {})[sm];
+      el("rect", {x: MAT_X + c * CELL_W, y: ay, width: CELL_W - 1, height: s.height,
+                  fill: (s.colors || {})[v] || "#DDDDDD"});
+    });
+    ay += s.height;
+  }
+
+  // sample labels (rotated, bottom)
+  samples.forEach((s, c) => {
+    const x = MAT_X + c * CELL_W + CELL_W / 2, y = MAT_Y + MAT_H + 10;
+    el("text", {x, y, "text-anchor": "start", "font-size": 8.5, fill: "#333",
+                transform: `rotate(-60 ${x} ${y})`}, s);
+  });
+
+  // alteration legend
+  let lx = MAT_X;
+  for (const [cls, c] of Object.entries(SPEC.alter_colors)) {
+    el("rect", {x: lx, y: MAT_Y + MAT_H + 42, width: 10, height: 10, fill: c});
+    el("text", {x: lx + 14, y: MAT_Y + MAT_H + 51, "font-size": 9.5, fill: "#444"}, cls);
+    lx += 14 + cls.length * 6.2 + 16;
+  }
+  document.getElementById("chart").appendChild(svg);
+})();
+</script>
+</body>
+</html>

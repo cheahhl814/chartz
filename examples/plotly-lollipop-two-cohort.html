@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Plotly.js 4.1.1</title>
+<script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · Plotly.js 4.1.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "data": [
+    {
+      "type": "scatter",
+      "mode": "lines+markers",
+      "name": "Cohort A (n=230)",
+      "x": [
+        155,
+        162,
+        298,
+        488,
+        718,
+        855
+      ],
+      "y": [
+        14,
+        9,
+        4,
+        11,
+        7,
+        2
+      ],
+      "line": {
+        "color": "#AAAAAA",
+        "width": 1.5
+      },
+      "marker": {
+        "color": [
+          "#D55E00",
+          "#D55E00",
+          "#0072B2",
+          "#D55E00",
+          "#D55E00",
+          "#0072B2"
+        ],
+        "size": 9
+      }
+    },
+    {
+      "type": "scatter",
+      "mode": "lines+markers",
+      "name": "Cohort B (n=180)",
+      "x": [
+        162,
+        204,
+        372,
+        488,
+        901
+      ],
+      "y": [
+        -3,
+        -2,
+        -5,
+        -4,
+        -2
+      ],
+      "line": {
+        "color": "#AAAAAA",
+        "width": 1.5
+      },
+      "marker": {
+        "color": [
+          "#D55E00",
+          "#0072B2",
+          "#0072B2",
+          "#D55E00",
+          "#999999"
+        ],
+        "size": 9
+      }
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Two-cohort lollipop - shared domain backbone, stems mirrored"
+    },
+    "xaxis": {
+      "title": {
+        "text": "Amino-acid position"
+      },
+      "range": [
+        0,
+        920
+      ]
+    },
+    "yaxis": {
+      "title": {
+        "text": "Recurrence (samples)"
+      },
+      "range": [
+        -16,
+        16
+      ],
+      "zeroline": true,
+      "zerolinewidth": 1,
+      "zerolinecolor": "#CCCCCC"
+    },
+    "shapes": [
+      {
+        "type": "rect",
+        "x0": 120,
+        "x1": 340,
+        "yref": "paper",
+        "y0": 0.5,
+        "y1": 0.53,
+        "fillcolor": "#0072B2",
+        "line": {
+          "width": 0
+        },
+        "opacity": 0.85
+      },
+      {
+        "type": "rect",
+        "x0": 460,
+        "x1": 610,
+        "yref": "paper",
+        "y0": 0.5,
+        "y1": 0.53,
+        "fillcolor": "#009E73",
+        "line": {
+          "width": 0
+        },
+        "opacity": 0.85
+      },
+      {
+        "type": "rect",
+        "x0": 700,
+        "x1": 790,
+        "yref": "paper",
+        "y0": 0.5,
+        "y1": 0.53,
+        "fillcolor": "#E69F00",
+        "line": {
+          "width": 0
+        },
+        "opacity": 0.85
+      }
+    ],
+    "annotations": [
+      {
+        "xref": "x",
+        "x": 230.0,
+        "yref": "paper",
+        "y": 0.52,
+        "text": "Kinase",
+        "showarrow": false,
+        "font": {
+          "size": 9
+        }
+      },
+      {
+        "xref": "x",
+        "x": 535.0,
+        "yref": "paper",
+        "y": 0.52,
+        "text": "SH2",
+        "showarrow": false,
+        "font": {
+          "size": 9
+        }
+      },
+      {
+        "xref": "x",
+        "x": 745.0,
+        "yref": "paper",
+        "y": 0.52,
+        "text": "P-loop",
+        "showarrow": false,
+        "font": {
+          "size": 9
+        }
+      },
+      {
+        "xref": "x",
+        "x": 155,
+        "yref": "y",
+        "y": 14.7,
+        "text": "14",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "x",
+        "x": 162,
+        "yref": "y",
+        "y": 9.7,
+        "text": "9",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "x",
+        "x": 298,
+        "yref": "y",
+        "y": 4.7,
+        "text": "4",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "x",
+        "x": 488,
+        "yref": "y",
+        "y": 11.7,
+        "text": "11",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "x",
+        "x": 718,
+        "yref": "y",
+        "y": 7.7,
+        "text": "7",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "x",
+        "x": 855,
+        "yref": "y",
+        "y": 2.7,
+        "text": "2",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "x",
+        "x": 162,
+        "yref": "y",
+        "y": -3.7,
+        "text": "3",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "x",
+        "x": 204,
+        "yref": "y",
+        "y": -2.7,
+        "text": "2",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "x",
+        "x": 372,
+        "yref": "y",
+        "y": -5.7,
+        "text": "5",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "x",
+        "x": 488,
+        "yref": "y",
+        "y": -4.7,
+        "text": "4",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "x",
+        "x": 901,
+        "yref": "y",
+        "y": -2.7,
+        "text": "2",
+        "showarrow": false,
+        "font": {
+          "size": 9.5
+        }
+      },
+      {
+        "xref": "paper",
+        "x": 0.01,
+        "yref": "paper",
+        "y": 1.02,
+        "text": "up = Cohort A, down = Cohort B (canonical isoform UniProt P12345)",
+        "showarrow": false,
+        "xanchor": "left",
+        "font": {
+          "size": 10,
+          "color": "#666"
+        }
+      }
+    ],
+    "showlegend": true,
+    "font": {
+      "size": 13
+    }
+  },
+  "config": {
+    "responsive": true,
+    "displaylogo": false
+  }
+};
+const cfg = SPEC.config || { responsive: true, displaylogo: false };
+cfg.responsive = true;
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
+</script>
+</body>
+</html>
