@@ -1,6 +1,6 @@
 Engine: SeqLogo
 Template: templates/seqlogo.html
-Routing row: 5
+Routing row: 6
 Loaded from SKILL.md §1 routing when this engine is selected.
 
 # SeqLogo — sequence logos

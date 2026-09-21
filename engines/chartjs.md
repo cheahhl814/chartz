@@ -1,6 +1,6 @@
 Engine: Chart.js
 Template: templates/chartjs.html
-Routing row: 9
+Routing row: 11
 Loaded from SKILL.md §1 routing when this engine is selected.
 
 # Chart.js — simple statistical charts

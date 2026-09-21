@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · HeatTree 1 (template-native)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1080px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .card-head h1 { font-size: 1.1rem; margin: 0 0 .75rem 0; color: #333; }
+  .dl-btn { font-size: .8rem; padding: .35rem .7rem; border: 1px solid #dee2e6; border-radius: 6px;
+            background: #fff; cursor: pointer; white-space: nowrap; }
+  .dl-btn:hover { background: #f1f3f5; }
+  #chart { width: 100%; display: flex; justify-content: center; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="card-head">
+      <h1 id="chart-title"></h1>
+      <div>
+        <button id="dl-svg" class="dl-btn" type="button">Download SVG</button>
+        <button id="dl-png" class="dl-btn" type="button">Download PNG</button>
+      </div>
+    </div>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · HeatTree (engine 12) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = /*__SPEC__*/;
+document.getElementById('chart-title').textContent = SPEC.title || 'Heat tree';
+(function render() {
+  // ---------- inputs & defaults ----------
+  var nodes  = SPEC.nodes || [];                    // [{id, value, label?}]  value: number|null
+  var edges  = SPEC.edges || [];                    // [{from, to, value?}]   edge value defaults to child node value
+  var scaleName = SPEC.scale || 'sqrt';             // linear | sqrt | log10
+  var pal    = SPEC.palette || {};
+  var naColor = pal.na_color || '#c9c9c9';
+  var stops  = pal.stops || [[0,'#FDE725'],[0.25,'#5EC962'],[0.5,'#21918C'],[0.75,'#3B528B'],[1,'#440154']]; // viridis
+  var treatZeroNA = pal.treat_zero_as_na !== false; // zero abundance -> grey (metacoder convention)
+  var size   = Object.assign({ node_min: 2, node_max: 16, edge_min: 0.6, edge_max: 7 }, SPEC.size || {});
+  var labels = Object.assign({ show: true, max_nodes: 150, font_size: 9 }, SPEC.labels || {});
+  var legend = SPEC.legend !== false ? Object.assign({ title: 'Value' }, (typeof SPEC.legend === 'object' ? SPEC.legend : {})) : null;
+  var lay    = SPEC.layout || {};
+  var W = lay.width || 1060, H = lay.height || 880;
+  var CX = (typeof lay.cx === 'number') ? lay.cx : 420, CY = (typeof lay.cy === 'number') ? lay.cy : H / 2;
+  var INNER_R = lay.inner_radius || 45, MAX_R = lay.max_radius || 400;
+  var START_DEG = (typeof lay.start_deg === 'number') ? lay.start_deg : -90; // 12 o'clock, clockwise
+
+  // ---------- build tree ----------
+  var byId = {}, nodeById = {};
+  nodes.forEach(function (n) { byId[n.id] = n; });
+  var hasParent = {}, children = {};
+  edges.forEach(function (e) {
+    if (!byId[e.from] || !byId[e.to]) throw new Error('heattree: edge references unknown node: ' + e.from + ' -> ' + e.to);
+    hasParent[e.to] = true;
+    (children[e.from] = children[e.from] || []).push(e.to);
+  });
+  var roots = nodes.filter(function (n) { return !hasParent[n.id]; }).map(function (n) { return n.id; });
+  if (roots.length !== 1) throw new Error('heattree: expected exactly one root, found ' + roots.length);
+  var rootId = roots[0];
+
+  // depth + DFS leaf order
+  var depth = {}, order = [];            // order: DFS preorder
+  (function dfs(id, d) {
+    depth[id] = d; order.push(id);
+    (children[id] || []).forEach(function (c) { dfs(c, d + 1); });
+  })(rootId, 0);
+  var maxDepth = Math.max.apply(null, order.map(function (id) { return depth[id]; }));
+
+  // ---------- value scaling ----------
+  var vals = nodes.map(function (n) { return (typeof n.value === 'number' && !(treatZeroNA && n.value <= 0)) ? n.value : null; })
+                  .filter(function (v) { return v !== null; });
+  edges.forEach(function (e) { if (typeof e.value === 'number') vals.push(e.value); });
+  var vMin = (pal.min != null) ? pal.min : Math.min.apply(null, vals.length ? vals : [0]);
+  var vMax = (pal.max != null) ? pal.max : Math.max.apply(null, vals.length ? vals : [1]);
+  function f(v) {
+    if (scaleName === 'sqrt') return Math.sqrt(v);
+    if (scaleName === 'log10') return Math.log10(v + 1);
+    return v;
+  }
+  var fMin = f(vMin), fMax = f(vMax), fRange = (fMax - fMin) || 1;
+  function norm(v) { return (f(v) - fMin) / fRange; }
+  function isNA(n) { return !(typeof n.value === 'number') || (treatZeroNA && n.value <= 0); }
+  function colorFor(t) {
+    t = Math.max(0, Math.min(1, t));
+    for (var i = 1; i < stops.length; i++) {
+      if (t <= stops[i][0]) {
+        var t0 = stops[i - 1][0], t1 = stops[i][0];
+        var u = t1 === t0 ? 0 : (t - t0) / (t1 - t0);
+        return lerpColor(rgb(stops[i - 1][1]), rgb(stops[i][1]), u);
+      }
+    }
+    return lerpColor(rgb(stops[stops.length - 2][1]), rgb(stops[stops.length - 1][1]), 1);
+  }
+  function rgb(h) {
+    h = h.replace('#', '');
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    return [parseInt(h.substr(0, 2), 16), parseInt(h.substr(2, 2), 16), parseInt(h.substr(4, 2), 16)];
+  }
+  function lerpColor(a, b, t) {
+    var c = [0, 1, 2].map(function (i) { return Math.round(a[i] + (b[i] - a[i]) * t); });
+    return 'rgb(' + c.join(',') + ')';
+  }
+  var nodeR = function (n) {
+    if (isNA(n)) return size.node_min;
+    return size.node_min + norm(n.value) * (size.node_max - size.node_min);
+  };
+  var nodeColor = function (n) { return isNA(n) ? naColor : colorFor(norm(n.value)); };
+  var edgeVal = function (e) {
+    if (typeof e.value === 'number') return e.value;
+    var child = byId[e.to];
+    return isNA(child) ? null : child.value;
+  };
+  var edgeW = function (e) {
+    var v = edgeVal(e);
+    if (v === null) return size.edge_min;
+    return size.edge_min + norm(v) * (size.edge_max - size.edge_min);
+  };
+  var edgeC = function (e) {
+    var v = edgeVal(e);
+    return v === null ? naColor : colorFor(norm(v));
+  };
+
+  // ---------- radial layout ----------
+  var leaves = order.filter(function (id) { return !(children[id] && children[id].length); });
+  var unit = 360 / Math.max(1, leaves.length);
+  var leafIdx = 0, angle = {};                       // degrees
+  (function assign(id) {
+    var kids = children[id] || [];
+    if (!kids.length) { angle[id] = START_DEG + (leafIdx++ + 0.5) * unit; return; }
+    kids.forEach(assign);
+    var first = kids[0], last = kids[kids.length - 1];
+    var a0 = angle[first], a1 = angle[last];
+    if (a1 < a0) a1 += 360;                          // wrap
+    angle[id] = a0 + (a1 - a0) / 2;
+  })(rootId);
+  var ringGap = maxDepth ? (MAX_R - INNER_R) / maxDepth : 0;
+  var pos = {};
+  order.forEach(function (id) {
+    var r = INNER_R + depth[id] * ringGap;
+    var th = angle[id] * Math.PI / 180;
+    pos[id] = { x: CX + r * Math.cos(th), y: CY + r * Math.sin(th), th: angle[id] };
+  });
+
+  // ---------- svg ----------
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  var svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svg.setAttribute('style', 'font-family: system-ui, sans-serif;');
+  // edges first (under nodes)
+  edges.forEach(function (e) {
+    var p = pos[e.from], c = pos[e.to];
+    var ln = el('line', { x1: p.x, y1: p.y, x2: c.x, y2: c.y,
+                          stroke: edgeC(e), 'stroke-width': edgeW(e),
+                          'stroke-opacity': edgeVal(e) === null ? 0.55 : 0.95, 'stroke-linecap': 'round' });
+    var t = document.createElementNS(NS, 'title');
+    t.textContent = e.from + ' \u2192 ' + e.to + (edgeVal(e) !== null ? ': ' + fmt(edgeVal(e)) : ' (NA)');
+    ln.appendChild(t);
+  });
+  // nodes
+  order.forEach(function (id) {
+    var n = byId[id], p = pos[id];
+    var c = el('circle', { cx: p.x, cy: p.y, r: nodeR(n), fill: nodeColor(n),
+                           stroke: '#ffffff', 'stroke-width': 0.6 });
+    var t = document.createElementNS(NS, 'title');
+    t.textContent = id + (isNA(n) ? ' (NA)' : ': ' + fmt(n.value));
+    c.appendChild(t);
+  });
+  function fmt(v) {
+    if (v == null) return 'NA';
+    if (Math.abs(v) >= 1000) return Math.round(v).toLocaleString('en-US');
+    return (Math.round(v * 100) / 100).toString();
+  }
+  // labels (root labelled at center, bold)
+  if (labels.show && order.length <= labels.max_nodes) {
+    order.forEach(function (id) {
+      var p = pos[id];
+      if (id === rootId) {
+        var m = nodeColor(rootId).match(/\d+/g);
+        var lum = m ? (0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2]) : 255;
+        el('text', { x: p.x, y: p.y + 4, 'text-anchor': 'middle',
+                     'font-size': labels.font_size + 2, 'font-weight': 'bold',
+                     fill: lum < 140 ? '#ffffff' : '#333333' }).textContent = id;
+        return;
+      }
+      var right = Math.cos(p.th * Math.PI / 180) >= 0;
+      el('text', { x: p.x + (right ? 6 : -6), y: p.y + 3,
+                   'text-anchor': right ? 'start' : 'end',
+                   'font-size': labels.font_size, fill: '#333333' }).textContent = id;
+    });
+  }
+  // ---------- legend ----------
+  if (legend) {
+    var lx = W - 150, ly = Math.max(40, H / 2 - 150), lh = 300, lw = 16;
+    var defs = el('defs');
+    var grad = el('linearGradient', { id: 'ht-leg', x1: 0, y1: 1, x2: 0, y2: 0 }, defs);
+    stops.forEach(function (s) { el('stop', { offset: (s[0] * 100) + '%', 'stop-color': s[1] }, grad); });
+    el('rect', { x: lx, y: ly, width: lw, height: lh, fill: 'url(#ht-leg)', stroke: '#dddddd', 'stroke-width': 0.5 });
+    el('rect', { x: lx, y: ly + lh + 8, width: lw, height: 8, fill: naColor, stroke: '#dddddd', 'stroke-width': 0.5 });
+    el('text', { x: lx + lw + 6, y: ly + lh + 15, 'font-size': 9, fill: '#666' }).textContent = 'NA';
+    var lt = el('text', { x: lx, y: ly - 24, 'font-size': 12, fill: '#333', 'font-weight': 'bold' });
+    lt.textContent = legend.title || 'Value';
+    for (var i = 0; i <= 4; i++) {
+      var v = vMin + (vMax - vMin) * i / 4;
+      el('text', { x: lx + lw + 6, y: ly + lh - (lh * i / 4) + 4, 'font-size': 10, fill: '#555' }).textContent = fmt(v);
+    }
+  }
+  document.getElementById('chart').appendChild(svg);
+  // auto-fit viewBox to actual content (long labels may overflow the nominal box)
+  var bb = svg.getBBox();
+  svg.setAttribute('viewBox', (bb.x - 12) + ' ' + (bb.y - 12) + ' ' + (bb.width + 24) + ' ' + (bb.height + 24));
+})();
+</script>
+<script>
+/* ---- chartz print-export module (identical across template-native engines; v0.8.0) ----
+   SPEC.export (optional, all keys optional):
+     width_mm    - journal column width (e.g. 89 = Nature single column). With dpi, sets the
+                   Download PNG raster deterministically: px = mm / 25.4 * dpi (default: 2x screen).
+                   Download SVG then carries width/height in mm units (true print vector).
+     dpi         - raster density for Download PNG (default 300).
+     font_family - overrides the system-ui stack in both exports (journals: "Arial"). */
+(function () {
+  var getSvg = function () { return document.querySelector('#chart svg'); };
+  var baseName = function () {
+    return (document.getElementById('chart-title').textContent || 'chart').replace(/\s+/g, '_');
+  };
+  function exportScale(el) {
+    var ex = (SPEC && SPEC.export) || {};
+    var dpi = ex.dpi || 300;
+    if (ex.width_mm) {
+      var cssW = (el.viewBox.baseVal && el.viewBox.baseVal.width) || el.clientWidth || 900;
+      return Math.max(1, (ex.width_mm / 25.4 * dpi) / cssW);
+    }
+    return 2;
+  }
+  function svgXml(print) {
+    var el = getSvg();
+    if (!el) return null;
+    var vb = el.viewBox.baseVal;
+    var w = (vb && vb.width) ? vb.width : el.clientWidth;
+    var h = (vb && vb.height) ? vb.height : el.clientHeight;
+    var clone = el.cloneNode(true);
+    var ex = (SPEC && SPEC.export) || {};
+    if (print && ex.width_mm) {
+      clone.setAttribute('width', ex.width_mm + 'mm');
+      clone.setAttribute('height', (h / w * ex.width_mm).toFixed(2) + 'mm');
+    } else {
+      clone.setAttribute('width', w);
+      clone.setAttribute('height', h);
+    }
+    if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    if (!clone.getAttribute('xmlns:xlink')) clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+    if (ex.font_family) clone.setAttribute('style', 'font-family: ' + ex.font_family + ';');
+    return { xml: new XMLSerializer().serializeToString(clone), w: w, h: h };
+  }
+  function download(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  document.getElementById('dl-svg').addEventListener('click', function () {
+    var r = svgXml(true);
+    if (!r) return;
+    var prolog = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    download(new Blob([prolog + r.xml], { type: 'image/svg+xml;charset=utf-8' }), baseName() + '.svg');
+  });
+  document.getElementById('dl-png').addEventListener('click', function () {
+    var r = svgXml(false);
+    if (!r) return;
+    var scale = exportScale(getSvg());
+    var url = URL.createObjectURL(new Blob([r.xml], { type: 'image/svg+xml;charset=utf-8' }));
+    var img = new Image();
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(r.w * scale);
+      canvas.height = Math.round(r.h * scale);
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function (blob) { download(blob, baseName() + '.png'); });
+    };
+    img.src = url;
+  });
+})();
+</script>
+</body>
+</html>

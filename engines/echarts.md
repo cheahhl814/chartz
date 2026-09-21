@@ -1,6 +1,6 @@
 Engine: ECharts
 Template: templates/echarts.html
-Routing row: 8
+Routing row: 10
 Loaded from SKILL.md §1 routing when this engine is selected.
 
 # ECharts — rich / dashboards / catch-all

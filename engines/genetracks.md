@@ -1,6 +1,6 @@
 Engine: GenomeTracks
 Template: templates/genetracks.html
-Routing row: 2
+Routing row: 3
 Loaded from SKILL.md §1 routing when this engine is selected.
 
 # GenomeTracks — genome-browser track figures

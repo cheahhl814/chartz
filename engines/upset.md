@@ -1,6 +1,6 @@
 Engine: UpSet
 Template: templates/upset.html
-Routing row: 6
+Routing row: 8
 Loaded from SKILL.md §1 routing when this engine is selected.
 
 # UpSet — set-intersection plots
