@@ -65,7 +65,8 @@ Worked, render-verified specs live in `examples/` named `<engine>-<charttype>.ht
 [ ] 3. /*__SPEC__*/ slot replaced exactly once (grep -c "__SPEC__" file == 0 after fill)
 [ ] 4. <script src> URLs reachable: curl -sI -o /dev/null -w "%{http_code}" <url> == 200 (skip when offline — note it in the delivery message; skip entirely for Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos — no CDN)
 [ ] 5. No NaN/undefined/None leaked into the spec (grep -c "NaN\|undefined" spec == 0)
-[ ] 5b. Template render call intact (v0.12.1 regression guard): the file contains exactly one engine render invocation — `Plotly.newPlot(` / `new Chart(` / `echarts.init(` + `setOption(` / `cytoscape(` / native `render()` — grep for it before delivering; a spec with no render call silently produces a blank page (no console error)
+[ ] 5b-1. Engine docs carry input templates: every `engines/<name>.md` opens with a **Spec** block (the `const SPEC = {...}` template, annotated with per-key defaults) — an engine routed by §1 must have its spec contract documented there; if missing, add it before using the engine
+[ ] 5b-2. Template render call intact (v0.12.1 regression guard): the file contains exactly one engine render invocation — `Plotly.newPlot(` / `new Chart(` / `echarts.init(` + `setOption(` / `cytoscape(` / native `render()` — grep for it before delivering; a spec with no render call silently produces a blank page (no console error)
 [ ] 6. Title text present in the spec; file written to <workdir>/charts/<name>.html; absolute path reported
 ```
 
