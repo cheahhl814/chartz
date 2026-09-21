@@ -1,7 +1,7 @@
 ---
 name: chartz
 description: 'Render charts and graphs as self-contained HTML files from four pinned CDN engines, chosen by chart type. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a file they can open in a browser — "make a bar chart", "plot this data", "heatmap of these values", "draw a network graph", "dashboard of these metrics". Engine router: Chart.js (simple statistical), Plotly.js (scientific/statistical), ECharts (rich/dashboards), Cytoscape.js (nodes + edges). Emits one single-file HTML per chart with pinned CDN versions; no build step, no server. Does NOT do text-to-flowchart/sequence diagrams (use Mermaid/lumen-generate_visual for that) and does NOT analyze data — it renders data you already have.'
-version: 0.12.3
+version: 0.13.0
 updated: "2026-09-21"
 triggers:
   - "make a chart"
@@ -20,7 +20,7 @@ requires:
 
 # chartz — chart & graph rendering skill
 
-> **v0.12.3.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus nine template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos — §5b–§5j), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
+> **v0.13.0.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus eleven template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos, PlotlyGeo, GeoMap — §5b–§5l), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
 
 ## 0. Workflow (always all five steps)
 
@@ -50,6 +50,8 @@ requires:
 | 12  | Treemap, sankey, sunburst, dendrogram (topology-only `tree`), large series (>10k points), dataZoom scrubbing, mixed multi-chart dashboards                                                | **ECharts**                      | `templates/echarts.html`          | §4            | `engines/echarts.md`     |
 | 13  | Simple bar / line / pie / doughnut / radar / scatter / bubble (few series, shared category axis)                                                                                          | **Chart.js**                     | `templates/chartjs.html`          | §2            | `engines/chartjs.md`     |
 | 14  | Anything else                                                                                                                                                                             | **ECharts** (broadest catch-all) | `templates/echarts.html`          | §4            | `engines/echarts.md`     |
+| 15  | Geographic figures from lon/lat — site maps, regional choropleths, global context maps (built-in Natural Earth 50m basemap, no GeoJSON needed)                                            | **PlotlyGeo**                    | `templates/plotly-geo.html`       | §5k           | `engines/plotlygeo.md`   |
+| 16  | Local-scale maps needing real coastline detail — small islands, coverage polygons from GeoJSON ( Natural Earth 10m / OSM / project GIS exports)                                            | **GeoMap**                       | `templates/geomap.html`           | §5l           | `engines/geomap.md`      |
 
 **Read engines/<name>.md for the full spec contract before emitting.**
 
@@ -120,6 +122,8 @@ export: { width_mm: 89, dpi: 300, font_family: "Arial" }
 | HeatTree     | 1 (template-native) | none — vanilla-JS SVG in `templates/heattree.html`                    | n/a        |
 | PhyloTree    | 1 (template-native) | none — vanilla-JS SVG in `templates/phylotree.html`                   | n/a        |
 | Concordance  | 1 (template-native) | none — vanilla-JS SVG in `templates/concordance.html`                 | n/a        |
+| PlotlyGeo    | Plotly.js 4.1.1     | same pin as Plotly.js + vendored `assets/world_50m.json` topology inlined in the template | MIT / PD (NE) |
+| GeoMap       | d3-geo 3.1.1        | `https://cdn.jsdelivr.net/npm/d3-geo@3.1.1/dist/d3-geo.min.js` (+ `d3-array@3.2.4`) | ISC       |
 
 Bump procedure: verify the new version on the npm registry, update the table here, then `sed` the same version string into every template, run §6, then bump this skill's version and add a README changelog line. Never float (`@latest`/`@^`) — reproducibility beats freshness.
 

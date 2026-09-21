@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · GeoMap (template-native SVG + d3-geo)</title>
+<script src="https://cdn.jsdelivr.net/npm/d3-array@3.2.4/dist/d3-array.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-geo@3.1.1/dist/d3-geo.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1040px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0; font-weight: 600; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .dl-btn { font: inherit; font-size: 0.75rem; padding: 0.35rem 0.7rem; border: 1px solid #d0d4d9; border-radius: 6px; background: #fff; color: #333; cursor: pointer; flex-shrink: 0; }
+  .dl-btn:hover { background: #f1f3f5; }
+  #chart { width: 100%; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="card-head">
+      <h1 id="chart-title"></h1>
+      <button id="dl-png" class="dl-btn" type="button">Download PNG</button>
+      <button id="dl-svg" class="dl-btn" type="button">Download SVG</button>
+    </div>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · GeoMap (engine 16) · d3-geo projections, GeoJSON embedded in spec · self-contained</footer>
+</div>
+<script>
+const SPEC = /*__SPEC__*/;
+document.getElementById('chart-title').textContent = SPEC.title || 'Map';
+if (SPEC.subtitle) {
+  const sub = document.createElement('div');
+  sub.style.cssText = 'font-size:0.8rem;color:#777;margin:-0.6rem 0 0.8rem;';
+  sub.textContent = SPEC.subtitle;
+  document.getElementById('chart').parentNode.insertBefore(sub, document.getElementById('chart'));
+}
+
+/* GeoMap renderer — d3-geo projection + GeoJSON embedded in the SPEC.
+   Spec: { title, subtitle?, width?, height?, projection?: "mercator"|"equirectangular",
+           bbox?: {lon_min, lat_min, lon_max, lat_max},        // default: fit to all data
+           basemap?: { land?: <FeatureCollection>, land_fill?, land_stroke?, ocean_color?, graticule? },
+           layers?: [ {type: "polygons"|"lines", label?, features: <FC|Feature|geometry>, fill?, fill_opacity?,
+                       stroke?, stroke_width?, dash?}
+                    | {type: "points", label?, items: [{lon, lat, label?, color?, size?, label_side?}] } ],
+           scale_bar?: true|{length_km?}, north_arrow?: true, legend?: true,
+           export?: { width_mm?, dpi?, font_family? } } */
+(function render() {
+  const NS = "http://www.w3.org/2000/svg";
+  const W = SPEC.width || 900, H = SPEC.height || 700, PAD = 34;
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("style", "font-family: system-ui, sans-serif; display: block; margin: 0 auto; max-width: 100%;");
+  const el = (tag, attrs, parent, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    (parent || svg).appendChild(n);
+    return n;
+  };
+  const fc = g => Array.isArray(g) ? {type: "FeatureCollection",
+        features: g.map(x => typeof x === "object" && x.type === "Feature" ? x : {type: "Feature", properties: {}, geometry: x})}
+      : (g.type === "FeatureCollection" ? g : {type: "FeatureCollection",
+        features: [g.type === "Feature" ? g : {type: "Feature", properties: {}, geometry: g}]});
+  const allLayers = (SPEC.layers || []);
+  const everything = {type: "FeatureCollection", features: []};
+  if (SPEC.basemap && SPEC.basemap.land) everything.features.push(...fc(SPEC.basemap.land).features);
+  for (const L of allLayers || []) {
+    if (L.type === "polygons" || L.type === "lines") everything.features.push(...fc(L.features).features);
+    if (L.type === "points") for (const p of L.items)
+      everything.features.push({type: "Feature", properties: {}, geometry: {type: "Point", coordinates: [p.lon, p.lat]}});
+  }
+  const projType = (SPEC.projection || "mercator").toLowerCase();
+  const proj = projType === "equirectangular" ? d3.geoEquirectangular() : d3.geoMercator();
+  // extent: explicit bbox (corners as a MultiPoint) or fit to all content
+  const fitTo = SPEC.bbox
+    ? {type: "MultiPoint", coordinates: [[SPEC.bbox.lon_min, SPEC.bbox.lat_min], [SPEC.bbox.lon_max, SPEC.bbox.lat_max]]}
+    : everything;
+  proj.fitExtent([[PAD, PAD], [W - PAD, H - PAD]], fitTo);
+  const path = d3.geoPath(proj);
+  const clipId = "mapclip";
+  const defs = el("defs");
+  const cp = el("clipPath", {id: clipId}, defs);
+  el("rect", {x: PAD - 1, y: PAD - 1, width: W - 2 * PAD + 2, height: H - 2 * PAD + 2}, cp);
+  // ocean background
+  el("rect", {x: PAD - 1, y: PAD - 1, width: W - 2 * PAD + 2, height: H - 2 * PAD + 2,
+              fill: (SPEC.basemap && SPEC.basemap.ocean_color) || "#cfe3f0"});
+  const mapG = el("g", {"clip-path": `url(#${clipId})`});
+  // graticule (optional, behind land)
+  if (SPEC.basemap && SPEC.basemap.graticule) {
+    el("path", {d: path(d3.geoGraticule()()), fill: "none", stroke: "#c8d4de",
+                "stroke-width": 0.5}, mapG);
+  }
+  // land
+  if (SPEC.basemap && SPEC.basemap.land) {
+    el("path", {d: path(fc(SPEC.basemap.land)),
+                fill: SPEC.basemap.land_fill || "#e8e4d8",
+                stroke: SPEC.basemap.land_stroke || "#8a8a7a",
+                "stroke-width": SPEC.basemap.land_stroke_width || 0.8,
+                "fill-rule": "evenodd"}, mapG);
+  }
+  // data layers, in spec order (polygons/lines under points)
+  const legendRows = [];
+  for (const L of allLayers) {
+    if (L.type === "polygons") {
+      el("path", {d: path(fc(L.features)), fill: L.fill || "#7fbf7b",
+                  "fill-opacity": L.fill_opacity == null ? 0.5 : L.fill_opacity,
+                  stroke: L.stroke || "none", "stroke-width": L.stroke_width || 0,
+                  "fill-rule": "evenodd"}, mapG);
+      if (L.label) legendRows.push({kind: "poly", label: L.label, fill: L.fill || "#7fbf7b", stroke: L.stroke || "none"});
+    } else if (L.type === "lines") {
+      el("path", {d: path(fc(L.features)), fill: "none",
+                  stroke: L.stroke || "#4477aa", "stroke-width": L.width || 2,
+                  "stroke-dasharray": L.dash || "none",
+                  "stroke-linecap": "round", "stroke-linejoin": "round"}, mapG);
+      if (L.label) legendRows.push({kind: "line", label: L.label, stroke: L.stroke || "#4477aa", dash: L.dash});
+    }
+  }
+  for (const L of allLayers) {
+    if (L.type !== "points") continue;
+    for (const p of L.items || []) {
+      const q = proj([p.lon, p.lat]); if (!q) continue;
+      el("circle", {cx: q[0], cy: q[1], r: p.size || 7,
+                    fill: p.color || (L.color || "#E15759"),
+                    stroke: "#fff", "stroke-width": 1.5}, mapG);
+      if (p.label) {
+        const side = p.label_side || "right";
+        const dx = side === "left" ? -(p.size || 7) - 5 : (side === "top" || side === "bottom") ? 0 : (p.size || 7) + 5;
+        const dy = side === "top" ? -(p.size || 7) - 5 : side === "bottom" ? (p.size || 7) + 13 : 4;
+        el("text", {x: q[0] + dx, y: q[1] + dy, "font-size": 11.5, fill: "#222",
+                    "text-anchor": side === "left" ? "end" : side === "top" || side === "bottom" ? "middle" : "start",
+                    "paint-order": "stroke", stroke: "rgba(255,255,255,0.85)", "stroke-width": 3}, mapG, p.label);
+      }
+    }
+    if (L.label) legendRows.push({kind: "point", label: L.label, fill: (L.items[0] && L.items[0].color) || L.color || "#E15759"});
+  }
+  // scale bar — km per pixel at map-centre latitude (mercator/equirectangular horizontal scale)
+  if (SPEC.scale_bar) {
+    const lat0 = SPEC.bbox ? (SPEC.bbox.lat_min + SPEC.bbox.lat_max) / 2 : 0;
+    const a = proj([0, lat0]), b = proj([1, lat0]);
+    const degPx = Math.abs(b[0] - a[0]);
+    const kmPerDeg = 111.32 * Math.cos(lat0 * Math.PI / 180);
+    const kmPerPx = kmPerDeg / degPx;
+    const wantKm = ((W - 2 * PAD) * kmPerPx) / 5;
+    const pow = Math.pow(10, Math.floor(Math.log10(wantKm)));
+    let nice = [1, 2, 5, 10].map(m => m * pow).reduce((p, c) => Math.abs(c - wantKm) < Math.abs(p - wantKm) ? c : p);
+    if (SPEC.scale_bar && SPEC.scale_bar.length_km) nice = SPEC.scale_bar.length_km;
+    const px = nice / kmPerPx;
+    const bx = PAD + 10, by = H - PAD - 12;
+    el("line", {x1: bx, x2: bx + px, y1: by, y2: by, stroke: "#222", "stroke-width": 2}, mapG);
+    el("line", {x1: bx, x2: bx, y1: by - 4, y2: by + 4, stroke: "#222", "stroke-width": 2}, mapG);
+    el("line", {x1: bx + px, x2: bx + px, y1: by - 4, y2: by + 4, stroke: "#222", "stroke-width": 2}, mapG);
+    el("text", {x: bx + px / 2, y: by - 6, "font-size": 10.5, fill: "#222", "text-anchor": "middle",
+                "paint-order": "stroke", stroke: "rgba(255,255,255,0.85)", "stroke-width": 3},
+       mapG, nice >= 1 ? `${nice} km` : `${Math.round(nice * 1000)} m`);
+  }
+  // north arrow — top-right
+  if (SPEC.north_arrow !== false) {
+    const nx = W - PAD - 18, ny = PAD + 14;
+    el("line", {x1: nx, x2: nx, y1: ny + 8, y2: ny + 28, stroke: "#222", "stroke-width": 1.5}, mapG);
+    el("path", {d: `M ${nx} ${ny} L ${nx - 4.5} ${ny + 11} L ${nx} ${ny + 8} L ${nx + 4.5} ${ny + 11} Z`,
+                fill: "#222"}, mapG);
+    el("text", {x: nx, y: ny + 40, "font-size": 11, fill: "#222", "text-anchor": "middle",
+                "font-weight": 600}, mapG, "N");
+  }
+  // legend — bottom-right
+  if (SPEC.legend !== false && legendRows.length) {
+    const lw = Math.max(...legendRows.map(r => r.label.length)) * 6.1 + 46;
+    const lh = legendRows.length * 17 + 12;
+    const lx = W - PAD - lw - 8, ly = H - PAD - 12 - 14 - lh;
+    el("rect", {x: lx, y: ly, width: lw, height: lh, rx: 5, fill: "rgba(255,255,255,0.92)",
+                stroke: "#c8cdd3", "stroke-width": 1}, mapG);
+    legendRows.forEach((r, i) => {
+      const cy = ly + 17 + i * 17;
+      if (r.kind === "point") el("circle", {cx: lx + 14, cy: cy - 4, r: 6, fill: r.fill, stroke: "#fff", "stroke-width": 1}, mapG);
+      else if (r.kind === "poly") el("rect", {x: lx + 8, y: cy - 8, width: 12, height: 8, fill: r.fill,
+                                              stroke: r.stroke !== "none" ? r.stroke : "none"}, mapG);
+      else el("line", {x1: lx + 8, x2: lx + 20, y1: cy - 4, y2: cy - 4, stroke: r.stroke, "stroke-width": 2.5,
+                       "stroke-dasharray": r.dash || "none"}, mapG);
+      el("text", {x: lx + 26, y: cy, "font-size": 11, fill: "#222"}, mapG, r.label);
+    });
+  }
+  // map frame
+  el("rect", {x: PAD - 1, y: PAD - 1, width: W - 2 * PAD + 2, height: H - 2 * PAD + 2,
+              fill: "none", stroke: "#9aa0a6", "stroke-width": 1}, svg);
+  document.getElementById("chart").appendChild(svg);
+})();
+</script>
+<script>
+/* ---- chartz print-export module (identical across template-native engines; v0.8.0) ----
+   SPEC.export (optional, all keys optional):
+     width_mm    - journal column width (e.g. 89 = Nature single column). With dpi, sets the
+                   Download PNG raster deterministically: px = mm / 25.4 * dpi (default: 2x screen).
+                   Download SVG then carries width/height in mm units (true print vector).
+     dpi         - raster density for Download PNG (default 300).
+     font_family - overrides the system-ui stack in both exports (journals: "Arial"). */
+(function () {
+  var getSvg = function () { return document.querySelector('#chart svg'); };
+  var baseName = function () {
+    return (document.getElementById('chart-title').textContent || 'chart').replace(/\s+/g, '_');
+  };
+  function exportScale(el) {
+    var ex = (window.SPEC && SPEC.export) || {};
+    if (ex.width_mm && ex.dpi) return (ex.width_mm / 25.4 * ex.dpi) / el.getBoundingClientRect().width;
+    return 2;
+  }
+  function svgWithSize(scale) {
+    var src = getSvg().cloneNode(true);
+    var bb = getSvg().getBoundingClientRect();
+    var w = Math.round(bb.width * scale), h = Math.round(bb.height * scale);
+    var mm = ((window.SPEC && SPEC.export && SPEC.export.width_mm) || null);
+    src.setAttribute('width', mm ? (mm + 'mm') : w);
+    src.setAttribute('height', mm ? (mm * bb.height / bb.width + 'mm') : h);
+    if (window.SPEC && SPEC.export && SPEC.export.font_family)
+      src.setAttribute('style', 'font-family: ' + SPEC.export.font_family + ', sans-serif;');
+    var s = new XMLSerializer().serializeToString(src);
+    return '<?xml version="1.0" encoding="UTF-8"?>\n' + s;
+  }
+  function download(name, href) {
+    var a = document.createElement('a');
+    a.href = href; a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(href); a.remove(); }, 800);
+  }
+  document.getElementById('dl-svg').addEventListener('click', function () {
+    var bb = getSvg().getBoundingClientRect();
+    var ex = (window.SPEC && SPEC.export) || {};
+    var scale = exportScale(getSvg());
+    var blob = new Blob([svgWithSize(scale)], {type: 'image/svg+xml'});
+    download(baseName() + '.svg', URL.createObjectURL(blob));
+  });
+  document.getElementById('dl-png').addEventListener('click', function () {
+    var scale = exportScale(getSvg());
+    var bb = getSvg().getBoundingClientRect();
+    var svgStr = svgWithSize(1);
+    var img = new Image();
+    img.onload = function () {
+      var c = document.createElement('canvas');
+      c.width = Math.round(bb.width * scale); c.height = Math.round(bb.height * scale);
+      var ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      download(baseName() + '.png', c.toDataURL('image/png'));
+    };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+  });
+})();
+</script>
+</body>
+</html>
