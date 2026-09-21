@@ -51,6 +51,32 @@ Clip/simplify recipes (python stdlib, no geopandas needed): filter features by b
 
 ## Pitfalls
 
+- **d3 winding convention (S12 — inverted/complement fills)**: d3-geo treats polygons as SPHERICAL and picks the interior by winding — exterior rings must be **clockwise** (holes counterclockwise), the OPPOSITE of the GeoJSON RFC. A counterclockwise ring fills its planar complement (the rest of the world → whole map turns land-colored). The template normalizes winding (shoelace test per ring) before rendering, so valid GeoJSON of either winding renders correctly — but if you render GeoJSON with raw d3 elsewhere, reverse CCW exterior rings yourself.
+- **Never fill multiple land features as ONE path with `fill-rule: evenodd`**: overlapping features (e.g. an OSM island inside a coarser Natural Earth mainland polygon) XOR to water. The template renders one path per feature; keep it that way.
+- **Derive marker coordinates from the geometry, never from memory**: compute the centroid of the site's polygon (the OSM relation geometry you fetched) — hand-recalled coordinates are routinely kilometres off (a Pulau Ketam marker was plotted 10 km north of the island).
+- **Natural Earth ≠ local detail**: NE 10m has ~44 coastline vertices in a 1° Klang bbox and omits mangrove islands entirely. For island-scale maps pull OSM (Overpass) or project-owned polygons; NE mainland + OSM islands can be merged, but then drop the coarse NE island pieces (they double-cover the OSM ones).
+- **Ring assembly traps**: (a) already-closed fragments must be routed to rings before chaining or they re-match themselves forever; (b) the two "prepend" branches of greedy chaining MUST pop the consumed fragment or the chain flips between fragments infinitely; (c) chains that leave the query bbox must be closed along the bbox BORDER (not a straight chord — it cuts across land and inverts the fill); verify orientation with a known-land point (ray cast) and reverse if needed.
+- **Degenerate rings**: tiny islets collapse to <4 points after simplification and crash d3 (sub-4-point polygon rings) — drop them.
+- **Overpass etiquette**: POST (GET gives 406 without a User-Agent), set a User-Agent, keep bbox queries small; relations need ring assembly (`role: "outer"` fragments chained by matching endpoints).
+- **HTML size**: every geometry is embedded. Clip + simplify at build time; a regional 10m basemap should land at tens–low hundreds of KB, not MBs.
+- **Ring closure**: unclosed rings silently break (the template skips malformed rings); holes work via `fill-rule: evenodd` when stored as sibling rings of the polygon.
+- **Meridian-crossing data** (lon > 180 vs < −180 mixed): normalize to one convention before embedding.
+
+## Build helper
+
+`bin/gis_prep.py` (python3 stdlib only) implements the verified pipeline:
+
+```bash
+# OSM coastline -> land rings (fetch, assemble, border-close, orient, simplify)
+python3 bin/gis_prep.py overpass "2.45,100.85,3.55,101.98" land.json \
+    --tol 0.0002 --land-pt 101.7,3.0 --sea-pt 101.05,3.1
+# retry from a cached Overpass response after 429/504 (no second fetch)
+python3 bin/gis_prep.py overpass "..." land.json --cache overpass_response.json ...
+# clip/simplify an existing GeoJSON (project GIS export) to the map bbox
+python3 bin/gis_prep.py clip input.geojson land.json "100.95,2.55,101.85,3.45" --tol 0.0002
+```
+
+`--land-pt`/`--sea-pt` are a known-land and a known-sea lon/lat used to verify ring orientation — pick them from the map region (a mistake here silently inverts the map; the sea point must be in OPEN WATER, the land point well inland).
 - **GeoJSON in, map out — no basemap magic**: the template draws exactly the geometry you embed. An empty/missing `basemap.land` renders points on plain ocean; that is usually a data-sourcing failure, not a template bug.
 - **Natural Earth ≠ local detail**: NE 10m omits islands below ~2–5 km². For island-scale maps pull OSM (Overpass) or project-owned polygons; combine NE (mainland) + OSM (islands) FeatureCollections into one `basemap.land` if needed.
 - **Overpass etiquette**: POST (GET gives 406 without a UA), set a User-Agent, keep bbox queries small; relations need ring assembly (`role: "outer"` fragments chained by matching endpoints) — a plain `out geom` relation has fragmented coastline ways.
@@ -61,7 +87,8 @@ Clip/simplify recipes (python stdlib, no geopandas needed): filter features by b
 
 ## Worked examples
 
-- `geomap-sampling-sites.html` — Klang Islands eDNA sites: NE 10m mainland + 9 OSM island polygons (Pulau Ketam, Tengah, Indah, Klang, Carey, …) merged into one basemap, zone-colored points with labels, auto scale bar (20 km), north arrow, legend; 91 KB self-contained HTML.
+- `geomap-sampling-sites.html` — Klang Islands eDNA sites: full OSM coastline basemap (mainland + 9 named island polygons, ring-assembled with `bin/gis_prep.py`), markers at true OSM island centroids, auto scale bar (20 km), north arrow, legend; 187 KB self-contained HTML.
+- `geomap-coverage.html` — polygon/line layers: demo mangrove-cover polygons + schematic Klang River over the same basemap (the "project GIS export" input path).
 
 ## Reference ecosystem (heavy GIS stays here, chartz renders)
 

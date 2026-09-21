@@ -66,6 +66,24 @@ if (SPEC.subtitle) {
         features: g.map(x => typeof x === "object" && x.type === "Feature" ? x : {type: "Feature", properties: {}, geometry: x})}
       : (g.type === "FeatureCollection" ? g : {type: "FeatureCollection",
         features: [g.type === "Feature" ? g : {type: "Feature", properties: {}, geometry: g}]});
+  // d3 treats polygons as SPHERICAL and picks the interior by winding: exterior rings
+  // must be CLOCKWISE (holes counterclockwise) — the OPPOSITE of the GeoJSON RFC.
+  // A counterclockwise ring fills its planar complement (the rest of the world).
+  // Normalize: exterior shoelace area ≤ 0 (clockwise in lon/lat plane), holes ≥ 0.
+  const signedArea = ring => ring.reduce((s, p, i) => {
+    const q = ring[(i + 1) % ring.length];
+    return s + (p[0] * q[1] - q[0] * p[1]);
+  }, 0) / 2;
+  const fixPolygon = poly => poly.map((ring, ri) => {
+    const a = signedArea(ring);
+    return (ri === 0 ? a > 0 : a < 0) ? [...ring].reverse() : ring;
+  });
+  const fixWinding = geo => {
+    if (geo.type === "Polygon") return {...geo, coordinates: fixPolygon(geo.coordinates)};
+    if (geo.type === "MultiPolygon")
+      return {...geo, coordinates: geo.coordinates.map(fixPolygon)};
+    return geo;
+  };
   const allLayers = (SPEC.layers || []);
   const everything = {type: "FeatureCollection", features: []};
   if (SPEC.basemap && SPEC.basemap.land) everything.features.push(...fc(SPEC.basemap.land).features);
@@ -95,22 +113,29 @@ if (SPEC.subtitle) {
     el("path", {d: path(d3.geoGraticule()()), fill: "none", stroke: "#c8d4de",
                 "stroke-width": 0.5}, mapG);
   }
-  // land
+  // land — one path PER FEATURE: combining features into a single evenodd path would
+  // XOR out overlapping regions (e.g. an OSM island inside a coarser Natural Earth
+  // mainland polygon renders as water). Per-feature paths stack safely; evenodd still
+  // honours holes WITHIN one feature (rings 2..n of a Polygon).
   if (SPEC.basemap && SPEC.basemap.land) {
-    el("path", {d: path(fc(SPEC.basemap.land)),
-                fill: SPEC.basemap.land_fill || "#e8e4d8",
-                stroke: SPEC.basemap.land_stroke || "#8a8a7a",
-                "stroke-width": SPEC.basemap.land_stroke_width || 0.8,
-                "fill-rule": "evenodd"}, mapG);
+    const lf = SPEC.basemap.land_fill || "#e8e4d8",
+          ls = SPEC.basemap.land_stroke || "#8a8a7a",
+          lsw = SPEC.basemap.land_stroke_width || 0.8;
+    for (const f of fc(SPEC.basemap.land).features) {
+      el("path", {d: path({...f, geometry: fixWinding(f.geometry)}), fill: lf, stroke: ls,
+                  "stroke-width": lsw, "fill-rule": "evenodd"}, mapG);
+    }
   }
   // data layers, in spec order (polygons/lines under points)
   const legendRows = [];
   for (const L of allLayers) {
     if (L.type === "polygons") {
-      el("path", {d: path(fc(L.features)), fill: L.fill || "#7fbf7b",
-                  "fill-opacity": L.fill_opacity == null ? 0.5 : L.fill_opacity,
-                  stroke: L.stroke || "none", "stroke-width": L.stroke_width || 0,
-                  "fill-rule": "evenodd"}, mapG);
+      for (const f of fc(L.features).features) {
+        el("path", {d: path({...f, geometry: fixWinding(f.geometry)}), fill: L.fill || "#7fbf7b",
+                    "fill-opacity": L.fill_opacity == null ? 0.5 : L.fill_opacity,
+                    stroke: L.stroke || "none", "stroke-width": L.stroke_width || 0,
+                    "fill-rule": "evenodd"}, mapG);
+      }
       if (L.label) legendRows.push({kind: "poly", label: L.label, fill: L.fill || "#7fbf7b", stroke: L.stroke || "none"});
     } else if (L.type === "lines") {
       el("path", {d: path(fc(L.features)), fill: "none",

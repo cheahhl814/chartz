@@ -51,6 +51,7 @@
 ## Pitfalls
 
 - **`geo.center` + `geo.scale` are silently ignored** when set together with default fit — set the extent with `geo.lonaxis.range` / `geo.lataxis.range` (verified). A blank geo with the title drawn usually means the topology fetch failed; the template's preloaded asset prevents this.
+- **Place markers at geometry-derived coordinates** (e.g. the centroid of the site's polygon), never hand-recalled lat/lon — recollected coordinates are routinely kilometres off and markers float in open water.
 - **resolution: 50 is the maximum** — plotly has no 10m base. Small islands (Pulau Ketam-class) are absent from the 50m base at local zooms; overlay them as custom GeoJSON via a `choropleth`/`scattergeo` trace, or switch to the GeoMap engine for island-scale maps.
 - **Custom polygons** (mangrove cover, protected areas): `choropleth` trace with `geojson` + `featureidkey` + `locations` + `z`. The GeoJSON is embedded in the SPEC — clip/trim it to the map bbox at build time to keep the HTML small.
 - **Aspect**: the geo subplot keeps the projection's aspect; with `responsive: true` the map fills the 65vh container. For print-width figures set `SPEC.export.width_mm` and take the SVG export.
@@ -59,6 +60,7 @@
 ## Worked examples
 
 - `plotly-site-map.html` — Klang Islands eDNA sampling sites, four zones color-coded, coast + land from the vendored topology, vector SVG export.
+- `plotly-choropleth-zone.html` — custom-GeoJSON choropleth (`geojson` + `featureidkey: "properties.zone"` over OSM island polygons) with a scattergeo overlay; the `references/gis.md` "project GIS output" path.
 
 ## Reference ecosystem (heavy GIS stays here, chartz renders)
 
