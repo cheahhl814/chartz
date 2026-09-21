@@ -94,10 +94,16 @@ if (SPEC.subtitle) {
   }
   const projType = (SPEC.projection || "mercator").toLowerCase();
   const proj = projType === "equirectangular" ? d3.geoEquirectangular() : d3.geoMercator();
-  // extent: explicit bbox (corners as a MultiPoint) or fit to all content
-  const fitTo = SPEC.bbox
-    ? {type: "MultiPoint", coordinates: [[SPEC.bbox.lon_min, SPEC.bbox.lat_min], [SPEC.bbox.lon_max, SPEC.bbox.lat_max]]}
-    : everything;
+  // extent: with a raster basemap the projection MUST fit the raster bbox (alignment);
+  // otherwise explicit bbox, else fit to all content
+  const rasterBbox = SPEC.basemap && SPEC.basemap.raster && SPEC.basemap.raster.bbox;
+  const fitTo = rasterBbox
+    ? {type: "MultiPoint", coordinates: [[rasterBbox.lon_min, rasterBbox.lat_min],
+                                         [rasterBbox.lon_max, rasterBbox.lat_max]]}
+    : SPEC.bbox
+      ? {type: "MultiPoint", coordinates: [[SPEC.bbox.lon_min, SPEC.bbox.lat_min],
+                                           [SPEC.bbox.lon_max, SPEC.bbox.lat_max]]}
+      : everything;
   proj.fitExtent([[PAD, PAD], [W - PAD, H - PAD]], fitTo);
   const path = d3.geoPath(proj);
   const clipId = "mapclip";
@@ -108,6 +114,20 @@ if (SPEC.subtitle) {
   el("rect", {x: PAD - 1, y: PAD - 1, width: W - 2 * PAD + 2, height: H - 2 * PAD + 2,
               fill: (SPEC.basemap && SPEC.basemap.ocean_color) || "#cfe3f0"});
   const mapG = el("g", {"clip-path": `url(#${clipId})`});
+  // raster tile basemap (optional, embedded data-URI PNG in web-mercator space).
+  // When present it replaces the ocean/land underlay; the vector projection is
+  // fit to the raster bbox so overlays align pixel-perfectly.
+  if (SPEC.basemap && SPEC.basemap.raster && SPEC.basemap.raster.data) {
+    const rb = SPEC.basemap.raster.bbox;
+    const img = el("image", {x: PAD - 1, y: PAD - 1,
+                             width: W - 2 * PAD + 2, height: H - 2 * PAD + 2,
+                             preserveAspectRatio: "none"}, mapG);
+    img.setAttributeNS("http://www.w3.org/1999/xlink", "href", SPEC.basemap.raster.data);
+    img.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", SPEC.basemap.raster.data);
+    if (SPEC.basemap.raster.attribution)
+      el("text", {x: W - PAD - 6, y: H - PAD - 6, "font-size": 9, fill: "#333",
+                  "text-anchor": "end", opacity: 0.85}, mapG, SPEC.basemap.raster.attribution);
+  }
   // graticule (optional, behind land)
   if (SPEC.basemap && SPEC.basemap.graticule) {
     el("path", {d: path(d3.geoGraticule()()), fill: "none", stroke: "#c8d4de",
@@ -186,11 +206,12 @@ if (SPEC.subtitle) {
   // north arrow — top-right
   if (SPEC.north_arrow !== false) {
     const nx = W - PAD - 18, ny = PAD + 14;
-    el("line", {x1: nx, x2: nx, y1: ny + 8, y2: ny + 28, stroke: "#222", "stroke-width": 1.5}, mapG);
+    const halo = {"paint-order": "stroke", stroke: "rgba(255,255,255,0.9)", "stroke-width": 3};
+    el("line", {...{"x1": nx, "x2": nx, "y1": ny + 8, "y2": ny + 28, stroke: "#222", "stroke-width": 1.5}, ...halo}, mapG);
     el("path", {d: `M ${nx} ${ny} L ${nx - 4.5} ${ny + 11} L ${nx} ${ny + 8} L ${nx + 4.5} ${ny + 11} Z`,
-                fill: "#222"}, mapG);
+                fill: "#222", ...halo}, mapG);
     el("text", {x: nx, y: ny + 40, "font-size": 11, fill: "#222", "text-anchor": "middle",
-                "font-weight": 600}, mapG, "N");
+                "font-weight": 600, ...halo}, mapG, "N");
   }
   // legend — bottom-right
   if (SPEC.legend !== false && legendRows.length) {
