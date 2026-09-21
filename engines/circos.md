@@ -1,6 +1,6 @@
 Engine: Circos
 Template: templates/circos.html
-Routing row: 7
+Routing row: 8
 Loaded from SKILL.md §1 routing when this engine is selected.
 
 # Circos (engine 10, template-native SVG) — circular genome plots

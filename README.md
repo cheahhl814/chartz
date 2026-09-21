@@ -1,15 +1,15 @@
 # chartz
 
-[![Version](https://img.shields.io/badge/version-0.9.0-blue)](#-installation)
+[![Version](https://img.shields.io/badge/version-0.10.0-blue)](#-installation)
 [![Type](https://img.shields.io/badge/type-agent%20skill-blueviolet)](#-installation)
 [![README standard](https://img.shields.io/badge/README%20per-bioinfo--skill--creator-orange)](https://github.com/cheahhl814/bioinfo-skill-creator)
 
-Render charts and graphs as self-contained HTML files from four CDN-pinned engines plus seven template-native engines, chosen by chart type. One request → one portable HTML file: simple statistical charts via Chart.js, scientific/statistical plots via Plotly.js, rich interactive dashboards via ECharts, nodes+edges network graphs via Cytoscape.js, genome-browser track figures via the zero-dependency GenomeTracks SVG renderer, clustered-heatmap composites via ClusterHeat, OncoPrint mutation matrices via OncoPrint, sequence logos via SeqLogo, set-intersection plots via UpSet, circular genome plots via Circos, and metacoder-style taxonomy heat trees via HeatTree — all template-native SVG. No build step, no server, no inline third-party library code.
+Render charts and graphs as self-contained HTML files from four CDN-pinned engines plus eight template-native engines, chosen by chart type. One request → one portable HTML file: simple statistical charts via Chart.js, scientific/statistical plots via Plotly.js, rich interactive dashboards via ECharts, nodes+edges network graphs via Cytoscape.js, genome-browser track figures via the zero-dependency GenomeTracks SVG renderer, clustered-heatmap composites via ClusterHeat, OncoPrint mutation matrices via OncoPrint, sequence logos via SeqLogo, set-intersection plots via UpSet, circular genome plots via Circos, metacoder-style taxonomy heat trees via HeatTree, and Newick phylogenies (phylograms with bootstrap circles, scale bars, and clade ranges) via PhyloTree — all template-native SVG. No build step, no server, no inline third-party library code.
 
 **Repository**: https://github.com/cheahhl814/chartz
 
 > [!NOTE]
-> Current version: **v0.9.0** (updated 2026-09-21). v0.9.0 adds the **HeatTree engine** (§5h, engine 1) — metacoder-style radial taxonomy heat trees with value-mapped node size/color and edge width/color, grey-for-NA, gradient legend, zero dependencies. v0.8.1 fixes v0.8.1 fixes the ECharts sankey/title overlap (S11 — sankey ignores `grid`; set `series.top`). v0.8.0 adds v0.2.0 GenomeTracks (§5b); v0.3.0 ClusterHeat (§5c); v0.4.0 OncoPrint (§5d); v0.5.0 SeqLogo (§5e); v0.6.0 UpSet (§5f); v0.7.0 adds Circos (§5g); v0.8.0 adds **print/vector export** — Download SVG (journal-submission vector, mm-sized) on all template-native engines, deterministic `export: {width_mm, dpi}` PNG raster, and Plotly vector export via `toImageButtonOptions` (SKILL.md §6b).
+> Current version: **v0.10.0** (updated 2026-09-21). v0.10.0 adds the **PhyloTree engine** (§5i, engine 2) — iTOL-class publication-ready phylogenetic trees from a Newick string: rectangular/circular phylograms & cladograms, bootstrap circles, scale bar, clade color ranges, italic tip labels, true-vector export. v0.9.0 adds v0.9.0 adds the **HeatTree engine** (§5h, engine 1) — metacoder-style radial taxonomy heat trees with value-mapped node size/color and edge width/color, grey-for-NA, gradient legend, zero dependencies. v0.8.1 fixes v0.8.1 fixes the ECharts sankey/title overlap (S11 — sankey ignores `grid`; set `series.top`). v0.8.0 adds v0.2.0 GenomeTracks (§5b); v0.3.0 ClusterHeat (§5c); v0.4.0 OncoPrint (§5d); v0.5.0 SeqLogo (§5e); v0.6.0 UpSet (§5f); v0.7.0 adds Circos (§5g); v0.8.0 adds **print/vector export** — Download SVG (journal-submission vector, mm-sized) on all template-native engines, deterministic `export: {width_mm, dpi}` PNG raster, and Plotly vector export via `toImageButtonOptions` (SKILL.md §6b).
 
 ## Contents
 
@@ -85,23 +85,19 @@ The routing table in `SKILL.md` §1 maps request shape → engine (first match w
 
 | #   | Request shape                                                    | Engine              | Template                   |
 |:--- |:---------------------------------------------------------------- |:------------------- |:-------------------------- |
-| #   | Request shape                                                    | Engine              | Template                   |
-|:--- |:---------------------------------------------------------------- |:------------------- |:-------------------------- |
 | 1   | Taxonomy heat trees (metacoder-style, value-mapped nodes/edges)  | HeatTree            | `templates/heattree.html`  |
-| 2   | Nodes + edges (pathways, networks, dependency graphs)            | Cytoscape.js        | `templates/cytoscape.html` |
-| 3   | Genome-browser tracks (coverage, peaks, gene models on a locus)  | GenomeTracks        | `templates/genetracks.html` |
-| 4   | Clustered heatmap (matrix + dendrograms + annotation strips)     | ClusterHeat         | `templates/clusteredheatmap.html` |
-| 5   | OncoPrint (stacked mutation cells, TMB + clinical strips)        | OncoPrint           | `templates/oncoprint.html`  |
-| 6   | Sequence logo (per-position letter stacks, bits axis)            | SeqLogo             | `templates/seqlogo.html`    |
-| 7   | Circular genome plots (ideogram + concentric tracks + SV links)  | Circos              | `templates/circos.html`    |
-| 8   | UpSet set intersections (dot matrix + bars, 4+ sets)             | UpSet               | `templates/upset.html`      |
-| 9   | Box/violin/histogram/**heatmap**/3D/error bars/log axes/subplots, **Manhattan/Miami/QQ/forest/funnel/lollipop** | Plotly.js | `templates/plotly.html`    |
-| 10  | Treemap/sankey/alluvial/sunburst/dendrogram/large series/dataZoom/mixed dashboards | ECharts | `templates/echarts.html`   |
-| 11  | Simple bar/line/pie/doughnut/radar/scatter/bubble                | Chart.js            | `templates/chartjs.html`   |
-| 12  | Anything else                                                    | ECharts (catch-all) | `templates/echarts.html`   |
-
-> [!TIP]
-> Read `SKILL.md` §6 before every delivery: spec strict-JSON check, CDN pin coherence, slot-fill verification, reachability probe, NaN/undefined hygiene, and output-path reporting. When a request matches no row and the data shape is ambiguous, the agent surfaces an *Evidence + Recommend + Options* stop point instead of guessing.
+| 2   | Phylogenetic trees (Newick, phylograms, bootstrap, clade ranges) | PhyloTree           | `templates/phylotree.html` |
+| 3   | Nodes + edges (pathways, networks, dependency graphs)            | Cytoscape.js        | `templates/cytoscape.html` |
+| 4   | Genome-browser tracks (coverage, peaks, gene models on a locus)  | GenomeTracks        | `templates/genetracks.html` |
+| 5   | Clustered heatmap (matrix + dendrograms + annotation strips)     | ClusterHeat         | `templates/clusteredheatmap.html` |
+| 6   | OncoPrint (stacked mutation cells, TMB + clinical strips)        | OncoPrint           | `templates/oncoprint.html`  |
+| 7   | Sequence logo (per-position letter stacks, bits axis)            | SeqLogo             | `templates/seqlogo.html`    |
+| 8   | Circular genome plots (ideogram + concentric tracks + SV links)  | Circos              | `templates/circos.html`    |
+| 9   | UpSet set intersections (dot matrix + bars, 4+ sets)             | UpSet               | `templates/upset.html`      |
+| 10  | Box/violin/histogram/**heatmap**/3D/error bars/log axes/subplots, **Manhattan/Miami/QQ/forest/funnel/lollipop** | Plotly.js | `templates/plotly.html`    |
+| 11  | Treemap/sankey/alluvial/sunburst/dendrogram/large series/dataZoom/mixed dashboards | ECharts | `templates/echarts.html`   |
+| 12  | Simple bar/line/pie/doughnut/radar/scatter/bubble                | Chart.js            | `templates/chartjs.html`   |
+| 13  | Anything else                                                    | ECharts (catch-all) | `templates/echarts.html`   |
 
 ## 🧰 Engines
 
@@ -120,6 +116,7 @@ All libraries are loaded from pinned CDN URLs at render time — no local instal
 | [UpSet](#-engines)                          | template v1    | Set-intersection plots (SVG, no CDN)           | n/a        |
 | [Circos](#-engines)                         | template v1    | Circular genome plots (SVG, no CDN)           | n/a        |
 | [HeatTree](#-engines)                       | template v1    | Metacoder-style taxonomy heat trees (SVG, no CDN) | n/a    |
+| [PhyloTree](#-engines)                      | template v1    | Phylogenetic trees, Newick (SVG, no CDN)      | n/a        |
 
 Engine version pins are single-sourced in `SKILL.md` §7 and mirrored into every template. Never float (`@latest`).
 
@@ -154,10 +151,10 @@ chartz/
 ├── params.json              # Machine-readable build flags (with_docs_corpus/with_pixi/with_nextflow_runner = false)
 ├── templates/               # One self-contained HTML template per engine (CDN-pinned or template-native SVG)
 │   ├── chartjs.html · plotly.html · echarts.html · cytoscape.html   # CDN-pinned engines
-│   └── genetracks.html · clusteredheatmap.html · oncoprint.html · seqlogo.html · upset.html · circos.html · heattree.html   # template-native SVG
+│   └── phylotree.html · genetracks.html · clusteredheatmap.html · oncoprint.html · seqlogo.html · upset.html · circos.html · heattree.html   # template-native SVG
 ├── engines/                 # Per-engine spec contracts (JSON shape, pitfalls) — read before emitting a spec
 ├── references/              # Design conventions (conventions.md) and colour palettes (palettes.md)
-├── examples/                # 54 worked demos: 4 v0.1.0 base demos + 50 engine/chart-type demos
+├── examples/                # 56 worked demos: 4 v0.1.0 base demos + 52 engine/chart-type demos
 │   ├── chartjs.html · plotly.html · echarts.html · cytoscape.html   # one per engine
 │   ├── plotly-heatmap/volcano/violin/3d-surface/heatmap-zscore/violin-signif.html
 │   ├── plotly-manhattan/miami/qq/locuszoom/forest/forest-subgroup/funnel/lollipop/lollipop-two-cohort/pca-biplot.html
@@ -167,7 +164,7 @@ chartz/
 │   ├── cytoscape-pathway-network/dependency-tree/consort/ppi-degree/ppi-preset.html
 │   ├── genetracks-locus/peaks-genes.html · clusterheat-annotated/simple.html
 │   ├── oncoprint-cohort/simple.html · seqlogo-tfbs/kinase.html · upset-genomics/degree.html
-│   ├── circos-genome/chord.html · heattree-taxonomy.html
+│   ├── circos-genome/chord.html · heattree-taxonomy.html · phylotree-rect/circular.html
 │   └── screenshots/         # Headless-Chrome render proof for every demo
 └── bin/
     └── skill-update-check.py  # Self-update check
@@ -183,8 +180,8 @@ Example naming convention: `<engine>-<charttype>.html`; the four base-named demo
 - **Explicit stop points** — ambiguous requests surface *Evidence + Recommend + Options*, not auto-picked choices.
 - **No machine-specific paths** — output goes to the working directory; the skill ships no local dependencies and no user-specific configuration.
 - **Print/vector export** — template-native engines export true-vector SVG (mm-sized at journal column widths) and a deterministic PNG raster via the spec-level `export: {width_mm, dpi, font_family}` field; Plotly exports vector SVG via `toImageButtonOptions` (SKILL.md §6b).
-- **Render-verified examples** — all fifty-four example demos were executed in headless Chrome, verified non-blank with zero console errors (see `examples/screenshots/`, 2× element-cropped chart renders).
-- **Offline-capable template-native engines** — HeatTree (1), GenomeTracks (3), ClusterHeat (4), OncoPrint (5), SeqLogo (6), Circos (7), and UpSet (8) are template-native SVG with no CDN dependency; they render even with no network (the only engines whose §6.4 reachability probe is skipped).
+- **Render-verified examples** — all fifty-six example demos were executed in headless Chrome, verified non-blank with zero console errors (see `examples/screenshots/`, 2× element-cropped chart renders).
+- **Offline-capable template-native engines** — HeatTree (1), PhyloTree (2), GenomeTracks (4), ClusterHeat (5), OncoPrint (6), SeqLogo (7), Circos (8), and UpSet (9) are template-native SVG with no CDN dependency; they render even with no network (the only engines whose §6.4 reachability probe is skipped).
 - **Battle-test equivalent, stated honestly** — chartz is a hand-authored workflow-skill and carries no preflight/skill-built/battle-test evidence chain; the de-facto battle-test is the 53 headless-Chrome-verified demos plus the §6 self-check run on every delivery (see `params.json: battle_test_note`).
 
 ## Provenance

@@ -1,6 +1,6 @@
 Engine: Plotly.js
 Template: templates/plotly.html
-Routing row: 9
+Routing row: 10
 Loaded from SKILL.md §1 routing when this engine is selected.
 
 # Plotly.js — scientific / statistical

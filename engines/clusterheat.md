@@ -1,6 +1,6 @@
 Engine: ClusterHeat
 Template: templates/clusteredheatmap.html
-Routing row: 4
+Routing row: 5
 Loaded from SKILL.md §1 routing when this engine is selected.
 
 # ClusterHeat — clustered heatmaps

@@ -1,6 +1,6 @@
 Engine: Cytoscape.js
 Template: templates/cytoscape.html
-Routing row: 2
+Routing row: 3
 Loaded from SKILL.md §1 routing when this engine is selected.
 
 # Cytoscape.js — nodes + edges
