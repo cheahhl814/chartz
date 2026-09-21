@@ -12,6 +12,9 @@ Loaded from SKILL.md §1 routing when this engine is selected.
 ```js
 {
   type: "bar",                      // bar | line | pie | doughnut | radar | scatter | bubble
+                                    // stacked bars: set scales.x.stacked AND scales.y.stacked = true (both!);
+                                    // relative abundance / composition figures → prefer Plotly (barmode "stack")
+                                    // for percent normalization + large taxa counts
   data: {
     labels: ["Q1", "Q2", "Q3", "Q4"],
     datasets: [{
