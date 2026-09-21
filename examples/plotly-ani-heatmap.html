@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Plotly.js 4.1.1</title>
+<script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · Plotly.js 4.1.1 · single-file, CDN-pinned</footer>
+</div>
+<script>
+const SPEC = {
+  "data": [
+    {
+      "type": "heatmap",
+      "z": [
+        [
+          100.0,
+          92.3,
+          91.8,
+          91.6,
+          91.2,
+          90.3,
+          90.0
+        ],
+        [
+          92.3,
+          100.0,
+          92.1,
+          91.9,
+          90.6,
+          89.7,
+          89.9
+        ],
+        [
+          91.8,
+          92.1,
+          100.0,
+          98.4,
+          90.8,
+          90.6,
+          90.3
+        ],
+        [
+          91.6,
+          91.9,
+          98.4,
+          100.0,
+          90.6,
+          90.6,
+          90.5
+        ],
+        [
+          91.2,
+          90.6,
+          90.8,
+          90.6,
+          100.0,
+          91.0,
+          90.5
+        ],
+        [
+          90.3,
+          89.7,
+          90.6,
+          90.6,
+          91.0,
+          100.0,
+          97.7
+        ],
+        [
+          90.0,
+          89.9,
+          90.3,
+          90.5,
+          90.5,
+          97.7,
+          100.0
+        ]
+      ],
+      "x": [
+        "C. indicum (this study)",
+        "C. plagiosum OP018327",
+        "C. punctatum AP019519",
+        "C. punctatum JQ082337",
+        "C. griseum JQ434458",
+        "H. ocellatum PQ043207",
+        "H. trispeculare PQ043209"
+      ],
+      "y": [
+        "C. indicum (this study)",
+        "C. plagiosum OP018327",
+        "C. punctatum AP019519",
+        "C. punctatum JQ082337",
+        "C. griseum JQ434458",
+        "H. ocellatum PQ043207",
+        "H. trispeculare PQ043209"
+      ],
+      "colorscale": [
+        [
+          0.0,
+          "#1a9850"
+        ],
+        [
+          0.11,
+          "#66bd63"
+        ],
+        [
+          0.22,
+          "#a6d96a"
+        ],
+        [
+          0.33,
+          "#d9ef8b"
+        ],
+        [
+          0.44,
+          "#ffffbf"
+        ],
+        [
+          0.56,
+          "#fee08b"
+        ],
+        [
+          0.67,
+          "#fdae61"
+        ],
+        [
+          0.78,
+          "#f46d43"
+        ],
+        [
+          0.89,
+          "#d73027"
+        ],
+        [
+          1.0,
+          "#a50026"
+        ]
+      ],
+      "zmin": 88,
+      "zmax": 100,
+      "colorbar": {
+        "title": {
+          "text": "fastANI identity (%)",
+          "side": "right"
+        },
+        "thickness": 18,
+        "len": 0.82,
+        "x": 1.02,
+        "tickvals": [
+          88,
+          90,
+          92,
+          94,
+          96,
+          98,
+          100
+        ]
+      },
+      "hovertemplate": "%{y} vs %{x}<br>ANI %{z:.1f}%<extra></extra>"
+    },
+    {
+      "type": "scatter",
+      "mode": "text",
+      "x": [
+        "C. indicum (this study)",
+        "C. plagiosum OP018327",
+        "C. punctatum AP019519",
+        "C. punctatum JQ082337",
+        "C. griseum JQ434458",
+        "H. ocellatum PQ043207",
+        "H. trispeculare PQ043209"
+      ],
+      "y": [
+        "C. indicum (this study)",
+        "C. plagiosum OP018327",
+        "C. punctatum AP019519",
+        "C. punctatum JQ082337",
+        "C. griseum JQ434458",
+        "H. ocellatum PQ043207",
+        "H. trispeculare PQ043209"
+      ],
+      "text": [
+        "100.0",
+        "92.3",
+        "<b>91.8</b>",
+        "<b>91.6</b>",
+        "91.2",
+        "90.3",
+        "90.0",
+        "92.3",
+        "100.0",
+        "<b>92.1</b>",
+        "<b>91.9</b>",
+        "90.6",
+        "89.7",
+        "89.9",
+        "<b>91.8</b>",
+        "<b>92.1</b>",
+        "<b>100.0</b>",
+        "<b>98.4</b>",
+        "<b>90.8</b>",
+        "<b>90.6</b>",
+        "<b>90.3</b>",
+        "<b>91.6</b>",
+        "<b>91.9</b>",
+        "<b>98.4</b>",
+        "<b>100.0</b>",
+        "<b>90.6</b>",
+        "<b>90.6</b>",
+        "<b>90.5</b>",
+        "91.2",
+        "90.6",
+        "<b>90.8</b>",
+        "<b>90.6</b>",
+        "100.0",
+        "91.0",
+        "90.5",
+        "90.3",
+        "89.7",
+        "<b>90.6</b>",
+        "<b>90.6</b>",
+        "91.0",
+        "100.0",
+        "97.7",
+        "90.0",
+        "89.9",
+        "<b>90.3</b>",
+        "<b>90.5</b>",
+        "90.5",
+        "97.7",
+        "100.0"
+      ],
+      "textfont": {
+        "size": 13,
+        "color": [
+          "#ffffff",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#ffffff",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#ffffff",
+          "#ffffff",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#ffffff",
+          "#ffffff",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#ffffff",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#ffffff",
+          "#ffffff",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#1a1a1a",
+          "#ffffff",
+          "#ffffff"
+        ]
+      },
+      "hoverinfo": "skip",
+      "showlegend": false
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Pairwise average nucleotide identity, 7 hemiscylliid mitogenomes<br><sup>(fastANI, symmetrized over both query/reference directions)</sup>",
+      "font": {
+        "size": 17
+      },
+      "x": 0.5,
+      "xanchor": "center"
+    },
+    "xaxis": {
+      "tickangle": -45,
+      "tickvals": [
+        "C. indicum (this study)",
+        "C. plagiosum OP018327",
+        "C. punctatum AP019519",
+        "C. punctatum JQ082337",
+        "C. griseum JQ434458",
+        "H. ocellatum PQ043207",
+        "H. trispeculare PQ043209"
+      ],
+      "ticktext": [
+        "<i>C. </i>indicum (this study)",
+        "<i>C. </i>plagiosum OP018327",
+        "<i>C. </i>punctatum AP019519",
+        "<i>C. </i>punctatum JQ082337",
+        "<i>C. </i>griseum JQ434458",
+        "<i>H. </i>ocellatum PQ043207",
+        "<i>H. </i>trispeculare PQ043209"
+      ],
+      "tickfont": {
+        "size": 12.5
+      },
+      "ticklen": 4
+    },
+    "yaxis": {
+      "autorange": "reversed",
+      "tickvals": [
+        "C. indicum (this study)",
+        "C. plagiosum OP018327",
+        "C. punctatum AP019519",
+        "C. punctatum JQ082337",
+        "C. griseum JQ434458",
+        "H. ocellatum PQ043207",
+        "H. trispeculare PQ043209"
+      ],
+      "ticktext": [
+        "<i>C. </i>indicum (this study)",
+        "<i>C. </i>plagiosum OP018327",
+        "<i>C. </i>punctatum AP019519",
+        "<i>C. </i>punctatum JQ082337",
+        "<i>C. </i>griseum JQ434458",
+        "<i>H. </i>ocellatum PQ043207",
+        "<i>H. </i>trispeculare PQ043209"
+      ],
+      "tickfont": {
+        "size": 12.5
+      }
+    },
+    "margin": {
+      "l": 215,
+      "r": 130,
+      "t": 92,
+      "b": 175
+    },
+    "font": {
+      "size": 13
+    },
+    "plot_bgcolor": "#ffffff"
+  },
+  "export": {
+    "format": "svg",
+    "scale": 3
+  }
+};
+const cfg = SPEC.config || { responsive: true, displaylogo: false };
+cfg.responsive = true;
+/* Print export (v0.8.0): optional spec-level export field wires the modebar camera to
+   true-vector SVG (journal submission format) with deterministic PNG raster scale.
+   See engines/plotly.md - Print export. */
+if (SPEC.export) {
+  var __t = (SPEC.layout && SPEC.layout.title)
+    ? (typeof SPEC.layout.title === 'string' ? SPEC.layout.title : SPEC.layout.title.text)
+    : null;
+  cfg.toImageButtonOptions = Object.assign({
+    format: SPEC.export.format || 'svg',
+    filename: ((__t || 'chart') + '').replace(/\s+/g, '_'),
+    scale: SPEC.export.scale || 2
+  }, cfg.toImageButtonOptions || {});
+}
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
+</script>
+</body>
+</html>

@@ -38,6 +38,7 @@ Loaded from SKILL.md §1 routing when this engine is selected.
 **Defaults:** thresholds `<70 / 70–95 / ≥95` with the red/orange/green traffic palette when `color_levels` is omitted; canvas fixed at 760×800 (square plot area); callouts default to the right of the point, vertically centered, auto-flipped left when they would cross the right axis, and clamped inside the plot area.
 
 **Pitfalls:**
+
 - **Colour assignment order matters**: `p.color` (explicit) beats `p.level`, which beats `p.support`. `support` uses the `max` thresholds of `color_levels` — values above the last `max` fall through to the last level's colour. Verify each point's colour in the render before delivering (the original bamboo-shark script shipped a wrong red because a missing support fell to the lowest class).
 - **Callout collisions are the author's job**: with dense point clouds, set per-point `dx`/`dy` (px; dy is the box-center offset). Callouts are clamped to the plot area but not to each other — for >15 labelled points, label only the extreme/discordant points and let the rest ride on `title`-tooltip hover (`data-tip` is set on every marker automatically).
 - **Coincident points are nudged deterministically** (12px grid, repeatable across renders) — don't add random jitter in the spec.
