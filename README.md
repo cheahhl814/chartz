@@ -1,6 +1,6 @@
 # chartz
 
-[![Version](https://img.shields.io/badge/version-0.14.0-blue)](#-installation)
+[![Version](https://img.shields.io/badge/version-0.14.1-blue)](#-installation)
 [![Type](https://img.shields.io/badge/type-agent%20skill-blueviolet)](#-installation)
 [![README standard](https://img.shields.io/badge/README%20per-bioinfo--skill--creator-orange)](https://github.com/cheahhl814/bioinfo-skill-creator)
 
@@ -9,7 +9,7 @@ Render charts and graphs as self-contained HTML files from four CDN-pinned engin
 **Repository**: https://github.com/cheahhl814/chartz
 
 > [!TIP]
-> Full change history: see the [commit log](https://github.com/cheahhl814/chartz/commits/master) — each release is tagged in the message header (v0.14.0 current).
+> Full change history: see the [commit log](https://github.com/cheahhl814/chartz/commits/master) — each release is tagged in the message header (v0.14.1 current).
 
 ## Contents
 
@@ -26,7 +26,7 @@ Render charts and graphs as self-contained HTML files from four CDN-pinned engin
 
 ## 📸 Demo gallery
 
-Every one of the [60 example figures](examples/) is a self-contained HTML file — click through to any demo, or browse [`examples/screenshots/`](examples/screenshots). A sample:
+Every one of the [61 example figures](examples/) is a self-contained HTML file — click through to any demo, or browse [`examples/screenshots/`](examples/screenshots). A sample:
 
 |                                                                                                                                                                                        |                                                                                                                                                                                                |
 |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -35,6 +35,7 @@ Every one of the [60 example figures](examples/) is a self-contained HTML file �
 | ![ECharts dual-axis](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/echarts-dual-axis.png)<br>**ECharts** · sequencing dashboard, volume vs quality   | ![ECharts treemap](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/echarts-treemap.png)<br>**ECharts** · metagenome relative abundance by taxonomy             |
 | ![PhyloTree](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/phylotree-rect.png)<br>**PhyloTree** · 16S rRNA phylogram, bootstrap circles + scale bar  | ![Plotly box+strip](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/plotly-boxstrip.png)<br>**Plotly.js** · box + raw points, dose response (exact p shown)    |
 | ![Plotly Manhattan](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/plotly-manhattan.png)<br>**Plotly.js** · GWAS Manhattan plot                       | ![Plotly violin](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/plotly-violin-signif.png)<br>**Plotly.js** · violin by genotype with significance brackets    |
+| ![GeoMap occurrence](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/geomap-occurrence.png)<br>**GeoMap** · *Betta waseri* occurrence map (NE 50m vector, shape = data source) | ![GeoMap site map](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/geomap-sampling-sites.png)<br>**GeoMap** · eDNA sampling sites on Esri World Imagery tiles    |
 
 ## 🚀 Installation
 
@@ -117,7 +118,7 @@ The routing table in `SKILL.md` §1 maps request shape → engine (first match w
 | 11  | Treemap/sankey/alluvial/sunburst/dendrogram/large series/dataZoom/mixed dashboards                              | ECharts             | `templates/echarts.html`          |
 | 12  | Simple bar/line/pie/doughnut/radar/scatter/bubble                                                               | Chart.js            | `templates/chartjs.html`          |
 | 13  | Anything else                                                                                                   | ECharts (catch-all) | `templates/echarts.html`          |
-| 14  | Site maps on raster tile basemaps (satellite/street, offline after build)                                       | GeoMap              | `templates/geomap.html`           |
+| 14  | Site maps on raster tile basemaps (satellite/street, offline after build); regional occurrence maps in vector style (NE 50m + degree graticule + shape-encoded points) | GeoMap              | `templates/geomap.html`           |
 
 ## 🧰 Engines
 

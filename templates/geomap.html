@@ -28,7 +28,7 @@
     </div>
     <div id="chart"></div>
   </div>
-  <footer>chartz · GeoMap (engine 16) · d3-geo projections, GeoJSON embedded in spec · self-contained</footer>
+  <footer>chartz · GeoMap (engine 15) · d3-geo projections, GeoJSON embedded in spec · self-contained</footer>
 </div>
 <script>
 const SPEC = /*__SPEC__*/;
@@ -43,15 +43,24 @@ if (SPEC.subtitle) {
 /* GeoMap renderer — d3-geo projection + GeoJSON embedded in the SPEC.
    Spec: { title, subtitle?, width?, height?, projection?: "mercator"|"equirectangular",
            bbox?: {lon_min, lat_min, lon_max, lat_max},        // default: fit to all data
-           basemap?: { land?: <FeatureCollection>, land_fill?, land_stroke?, ocean_color?, graticule? },
+           basemap?: { land?: <FeatureCollection>, land_fill?, land_stroke?, land_stroke_width?, ocean_color?,
+                       graticule?: true|{stroke?, stroke_width?, step?: [lon,lat], labels?: bool, label_color?} },
            layers?: [ {type: "polygons"|"lines", label?, features: <FC|Feature|geometry>, fill?, fill_opacity?,
                        stroke?, stroke_width?, dash?}
-                    | {type: "points", label?, items: [{lon, lat, label?, color?, size?, label_side?}] } ],
-           scale_bar?: true|{length_km?}, north_arrow?: true, legend?: true,
-           export?: { width_mm?, dpi?, font_family? } } */
+                    | {type: "points", label?, legend_title?, legend_rows?: "items",
+                       items: [{lon, lat, label?, color?, size?, shape?, stroke?, stroke_width?, label_side?, italic?}] } ],
+           annotations?: [{lon, lat, text, color?, size?, italic?, anchor?}],   // free place-name labels
+           shape_key?: {title?, items: [{shape, fill?, stroke?, size?, label}]}, // 2nd legend section
+           scale_bar?: true|{length_km?}|false, north_arrow?: true, legend?: true,
+           export?: { width_mm?, dpi?, font_family? } }
+   Marker shapes: "circle" (default) | "diamond" | "square" | "triangle" — encode a second
+   categorical variable (e.g. colour = species, shape = data source) publication-style.
+   Reference-map preset: basemap {land_fill:"#f0f0f0", land_stroke:"#888888", land_stroke_width:0.3,
+   ocean_color:"#e6f0fa", graticule:true} + annotations for place names. */
 (function render() {
   const NS = "http://www.w3.org/2000/svg";
-  const W = SPEC.width || 900, H = SPEC.height || 700, PAD = 34;
+  const grat = SPEC.basemap && SPEC.basemap.graticule;
+  const W = SPEC.width || 900, H = SPEC.height || 700, PAD = grat ? 42 : 34;
   const svg = document.createElementNS(NS, "svg");
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.setAttribute("style", "font-family: system-ui, sans-serif; display: block; margin: 0 auto; max-width: 100%;");
@@ -84,6 +93,17 @@ if (SPEC.subtitle) {
       return {...geo, coordinates: geo.coordinates.map(fixPolygon)};
     return geo;
   };
+  // point glyph outlines for the non-circle marker shapes (second categorical encoding)
+  const shapeGlyph = (shape, cx, cy, s) => {
+    if (shape === "square") return `M ${cx - s} ${cy - s} H ${cx + s} V ${cy + s} H ${cx - s} Z`;
+    if (shape === "diamond") return `M ${cx} ${cy - 1.25 * s} L ${cx + 1.25 * s} ${cy} L ${cx} ${cy + 1.25 * s} L ${cx - 1.25 * s} ${cy} Z`;
+    if (shape === "triangle") return `M ${cx} ${cy - 1.2 * s} L ${cx + 1.15 * s} ${cy + 0.9 * s} L ${cx - 1.15 * s} ${cy + 0.9 * s} Z`;
+    return null;
+  };
+  const fmtLon = d => Math.round(d * 1e6) / 1e6 === 0 ? "0°"
+      : `${Math.abs(Math.round(d * 1e6) / 1e6)}°${d < 0 ? "W" : "E"}`;
+  const fmtLat = d => Math.round(d * 1e6) / 1e6 === 0 ? "0°"
+      : `${Math.abs(Math.round(d * 1e6) / 1e6)}°${d < 0 ? "S" : "N"}`;
   const allLayers = (SPEC.layers || []);
   const everything = {type: "FeatureCollection", features: []};
   if (SPEC.basemap && SPEC.basemap.land) everything.features.push(...fc(SPEC.basemap.land).features);
@@ -128,10 +148,51 @@ if (SPEC.subtitle) {
       el("text", {x: W - PAD - 6, y: H - PAD - 6, "font-size": 9, fill: "#333",
                   "text-anchor": "end", opacity: 0.85}, mapG, SPEC.basemap.raster.attribution);
   }
-  // graticule (optional, behind land)
-  if (SPEC.basemap && SPEC.basemap.graticule) {
-    el("path", {d: path(d3.geoGraticule()()), fill: "none", stroke: "#c8d4de",
-                "stroke-width": 0.5}, mapG);
+  // graticule (optional) — drawn AFTER land as white hairlines over the map (the journal
+  // reference-map look), with degree-formatted tick labels outside the frame.
+  // true | {stroke?, stroke_width?, step?: [lon,lat], labels?: bool, label_color?}
+  if (grat) {
+    const g = grat === true ? {} : grat;
+    const gStroke = g.stroke || "#ffffff", gW = g.stroke_width == null ? 0.7 : g.stroke_width;
+    let bb = rasterBbox || SPEC.bbox;
+    if (!bb) {
+      const a = proj.invert([PAD, PAD]), b2 = proj.invert([W - PAD, H - PAD]);
+      bb = {lon_min: a[0], lat_min: b2[1], lon_max: b2[0], lat_max: a[1]};
+    }
+    const pick = s => [0.5, 1, 2, 5, 10, 15, 20, 30, 45, 60].reduce((p, c) =>
+      Math.abs(c - s / 5) < Math.abs(p - s / 5) ? c : p);
+    const st = g.step || [pick(bb.lon_max - bb.lon_min), pick(bb.lat_max - bb.lat_min)];
+    const ticks = (min, max, stepv) => {
+      const out = [];
+      for (let v = Math.ceil(min / stepv) * stepv; v <= max + 1e-9; v += stepv)
+        out.push(Math.round(v * 1e6) / 1e6);
+      return out;
+    };
+    const lons = ticks(bb.lon_min, bb.lon_max, st[0]);
+    const lats = ticks(bb.lat_min, bb.lat_max, st[1]);
+    for (const lo of lons) {
+      const a = proj([lo, Math.max(-85, bb.lat_min)]), b2 = proj([lo, Math.min(85, bb.lat_max)]);
+      if (a && b2) el("path", {d: `M ${a[0]} ${a[1]} L ${b2[0]} ${b2[1]}`, stroke: gStroke,
+                               "stroke-width": gW, fill: "none"}, mapG);
+    }
+    for (const la of lats) {
+      const a = proj([bb.lon_min, la]), b2 = proj([bb.lon_max, la]);
+      if (a && b2) el("path", {d: `M ${a[0]} ${a[1]} L ${b2[0]} ${b2[1]}`, stroke: gStroke,
+                               "stroke-width": gW, fill: "none"}, mapG);
+    }
+    if (g.labels !== false) {
+      const lc = g.label_color || "#555";
+      for (const lo of lons) {
+        const x = proj([lo, 0])[0];
+        el("text", {x, y: H - PAD + 15, "font-size": 9.5, fill: lc, "text-anchor": "middle"}, svg,
+           fmtLon(lo));
+      }
+      for (const la of lats) {
+        const y = proj([0, la])[1];
+        el("text", {x: PAD - 7, y: y + 3, "font-size": 9.5, fill: lc, "text-anchor": "end"}, svg,
+           fmtLat(la));
+      }
+    }
   }
   // land — one path PER FEATURE: combining features into a single evenodd path would
   // XOR out overlapping regions (e.g. an OSM island inside a coarser Natural Earth
@@ -169,20 +230,44 @@ if (SPEC.subtitle) {
     if (L.type !== "points") continue;
     for (const p of L.items || []) {
       const q = proj([p.lon, p.lat]); if (!q) continue;
-      el("circle", {cx: q[0], cy: q[1], r: p.size || 7,
-                    fill: p.color || (L.color || "#E15759"),
-                    stroke: "#fff", "stroke-width": 1.5}, mapG);
+      const s = p.size || 7, shp = p.shape || "circle";
+      const fill = p.color || (L.color || "#E15759");
+      const stroke = p.stroke == null ? "#fff" : p.stroke;
+      const sw = p.stroke_width == null ? 1.5 : p.stroke_width;
+      const glyph = shapeGlyph(shp, q[0], q[1], s);
+      if (glyph) el("path", {d: glyph, fill, stroke, "stroke-width": sw,
+                             "stroke-linejoin": "miter"}, mapG);
+      else el("circle", {cx: q[0], cy: q[1], r: s, fill, stroke, "stroke-width": sw}, mapG);
       if (p.label) {
         const side = p.label_side || "right";
-        const dx = side === "left" ? -(p.size || 7) - 5 : (side === "top" || side === "bottom") ? 0 : (p.size || 7) + 5;
-        const dy = side === "top" ? -(p.size || 7) - 5 : side === "bottom" ? (p.size || 7) + 13 : 4;
+        const dx = side === "left" ? -s - 5 : (side === "top" || side === "bottom") ? 0 : s + 5;
+        const dy = side === "top" ? -(s) - 5 : side === "bottom" ? s + 13 : 4;
         el("text", {x: q[0] + dx, y: q[1] + dy, "font-size": 11.5, fill: "#222",
+                    "font-style": p.italic ? "italic" : "normal",
                     "text-anchor": side === "left" ? "end" : side === "top" || side === "bottom" ? "middle" : "start",
                     "paint-order": "stroke", stroke: "rgba(255,255,255,0.85)", "stroke-width": 3}, mapG, p.label);
       }
     }
-    if (L.label) legendRows.push({kind: "point", label: L.label, fill: (L.items[0] && L.items[0].color) || L.color || "#E15759"});
+    if (L.legend_rows === "items") {
+      // one legend row PER ITEM (e.g. each species its own coloured glyph)
+      for (const p of L.items || [])
+        if (p.label) legendRows.push({kind: "point", label: p.label, fill: p.color || L.color || "#E15759",
+                                      shape: p.shape || "circle", stroke: p.stroke == null ? "#fff" : p.stroke,
+                                      size: Math.min(p.size || 7, 7), italic: p.italic});
+    } else if (L.label) {
+      legendRows.push({kind: "point", label: L.label,
+                       fill: (L.items[0] && L.items[0].color) || L.color || "#E15759",
+                       shape: L.legend_shape || (L.items[0] && L.items[0].shape) || "circle",
+                       stroke: (L.items[0] && L.items[0].stroke == null) ? "#fff" : L.items[0].stroke,
+                       italic: L.italic, group: L.group});
+    }
   }
+  // shape key — a SECOND legend section for the shape encoding (e.g. marker shape = data source)
+  if (SPEC.shape_key && SPEC.shape_key.items)
+    for (const k of SPEC.shape_key.items)
+      legendRows.push({kind: "point", group: SPEC.shape_key.title || "", label: k.label,
+                       fill: k.fill == null ? "#fff" : k.fill, stroke: k.stroke == null ? "#222" : k.stroke,
+                       shape: k.shape || "circle", size: Math.min(k.size || 7, 7)});
   // scale bar — km per pixel at map-centre latitude (mercator/equirectangular horizontal scale)
   if (SPEC.scale_bar) {
     const lat0 = SPEC.bbox ? (SPEC.bbox.lat_min + SPEC.bbox.lat_max) / 2 : 0;
@@ -213,22 +298,54 @@ if (SPEC.subtitle) {
     el("text", {x: nx, y: ny + 40, "font-size": 11, fill: "#222", "text-anchor": "middle",
                 "font-weight": 600, ...halo}, mapG, "N");
   }
-  // legend — bottom-right
+  // legend — bottom-right; rows may carry `group` titles (grouped/sectioned legend:
+  // e.g. "Species" block of coloured glyphs, then a "Data source" shape-key block)
   if (SPEC.legend !== false && legendRows.length) {
-    const lw = Math.max(...legendRows.map(r => r.label.length)) * 6.1 + 46;
-    const lh = legendRows.length * 17 + 12;
+    const rows = [];
+    let lastGroup = null;
+    for (const r of legendRows) {
+      if (r.group != null && r.group !== lastGroup) { rows.push({header: r.group}); lastGroup = r.group; }
+      else if (r.group == null) lastGroup = null;
+      rows.push(r);
+    }
+    const lw = Math.max(...rows.map(r => ((r.header || r.label || "")).length)) * 6.3 + 46;
+    const lh = rows.length * 17 + 12 + rows.filter(r => r.header !== undefined).length * 6;
     const lx = W - PAD - lw - 8, ly = H - PAD - 12 - 14 - lh;
     el("rect", {x: lx, y: ly, width: lw, height: lh, rx: 5, fill: "rgba(255,255,255,0.92)",
                 stroke: "#c8cdd3", "stroke-width": 1}, mapG);
-    legendRows.forEach((r, i) => {
-      const cy = ly + 17 + i * 17;
-      if (r.kind === "point") el("circle", {cx: lx + 14, cy: cy - 4, r: 6, fill: r.fill, stroke: "#fff", "stroke-width": 1}, mapG);
-      else if (r.kind === "poly") el("rect", {x: lx + 8, y: cy - 8, width: 12, height: 8, fill: r.fill,
+    let cy = ly + 17;
+    for (const r of rows) {
+      if (r.header !== undefined) {
+        el("text", {x: lx + 8, y: cy + 3, "font-size": 11, fill: "#444", "font-weight": 600}, mapG, r.header);
+        cy += 23;
+        continue;
+      }
+      if (r.kind === "point") {
+        const gx = lx + 14, gy = cy - 4, gs = Math.max(4, Math.min(r.size || 6, 9));
+        const glyph = shapeGlyph(r.shape, gx, gy, gs);
+        if (glyph) el("path", {d: glyph, fill: r.fill, stroke: r.stroke, "stroke-width": 1.4,
+                               "stroke-linejoin": "miter"}, mapG);
+        else el("circle", {cx: gx, cy: gy, r: 6, fill: r.fill,
+                           stroke: r.stroke || "#fff", "stroke-width": 1.4}, mapG);
+      } else if (r.kind === "poly") el("rect", {x: lx + 8, y: cy - 8, width: 12, height: 8, fill: r.fill,
                                               stroke: r.stroke !== "none" ? r.stroke : "none"}, mapG);
       else el("line", {x1: lx + 8, x2: lx + 20, y1: cy - 4, y2: cy - 4, stroke: r.stroke, "stroke-width": 2.5,
                        "stroke-dasharray": r.dash || "none"}, mapG);
-      el("text", {x: lx + 26, y: cy, "font-size": 11, fill: "#222"}, mapG, r.label);
-    });
+      el("text", {x: lx + 26, y: cy, "font-size": 11, fill: "#222",
+                  "font-style": r.italic ? "italic" : "normal"}, mapG, r.label);
+      cy += 17;
+    }
+  }
+  // free-floating place-name annotations (lon/lat-anchored, layer-independent —
+  // e.g. italic grey "Sumatra" / "Borneo" / "South China Sea" labels)
+  for (const a of SPEC.annotations || []) {
+    const q = proj([a.lon, a.lat]); if (!q) continue;
+    const size = a.size || 10, lines = String(a.text).split("\n");
+    const t = el("text", {x: q[0], y: q[1], "font-size": size, fill: a.color || "#666",
+                "font-style": a.italic === false ? "normal" : "italic",
+                "text-anchor": a.anchor || "middle",
+                "paint-order": "stroke", stroke: "rgba(255,255,255,0.9)", "stroke-width": 3}, mapG);
+    lines.forEach((ln, i) => el("tspan", {x: q[0], dy: i === 0 ? 0 : size * 1.25}, t, ln));
   }
   // map frame
   el("rect", {x: PAD - 1, y: PAD - 1, width: W - 2 * PAD + 2, height: H - 2 * PAD + 2,
