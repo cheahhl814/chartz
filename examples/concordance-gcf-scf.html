@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Concordance 1 (template-native)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .card-head h1 { font-size: 1.1rem; margin: 0 0 .75rem 0; color: #333; }
+  .dl-btn { font-size: .8rem; padding: .35rem .7rem; border: 1px solid #dee2e6; border-radius: 6px;
+            background: #fff; cursor: pointer; white-space: nowrap; }
+  .dl-btn:hover { background: #f1f3f5; }
+  #chart { width: 100%; display: flex; justify-content: center; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="card-head">
+      <h1 id="chart-title"></h1>
+      <div>
+        <button id="dl-svg" class="dl-btn" type="button">Download SVG</button>
+        <button id="dl-png" class="dl-btn" type="button">Download PNG</button>
+      </div>
+    </div>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · Concordance (engine 14) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "Mitogenome species tree: gene vs site concordance per branch",
+  "subtitle": "(7 taxa × 14,060 bp; 15 gene trees; labels = UFBoot/gCF/sCF)",
+  "x_label": "Gene concordance factor, gCF (%)",
+  "y_label": "Site concordance factor, sCF (%)",
+  "x_max": 108,
+  "y_max": 105,
+  "random_line": 33.3,
+  "level_title": "UFBoot support",
+  "color_levels": [
+    {
+      "max": 70,
+      "color": "#d62728",
+      "label": "< 70%"
+    },
+    {
+      "max": 95,
+      "color": "#ff7f0e",
+      "label": "70–95%"
+    },
+    {
+      "max": 100,
+      "color": "#2ca02c",
+      "label": "≥ 95%"
+    }
+  ],
+  "points": [
+    {
+      "x": 100.0,
+      "y": 88.6,
+      "level": "≥ 95%",
+      "label": "n10: all Chiloscyllium vs H. trispeculare",
+      "sub": "UFBoot 100 · gCF 100.0 · sCF 88.6",
+      "dx": 16,
+      "dy": -40
+    },
+    {
+      "x": 46.7,
+      "y": 35.9,
+      "level": "< 70%",
+      "label": "n11: C. griseum vs rest of ingroup",
+      "sub": "UFBoot 68 · gCF 46.7 · sCF 35.9",
+      "dx": 16,
+      "dy": 30
+    },
+    {
+      "x": 93.3,
+      "y": 44.3,
+      "level": "≥ 95%",
+      "label": "n12: C. indicum + C. plagiosum",
+      "sub": "UFBoot 100 · gCF 93.3 · sCF 44.3",
+      "dx": 16,
+      "dy": -36
+    },
+    {
+      "x": 100.0,
+      "y": 88.0,
+      "level": "≥ 95%",
+      "label": "n13: C. punctatum pair",
+      "sub": "UFBoot 100 · gCF 100.0 · sCF 88.0",
+      "dx": 16,
+      "dy": 44
+    }
+  ],
+  "export": {
+    "width_mm": 89,
+    "dpi": 300,
+    "font_family": "Arial"
+  }
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Concordance scatter';
+(function render() {
+  // ================= inputs =================
+  if (!SPEC.points || !SPEC.points.length) throw new Error('concordance: SPEC.points is required');
+  var xlab = SPEC.x_label || 'x';
+  var ylab = SPEC.y_label || 'y';
+  var XMAX = SPEC.x_max || 105, YMAX = SPEC.y_max || 105;
+  var XSTEP = SPEC.x_step || 20, YSTEP = SPEC.y_step || 20;
+  var levels = SPEC.color_levels || [
+    { max: 70,  color: '#d62728', label: '< 70%' },
+    { max: 95,  color: '#ff7f0e', label: '70\u201395%' },
+    { max: 100, color: '#2ca02c', label: '\u2265 95%' }
+  ];
+  var levelTitle = SPEC.level_title !== undefined ? SPEC.level_title : 'Support';
+  var rl = (SPEC.random_line === false || SPEC.random_line === null || SPEC.random_line === undefined) ? null : SPEC.random_line;
+
+  // ================= canvas =================
+  var W = 760, H = 800;
+  var M = { l: 84, r: 46, t: (SPEC.subtitle ? 88 : 62), b: 78 };
+  var PW = W - M.l - M.r, PH = H - M.t - M.b;
+  var NS = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svg.style.background = '#fff';
+  document.getElementById('chart').appendChild(svg);
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  var X = function (v) { return M.l + (v / XMAX) * PW; };
+  var Y = function (v) { return M.t + PH - (v / YMAX) * PH; };
+
+  // subtitle (small grey line under the card title, inside the SVG)
+  if (SPEC.subtitle) {
+    var st = el('text', { x: M.l - 20, y: 34, 'font-size': 12.5, fill: '#666' });
+    st.textContent = SPEC.subtitle;
+  }
+
+  // ================= axes =================
+  el('rect', { x: M.l, y: M.t, width: PW, height: PH, fill: 'none', stroke: '#333', 'stroke-width': 1.2 });
+  var xt = el('text', { x: M.l + PW / 2, y: H - 26, 'text-anchor': 'middle', 'font-size': 14, fill: '#222' });
+  xt.textContent = xlab;
+  var yt = el('text', { x: 24, y: M.t + PH / 2, 'text-anchor': 'middle', 'font-size': 14, fill: '#222',
+                        transform: 'rotate(-90 24 ' + (M.t + PH / 2) + ')' });
+  yt.textContent = ylab;
+  for (var v = 0; v <= XMAX + 1e-9; v += XSTEP) {
+    el('line', { x1: X(v), y1: M.t + PH, x2: X(v), y2: M.t + PH + 6, stroke: '#333', 'stroke-width': 1 });
+    var t = el('text', { x: X(v), y: M.t + PH + 22, 'text-anchor': 'middle', 'font-size': 12, fill: '#333' });
+    t.textContent = v;
+  }
+  for (var v2 = 0; v2 <= YMAX + 1e-9; v2 += YSTEP) {
+    el('line', { x1: M.l - 6, y1: Y(v2), x2: M.l, y2: Y(v2), stroke: '#333', 'stroke-width': 1 });
+    var t2 = el('text', { x: M.l - 10, y: Y(v2) + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#333' });
+    t2.textContent = v2;
+  }
+
+  // random-concordance reference lines (dashed, both axes)
+  if (rl !== null) {
+    el('line', { x1: X(rl), y1: M.t, x2: X(rl), y2: M.t + PH, stroke: '#999', 'stroke-width': 1, 'stroke-dasharray': '6 5' });
+    el('line', { x1: M.l, y1: Y(rl), x2: M.l + PW, y2: Y(rl), stroke: '#999', 'stroke-width': 1, 'stroke-dasharray': '6 5' });
+    var rt = el('text', { x: X(rl) + 6, y: M.t + PH - 8, 'font-size': 11, fill: '#888', 'font-style': 'italic' });
+    rt.textContent = 'Random (' + Math.round(rl) + '%)';
+  }
+
+  // ================= legend (top-left, inside plot) =================
+  var leg = null;
+  if (levelTitle !== false && levels.length) {
+    leg = { x: M.l + 14, y: M.t + 14, rowH: 24 };
+    var w = 10;
+    var mctx = document.createElement('canvas').getContext('2d');
+    mctx.font = '12px system-ui, sans-serif';
+    levels.forEach(function (lv) { w = Math.max(w, mctx.measureText(lv.label).width + 34); });
+    leg.w = Math.max(w, mctx.measureText(levelTitle).width + 34) + 8;
+    leg.h = 34 + levels.length * leg.rowH;
+    el('rect', { x: leg.x, y: leg.y, width: leg.w, height: leg.h, fill: '#fff', 'fill-opacity': 0.92,
+                 stroke: '#999', rx: 4 });
+    var lt = el('text', { x: leg.x + 16, y: leg.y + 22, 'font-size': 13, fill: '#222' });
+    lt.textContent = levelTitle;
+    levels.forEach(function (lv, k) {
+      el('circle', { cx: leg.x + 22, cy: leg.y + 40 + k * leg.rowH, r: 8, fill: lv.color, stroke: '#fff', 'stroke-width': 1 });
+      var t3 = el('text', { x: leg.x + 38, y: leg.y + 44 + k * leg.rowH, 'font-size': 12, fill: '#333' });
+      t3.textContent = lv.label;
+    });
+  }
+
+  // ================= points =================
+  // deterministic nudge for coincident coordinates so every marker stays visible
+  var seen = {};
+  var placed = [];
+  SPEC.points.forEach(function (p) {
+    if (typeof p.x !== 'number' || typeof p.y !== 'number')
+      throw new Error('concordance: every point needs numeric x and y');
+    var color = p.color;
+    if (!color) {
+      if (p.level !== undefined) {
+        for (var i = 0; i < levels.length; i++) {
+          if (levels[i].label === p.level || String(i) === String(p.level) || i === p.level) { color = levels[i].color; break; }
+        }
+      } else if (typeof p.support === 'number') {
+        for (var j = 0; j < levels.length; j++) {
+          var lo = j > 0 ? levels[j - 1].max : -Infinity;
+          if (p.support > lo && p.support <= levels[j].max + 1e-9) { color = levels[j].color; break; }
+        }
+      }
+    }
+    if (!color) color = levels.length ? levels[levels.length - 1].color : '#2ca02c';
+    var key = p.x.toFixed(1) + ',' + p.y.toFixed(1);
+    var n = seen[key] || 0; seen[key] = n + 1;
+    var jx = (n % 2) * 12 - 6 * (n > 0), jy = Math.floor(n / 2) * 12 - 6 * (n > 0);
+    var px = X(p.x) + jx, py = Y(p.y) + jy;
+    placed.push({ p: p, px: px, py: py, color: color });
+  });
+
+  // callouts first (under the markers), then markers on top
+  var meas = document.createElement('canvas').getContext('2d');
+  placed.forEach(function (d) {
+    var lines = [d.p.label, d.p.sub].filter(Boolean);
+    if (!lines.length) return;
+    var fs = 11.5, pad = 6, lh = fs + 3;
+    meas.font = fs + 'px system-ui, sans-serif';
+    var w = 0;
+    lines.forEach(function (ln) { w = Math.max(w, meas.measureText(ln).width); });
+    w += pad * 2;
+    var h = lines.length * lh + pad * 2 - 2;
+    var dx = d.p.dx !== undefined ? d.p.dx : 14;
+    var dy = d.p.dy !== undefined ? d.p.dy : 0;
+    var bx = d.px + dx, by = d.py + dy - h / 2;
+    if (bx + w > M.l + PW - 4) bx = d.px - Math.abs(dx) - w;      // flip left on overflow
+    by = Math.max(M.t + 4, Math.min(by, M.t + PH - h - 4));        // clamp inside plot
+    // leader line: point edge -> nearest box edge midpoint
+    var ex = bx > d.px ? bx : bx + w;
+    var ey = by + h / 2;
+    el('line', { x1: d.px, y1: d.py, x2: ex, y2: ey, stroke: '#777', 'stroke-width': 0.9 });
+    el('rect', { x: bx, y: by, width: w, height: h, rx: 5, fill: '#fff', 'fill-opacity': 0.9,
+                 stroke: d.color, 'stroke-width': 1 });
+    lines.forEach(function (ln, k) {
+      var t4 = el('text', { x: bx + pad, y: by + pad + fs - 2 + k * lh, 'font-size': fs, fill: d.color });
+      t4.textContent = ln;
+    });
+  });
+  placed.forEach(function (d) {
+    el('circle', { cx: d.px, cy: d.py, r: 9, fill: d.color, stroke: '#fff', 'stroke-width': 1.4 })
+      .setAttribute('data-tip', (d.p.label || '') + (d.p.sub ? ' — ' + d.p.sub : ''));
+  });
+})();
+</script>
+<script>
+/* ---- chartz print-export module (identical across template-native engines; v0.8.0) ----
+   SPEC.export (optional, all keys optional):
+     width_mm    - journal column width (e.g. 89 = Nature single column). With dpi, sets the
+                   Download PNG raster deterministically: px = mm / 25.4 * dpi (default: 2x screen).
+                   Download SVG then carries width/height in mm units (true print vector).
+     dpi         - raster density for Download PNG (default 300).
+     font_family - overrides the system-ui stack in both exports (journals: "Arial"). */
+(function () {
+  var getSvg = function () { return document.querySelector('#chart svg'); };
+  var baseName = function () {
+    return (document.getElementById('chart-title').textContent || 'chart').replace(/\s+/g, '_');
+  };
+  function exportScale(el) {
+    var ex = (SPEC && SPEC.export) || {};
+    var dpi = ex.dpi || 300;
+    if (ex.width_mm) {
+      var cssW = (el.viewBox.baseVal && el.viewBox.baseVal.width) || el.clientWidth || 900;
+      return Math.max(1, (ex.width_mm / 25.4 * dpi) / cssW);
+    }
+    return 2;
+  }
+  function svgXml(print) {
+    var el = getSvg();
+    if (!el) return null;
+    var vb = el.viewBox.baseVal;
+    var w = (vb && vb.width) ? vb.width : el.clientWidth;
+    var h = (vb && vb.height) ? vb.height : el.clientHeight;
+    var clone = el.cloneNode(true);
+    var ex = (SPEC && SPEC.export) || {};
+    if (print && ex.width_mm) {
+      clone.setAttribute('width', ex.width_mm + 'mm');
+      clone.setAttribute('height', (h / w * ex.width_mm).toFixed(2) + 'mm');
+    } else {
+      clone.setAttribute('width', w);
+      clone.setAttribute('height', h);
+    }
+    if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    if (!clone.getAttribute('xmlns:xlink')) clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+    if (ex.font_family) clone.setAttribute('style', 'font-family: ' + ex.font_family + ';');
+    return { xml: new XMLSerializer().serializeToString(clone), w: w, h: h };
+  }
+  function download(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  document.getElementById('dl-svg').addEventListener('click', function () {
+    var r = svgXml(true);
+    if (!r) return;
+    var prolog = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    download(new Blob([prolog + r.xml], { type: 'image/svg+xml;charset=utf-8' }), baseName() + '.svg');
+  });
+  document.getElementById('dl-png').addEventListener('click', function () {
+    var r = svgXml(false);
+    if (!r) return;
+    var scale = exportScale(getSvg());
+    var url = URL.createObjectURL(new Blob([r.xml], { type: 'image/svg+xml;charset=utf-8' }));
+    var img = new Image();
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(r.w * scale);
+      canvas.height = Math.round(r.h * scale);
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function (blob) { download(blob, baseName() + '.png'); });
+    };
+    img.src = url;
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 ---
 name: chartz
 description: 'Render charts and graphs as self-contained HTML files from four pinned CDN engines, chosen by chart type. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a file they can open in a browser — "make a bar chart", "plot this data", "heatmap of these values", "draw a network graph", "dashboard of these metrics". Engine router: Chart.js (simple statistical), Plotly.js (scientific/statistical), ECharts (rich/dashboards), Cytoscape.js (nodes + edges). Emits one single-file HTML per chart with pinned CDN versions; no build step, no server. Does NOT do text-to-flowchart/sequence diagrams (use Mermaid/lumen-generate_visual for that) and does NOT analyze data — it renders data you already have.'
-version: 0.11.1
+version: 0.12.0
 updated: "2026-09-21"
 triggers:
   - "make a chart"
@@ -20,7 +20,7 @@ requires:
 
 # chartz — chart & graph rendering skill
 
-> **v0.11.1.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus eight template-native SVG engines (PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos, HeatTree — §5b–§5i), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
+> **v0.12.0.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus nine template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos — §5b–§5j), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
 
 ## 0. Workflow (always all five steps)
 
@@ -36,23 +36,20 @@ requires:
 
 | #   | If the request is…                                                                                                                                                                        | Engine                           | Template                          | Spec contract | Engine file              |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------- | ------------- | ------------------------ |
-| #   | If the request is…                                                                                                                                                                        | Engine                           | Template                          | Spec contract | Engine file              |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------- | ------------- | ------------------------ |
-| #   | If the request is…                                                                                                                                                                        | Engine                           | Template                          | Spec contract | Engine file              |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------- | ------------- | ------------------------ |
 | 1   | Taxonomy heat trees (metacoder-style: radial taxonomy tree, node size/color + edge width/color encode a value such as abundance)                                                          | **HeatTree**                     | `templates/heattree.html`         | §5h           | `engines/heattree.md`    |
 | 2   | Phylogenetic trees (Newick, phylograms/cladograms, bootstrap circles, scale bar, clade ranges, iTOL-class figures)                                                                        | **PhyloTree**                    | `templates/phylotree.html`        | §5i           | `engines/phylotree.md`   |
-| 3   | Nodes + edges (pathways, gene networks, dependency graphs, org charts as graphs)                                                                                                          | **Cytoscape.js**                 | `templates/cytoscape.html`        | §5            | `engines/cytoscape.md`   |
-| 4   | Genome-browser track figures (coverage, peaks, gene models stacked on locus coordinates)                                                                                                  | **GenomeTracks**                 | `templates/genetracks.html`       | §5b           | `engines/genetracks.md`  |
-| 5   | Clustered heatmaps (matrix + attached dendrograms + annotation strips)                                                                                                                    | **ClusterHeat**                  | `templates/clusteredheatmap.html` | §5c           | `engines/clusterheat.md` |
-| 6   | OncoPrint / mutation matrices (stacked alteration cells, TMB + clinical strips)                                                                                                           | **OncoPrint**                    | `templates/oncoprint.html`        | §5d           | `engines/oncoprint.md`   |
-| 7   | Sequence logos (per-position letter stacks, bits axis)                                                                                                                                    | **SeqLogo**                      | `templates/seqlogo.html`          | §5e           | `engines/seqlogo.md`     |
-| 8   | Circos circular genome plots (ideogram + concentric tracks + SV links)                                                                                                                    | **Circos**                       | `templates/circos.html`           | §5g           | `engines/circos.md`      |
-| 9   | UpSet set-intersection plots (dot matrix + intersection bars, 4+ sets)                                                                                                                    | **UpSet**                        | `templates/upset.html`            | §5f           | `engines/upset.md`       |
-| 10  | Box plots, violin plots, histograms, **heatmaps** (better colorbar/labels), 3D surfaces, error bars, log axes, subplots, **Manhattan/Miami/QQ/locuszoom-regional/forest/funnel/lollipop** | **Plotly.js**                    | `templates/plotly.html`           | §3            | `engines/plotly.md`      |
-| 11  | Treemap, sankey, sunburst, dendrogram (topology-only `tree`), large series (>10k points), dataZoom scrubbing, mixed multi-chart dashboards                                                | **ECharts**                      | `templates/echarts.html`          | §4            | `engines/echarts.md`     |
-| 12  | Simple bar / line / pie / doughnut / radar / scatter / bubble (few series, shared category axis)                                                                                          | **Chart.js**                     | `templates/chartjs.html`          | §2            | `engines/chartjs.md`     |
-| 13  | Anything else                                                                                                                                                                             | **ECharts** (broadest catch-all) | `templates/echarts.html`          | §4            | `engines/echarts.md`     |
+| 3   | Concordance-factor scatter (IQ-TREE gCF vs sCF per branch, support-coloured classes, random-33% lines, callout labels)                                                                    | **Concordance**                  | `templates/concordance.html`      | §5j           | `engines/concordance.md` |
+| 4   | Nodes + edges (pathways, gene networks, dependency graphs, org charts as graphs)                                                                                                          | **Cytoscape.js**                 | `templates/cytoscape.html`        | §5            | `engines/cytoscape.md`   |
+| 5   | Genome-browser track figures (coverage, peaks, gene models stacked on locus coordinates)                                                                                                  | **GenomeTracks**                 | `templates/genetracks.html`       | §5b           | `engines/genetracks.md`  |
+| 6   | Clustered heatmaps (matrix + attached dendrograms + annotation strips)                                                                                                                    | **ClusterHeat**                  | `templates/clusteredheatmap.html` | §5c           | `engines/clusterheat.md` |
+| 7   | OncoPrint / mutation matrices (stacked alteration cells, TMB + clinical strips)                                                                                                           | **OncoPrint**                    | `templates/oncoprint.html`        | §5d           | `engines/oncoprint.md`   |
+| 8   | Sequence logos (per-position letter stacks, bits axis)                                                                                                                                    | **SeqLogo**                      | `templates/seqlogo.html`          | §5e           | `engines/seqlogo.md`     |
+| 9   | Circos circular genome plots (ideogram + concentric tracks + SV links)                                                                                                                    | **Circos**                       | `templates/circos.html`           | §5g           | `engines/circos.md`      |
+| 10  | UpSet set-intersection plots (dot matrix + intersection bars, 4+ sets)                                                                                                                    | **UpSet**                        | `templates/upset.html`            | §5f           | `engines/upset.md`       |
+| 11  | Box plots, violin plots, histograms, **heatmaps** (better colorbar/labels), 3D surfaces, error bars, log axes, subplots, **Manhattan/Miami/QQ/locuszoom-regional/forest/funnel/lollipop** | **Plotly.js**                    | `templates/plotly.html`           | §3            | `engines/plotly.md`      |
+| 12  | Treemap, sankey, sunburst, dendrogram (topology-only `tree`), large series (>10k points), dataZoom scrubbing, mixed multi-chart dashboards                                                | **ECharts**                      | `templates/echarts.html`          | §4            | `engines/echarts.md`     |
+| 13  | Simple bar / line / pie / doughnut / radar / scatter / bubble (few series, shared category axis)                                                                                          | **Chart.js**                     | `templates/chartjs.html`          | §2            | `engines/chartjs.md`     |
+| 14  | Anything else                                                                                                                                                                             | **ECharts** (broadest catch-all) | `templates/echarts.html`          | §4            | `engines/echarts.md`     |
 
 **Read engines/<name>.md for the full spec contract before emitting.**
 
@@ -66,7 +63,7 @@ Worked, render-verified specs live in `examples/` named `<engine>-<charttype>.ht
 [ ] 1. Spec is STRICT JSON (quote every key) and parses: python3 -c "import json; json.load(open('/tmp/spec.json'))" — the slot fill must be pure JSON, not JS-literal notation (unquoted keys fail this check; strict JSON is valid JS everywhere, the reverse is not)
 [ ] 2. Template CDN tag version matches the engine version in this SKILL.md (§ header pins)
 [ ] 3. /*__SPEC__*/ slot replaced exactly once (grep -c "__SPEC__" file == 0 after fill)
-[ ] 4. <script src> URLs reachable: curl -sI -o /dev/null -w "%{http_code}" <url> == 200 (skip when offline — note it in the delivery message; skip entirely for PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos and HeatTree — no CDN)
+[ ] 4. <script src> URLs reachable: curl -sI -o /dev/null -w "%{http_code}" <url> == 200 (skip when offline — note it in the delivery message; skip entirely for Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos — no CDN)
 [ ] 5. No NaN/undefined/None leaked into the spec (grep -c "NaN\|undefined" spec == 0)
 [ ] 6. Title text present in the spec; file written to <workdir>/charts/<name>.html; absolute path reported
 ```
@@ -120,6 +117,7 @@ export: { width_mm: 89, dpi: 300, font_family: "Arial" }
 | Circos       | 1 (template-native) | none — vanilla-JS SVG in `templates/circos.html`                      | n/a        |
 | HeatTree     | 1 (template-native) | none — vanilla-JS SVG in `templates/heattree.html`                    | n/a        |
 | PhyloTree    | 1 (template-native) | none — vanilla-JS SVG in `templates/phylotree.html`                   | n/a        |
+| Concordance  | 1 (template-native) | none — vanilla-JS SVG in `templates/concordance.html`                 | n/a        |
 
 Bump procedure: verify the new version on the npm registry, update the table here, then `sed` the same version string into every template, run §6, then bump this skill's version and add a README changelog line. Never float (`@latest`/`@^`) — reproducibility beats freshness.
 
@@ -128,8 +126,9 @@ Bump procedure: verify the new version on the npm registry, update the table her
 - **Mermaid / flow / sequence / ER diagrams** → out of scope; use `lumen-generate_visual` (mermaid routes) in the Pi harness.
 - **ggplot2/matplotlib fundamentals** → the R/Python tooling (cairo_pdf, tidy evaluation, ggrepel) stays out of scope, but the design layer — publication theme baseline and faceting conventions — **is imported as references/conventions.md §10.10**; faceting is rendered via Plotly subplots (engines/plotly.md), which is why no sixth template exists for it.
 - **Fgraph structured diagrams** (layered/sequence topologies) → `lumen-generate_visual type:"diagram"`.
-- chartz adds twelve engines (four CDN-pinned + eight template-native SVG) — use it whenever the output must be a **portable data chart** the user opens in their own browser, with data the agent already holds.
+- chartz adds thirteen engines (four CDN-pinned + nine template-native SVG) — use it whenever the output must be a **portable data chart** the user opens in their own browser, with data the agent already holds.
 - **Phylogenetic trees (iTOL-class)** → the PhyloTree engine (§5i) renders publication-ready phylograms/cladograms (rect or circular, bootstrap circles, scale bar, clade ranges) from a Newick string. For tree inference, pruning, or iTOL batch annotation datasets, use the `phylogenetics-agent` skill (`visualize/phylo-itol` / `visualize/phylo-render`) — chartz renders standalone figures from a Newick string the agent already holds.
+- **Concordance-factor scatter (IQ-TREE `--cf-branch`)** → the Concordance engine (§5j) renders the gCF-vs-sCF per-branch figure (support-coloured classes, random-33% reference, callout labels) from the parsed `concordance.cf.stat` rows; running IQ-TREE concordance analyses stays with `phylogenetics-agent`.
 - **metacoder heat trees** → the HeatTree engine (§5h) reproduces `metacoder::heat_tree()` figures (radial taxonomy tree, value-mapped node size/color + edge width/color) as portable HTML; R/metacoder itself stays out of scope.
 
 ## 9. Update check
