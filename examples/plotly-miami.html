@@ -9803,6 +9803,7 @@ if (SPEC.export) {
     scale: SPEC.export.scale || 2
   }, cfg.toImageButtonOptions || {});
 }
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
 </script>
 </body>
 </html>
