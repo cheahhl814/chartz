@@ -21,16 +21,20 @@ Loaded from SKILL.md §1 routing when this engine is selected.
     width: 1100, height: 640      // nominal canvas; viewBox auto-fits content
   },
   bootstrap: {
-    display: true,                // circles at internal nodes carrying a numeric label
-    min_size: 2, max_size: 7,     // radius scales with support value
-    show_values: false,           // print the number above the circle (rect only)
+    display: true,                // show support values at internal nodes
+    mode: "balloon",              // "balloon" (blue circles, radius by support) | "text" (printed value at the node)
+    min_size: 2, max_size: 7,     // balloon radius range (balloon mode)
+    font_size: 10,                // text size (text mode)
     threshold: 50                 // hide supports below this (0 = show all)
   },
-  scale_bar: { label: "substitutions/site" },   // false to omit; auto nice length ≈ 1/5 of tree depth
-  ranges: [                       // iTOL-style clade ranges
-    { tips: ["Escherichia_coli", "Salmonella_enterica"], color: "#aec7e8", label: "Enterobacteriaceae" }
-  ],
-  tip_labels: { show: true, font_size: 11, italic: true },
+  scale_bar: { label: "substitutions/site" },   // false to omit; auto nice length ≈ 1/5 of tree depth;
+                                                // horizontal, bottom-left in BOTH layouts
+  ranges: [                       // iTOL-style clade colour strips, layered
+    { tips: ["Escherichia_coli", "Salmonella_enterica"], color: "#aec7e8", label: "Enterobacteriaceae", layer: 0 },
+    { tips: ["Escherichia_coli", "Bacillus_subtilis"], color: "#dddddd", label: "Bacteria", layer: 1 }
+  ],                              // layer: strip column index (rect) / concentric ring index (circular);
+                                  // default 0. Use successive layers for higher taxonomic levels.
+  tip_labels: { show: true, font_size: 14, italic: true, align: false },
   legend: true,                   // legend for ranges (default on when ranges exist)
   export: { width_mm: 183, dpi: 300 }   // see SKILL.md §6b
 }
@@ -43,10 +47,12 @@ Loaded from SKILL.md §1 routing when this engine is selected.
 - **Newick must be balanced and semicolon-terminated** — the parser throws with the position on any structural error (fail-loud, never a blank page). Generate the string programmatically from your source data rather than hand-typing; hand-typed trees with one extra `)` are the #1 build failure.
 - **Bootstrap circles appear only for internal nodes with a numeric label** — if your Newick carries support as e.g. `)100:0.041` it works; if support lives in a separate table, re-emit the Newick with labels inlined. Strings like `"high"` become clade names, not supports.
 - **`ranges[].tips` are tip-name exact matches** (underscores included). A range with an unknown tip throws. Ranges render as a vertical band lane (rect) or an outer arc (circular) spanning the member leaves' extent — the members must form a monophyletic clade or the band will visually mislead; check monophyly upstream and say so in the delivery message if uncertain.
-- **Cladogram vs phylogram**: with `style: "cladogram"` branch lengths are ignored (equidistant depths) — never present a cladogram where the substitution distances are the message.
+- **Cladogram vs phylogram**: with `style: "cladogram"` branch lengths are stripped before parsing (equidistant depths) — never present a cladogram where the substitution distances are the message.
+- **Range strips**: rect draws one strip column per `layer` on the RIGHT of the tip labels (staggered band labels); circular draws concentric arcs beyond the outermost tip label (never over the tree). Ranges spanning > 180° (e.g. a root-level layer) get the SVG large-arc flag automatically. Ranges are rect-only for labels-above-band; circular bands rely on the legend.
+- **Bootstrap text vs balloon**: `mode: "text"` prints the support value beside the internal node; `mode: "balloon"` draws a support-scaled circle. Both honour `threshold`. TBE trees on a 0-1 scale are rescaled ×100 automatically.
 - **No midpoint/outgroup rerooting in v1** — root the tree upstream (gotree/IQ-TREE/nj) and emit the rooted Newick; the template draws the root where the Newick roots it.
 - **Label cap**: none by default (tip labels auto-fit via the viewBox), but >200 tips make labels unreadable at journal widths — collapse clades upstream (gotree collapse) and represent them with a range.
-- **Dataset annotation strips** (iTOL heatmaps/bars aligned to tips) are NOT in v1 — for those, use `phylogenetics-agent → visualize/phylo-itol`, or compose the value table as a separate ClusterHeat figure with matching tip order.
+- **Dataset annotation strips** (iTOL heatmaps/bars aligned to tips) are NOT in v1 — for those, use `phylogenetics-agent → visualize/phylo-itol`, or compose the value table as a separate ClusterHeat figure with matching tip order. Clade colour ranges (solid strips/arcs) ARE supported, multi-layer.
 
 **Print export**: Download SVG (true vector, mm-sized via `export.width_mm` — journal submission format) and Download PNG (deterministic: `px = mm / 25.4 · dpi`). Same module as all template-native engines; see SKILL.md §6b.
 
