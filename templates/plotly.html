@@ -22,6 +22,19 @@
 const SPEC = /*__SPEC__*/;
 const cfg = SPEC.config || { responsive: true, displaylogo: false };
 cfg.responsive = true;
+/* Print export (v0.8.0): optional spec-level export field wires the modebar camera to
+   true-vector SVG (journal submission format) with deterministic PNG raster scale.
+   See engines/plotly.md - Print export. */
+if (SPEC.export) {
+  var __t = (SPEC.layout && SPEC.layout.title)
+    ? (typeof SPEC.layout.title === 'string' ? SPEC.layout.title : SPEC.layout.title.text)
+    : null;
+  cfg.toImageButtonOptions = Object.assign({
+    format: SPEC.export.format || 'svg',
+    filename: ((__t || 'chart') + '').replace(/\s+/g, '_'),
+    scale: SPEC.export.scale || 2
+  }, cfg.toImageButtonOptions || {});
+}
 Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
 </script>
 </body>

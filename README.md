@@ -1,6 +1,6 @@
 # chartz
 
-[![Version](https://img.shields.io/badge/version-0.7.0-blue)](#-installation)
+[![Version](https://img.shields.io/badge/version-0.8.0-blue)](#-installation)
 [![Type](https://img.shields.io/badge/type-agent%20skill-blueviolet)](#-installation)
 [![README standard](https://img.shields.io/badge/README%20per-bioinfo--skill--creator-orange)](https://github.com/cheahhl814/bioinfo-skill-creator)
 
@@ -9,7 +9,7 @@ Render charts and graphs as self-contained HTML files from four CDN-pinned engin
 **Repository**: https://github.com/cheahhl814/chartz
 
 > [!NOTE]
-> Current version: **v0.7.0** (updated 2026-09-20). v0.2.0 GenomeTracks (§5b); v0.3.0 ClusterHeat (§5c); v0.4.0 OncoPrint (§5d); v0.5.0 SeqLogo (§5e); v0.6.0 UpSet (§5f); v0.7.0 adds Circos (§5g) for circular genome plots.
+> Current version: **v0.8.0** (updated 2026-09-21). v0.2.0 GenomeTracks (§5b); v0.3.0 ClusterHeat (§5c); v0.4.0 OncoPrint (§5d); v0.5.0 SeqLogo (§5e); v0.6.0 UpSet (§5f); v0.7.0 adds Circos (§5g); v0.8.0 adds **print/vector export** — Download SVG (journal-submission vector, mm-sized) on all template-native engines, deterministic `export: {width_mm, dpi}` PNG raster, and Plotly vector export via `toImageButtonOptions` (SKILL.md §6b).
 
 ## Contents
 
@@ -50,6 +50,10 @@ cd chartz
 ## 💡 Usage
 
 The skill is designed to be driven by an AI agent: the agent reads the master `SKILL.md`, classifies the request against the engine routing table (§1), emits the engine's JSON spec, fills the matching template's `/*__SPEC__*/` slot, runs the 6-point self-check (§6), and delivers the absolute path of the generated HTML file.
+
+### Print / journal export
+
+Every template-native chart ships **Download SVG** (true vector — when the spec carries `export: {width_mm: 89}`, the SVG is sized in mm at the journal column width) and **Download PNG** (deterministic raster: `px = mm / 25.4 · dpi`, default 300 dpi). Plotly charts export **vector SVG** from the modebar camera whenever the spec carries an `export` field. Canvas-bound engines (Chart.js, ECharts, Cytoscape) have no vector path — route journal-bound figures to Plotly or a template-native engine. Full rules: SKILL.md §6b.
 
 ### Natural-language prompts that trigger the skill
 
@@ -174,7 +178,8 @@ Example naming convention: `<engine>-<charttype>.html`; the four base-named demo
 - **Signature-library debugging** — silent failures (blank canvas, missing edges, squashed charts) are catalogued as S1–S10 with cause → fix, not rediscovered ad hoc.
 - **Explicit stop points** — ambiguous requests surface *Evidence + Recommend + Options*, not auto-picked choices.
 - **No machine-specific paths** — output goes to the working directory; the skill ships no local dependencies and no user-specific configuration.
-- **Render-verified examples** — all fifty-three example demos were executed in headless Chrome, verified non-blank with zero console errors (see `examples/screenshots/`).
+- **Print/vector export** — template-native engines export true-vector SVG (mm-sized at journal column widths) and a deterministic PNG raster via the spec-level `export: {width_mm, dpi, font_family}` field; Plotly exports vector SVG via `toImageButtonOptions` (SKILL.md §6b).
+- **Render-verified examples** — all fifty-three example demos were executed in headless Chrome, verified non-blank with zero console errors (see `examples/screenshots/`, 2× element-cropped chart renders).
 - **Offline-capable template-native engines** — GenomeTracks (5), ClusterHeat (6), Circos (7), UpSet (8), SeqLogo (9), and OncoPrint (10) are template-native SVG with no CDN dependency; they render even with no network (the only engines whose §6.4 reachability probe is skipped).
 - **Battle-test equivalent, stated honestly** — chartz is a hand-authored workflow-skill and carries no preflight/skill-built/battle-test evidence chain; the de-facto battle-test is the 53 headless-Chrome-verified demos plus the §6 self-check run on every delivery (see `params.json: battle_test_note`).
 

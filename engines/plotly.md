@@ -7,6 +7,8 @@ Loaded from SKILL.md §1 routing when this engine is selected.
 
 **Scope:** box, violin, histogram, 2D histogram, heatmap, contour, error bars, log axes, subplots, 3D surface/scatter, **GWAS Manhattan/Miami/QQ plots, meta-analysis forest/funnel plots, protein lollipop maps, distribution combos (raincloud, box+jitter strip, split violin)**. This is the bioinformatics-workspace default for distributional data (MA plots, volcano plots, differential abundance).
 
+**Print export** (v0.8.0): when the spec carries `export`, the template wires Plotly's modebar camera to `toImageButtonOptions` — `format: "svg"` by default (**true vector**, the journal submission format), `scale` for the PNG raster, filename derived from the layout title. Optional spec field: `export: { format: "svg", scale: 4 }` (all keys optional; `{}` alone switches the camera to vector SVG). See SKILL.md §6b.
+
 **Spec** (fills `/*__SPEC__*/` as `const SPEC = {...}`):
 
 ```js

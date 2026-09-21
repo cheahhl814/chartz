@@ -7,6 +7,8 @@ Loaded from SKILL.md §1 routing when this engine is selected.
 
 **Scope:** stacked locus figures aligned to genome coordinates — BigWig-style coverage, BED/narrowPeak rectangles, UCSC-style gene models (intron line + exon blocks + strand arrows). Fills the one reference chart class the four CDN engines cannot express. **Zero dependencies**: the renderer is template-native vanilla-JS SVG (no CDN, works offline — the only engine where §6.4's reachability probe is skipped).
 
+**Print export** (v0.8.0): the template ships **Download SVG** (true vector; mm-sized when the spec carries `export.width_mm` — journal submission format) and **Download PNG** (deterministic raster: `px = mm / 25.4 · dpi`, default 2× screen / 300 dpi). Optional spec field, all keys optional: `export: { width_mm: 89, dpi: 300, font_family: "Arial" }` — `font_family` overrides the system-ui stack for journals that mandate it. See SKILL.md §6b.
+
 **Spec** (fills `/*__SPEC__*/` as `const SPEC = {...}`):
 
 ```js

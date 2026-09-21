@@ -1,8 +1,8 @@
 ---
 name: chartz
 description: 'Render charts and graphs as self-contained HTML files from four pinned CDN engines, chosen by chart type. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a file they can open in a browser — "make a bar chart", "plot this data", "heatmap of these values", "draw a network graph", "dashboard of these metrics". Engine router: Chart.js (simple statistical), Plotly.js (scientific/statistical), ECharts (rich/dashboards), Cytoscape.js (nodes + edges). Emits one single-file HTML per chart with pinned CDN versions; no build step, no server. Does NOT do text-to-flowchart/sequence diagrams (use Mermaid/lumen-generate_visual for that) and does NOT analyze data — it renders data you already have.'
-version: 0.7.0
-updated: "2026-09-20"
+version: 0.8.0
+updated: "2026-09-21"
 triggers:
   - "make a chart"
   - "plot this data"
@@ -20,7 +20,7 @@ requires:
 
 # chartz — chart & graph rendering skill
 
-> **v0.7.0.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus six template-native SVG engines (GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos — §5b–§5g), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
+> **v0.8.0.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus six template-native SVG engines (GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos — §5b–§5g), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
 
 ## 0. Workflow (always all five steps)
 
@@ -66,6 +66,21 @@ Worked, render-verified specs live in `examples/` named `<engine>-<charttype>.ht
 ```
 
 If the user has no network, say so and offer the same spec via lumen-generate_visual (static render) instead — do not silently produce a blank page.
+
+## 6b. Print/vector export (journal submission)
+
+Every template-native engine ships two export buttons; Plotly wires its modebar camera. Output is **true vector SVG** (the journal submission format) plus a deterministic PNG raster.
+
+- **`Download SVG`** — serializes the chart SVG with an XML prolog. When the spec carries `export.width_mm`, the SVG root carries `width`/`height` in **mm units** at the journal column width (Nature 89/183, Cell 85/174, Science 55/120, PNAS 87/178, eLife 86/175 mm — see `references/conventions.md` §10.10–§10.11).
+- **`Download PNG`** — raster size is deterministic when the spec carries `export`: `px = width_mm / 25.4 · dpi` (defaults: 2× screen resolution at dpi 300). No viewport-dependent scale guessing.
+- **`export.font_family`** — overrides the `system-ui` stack in both exports; use `"Arial"` for journals that mandate it.
+- **Plotly** — a spec-level `export` sets `toImageButtonOptions` (`format: "svg"` default, `scale` for PNG raster, filename derived from the layout title). Chart.js/ECharts/Cytoscape render to Canvas/WebGL — route any figure that must be submitted as vector to Plotly or a template-native engine.
+
+Optional spec field (all keys optional; omit entirely for the old 2× screen-raster behaviour):
+
+```js
+export: { width_mm: 89, dpi: 300, font_family: "Arial" }
+```
 
 ## § Signature library
 

@@ -22,6 +22,7 @@
     <div class="card-head">
       <h1 id="chart-title"></h1>
       <button id="dl-png" class="dl-btn" type="button">Download PNG</button>
+      <button id="dl-svg" class="dl-btn" type="button">Download SVG</button>
     </div>
     <div id="chart"></div>
   </div>
@@ -196,40 +197,80 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Genome track
   }
   document.getElementById("chart").appendChild(svg);
 })();
-document.getElementById('dl-png').addEventListener('click', function () {
-  const svgEl = document.querySelector('#chart svg');
-  if (!svgEl) return;
-  const vb = svgEl.viewBox.baseVal;
-  const w = (vb && vb.width) ? vb.width : svgEl.clientWidth;
-  const h = (vb && vb.height) ? vb.height : svgEl.clientHeight;
-  const scale = 2;
-  const clone = svgEl.cloneNode(true);
-  clone.setAttribute('width', w);
-  clone.setAttribute('height', h);
-  if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-  const xml = new XMLSerializer().serializeToString(clone);
-  const svgBlob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(svgBlob);
-  const img = new Image();
-  img.onload = function () {
-    const canvas = document.createElement('canvas');
-    canvas.width = w * scale;
-    canvas.height = h * scale;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    URL.revokeObjectURL(url);
-    canvas.toBlob(function (blob) {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = (document.getElementById('chart-title').textContent || 'chart').replace(/\s+/g, '_') + '.png';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
+/* ---- chartz print-export module (identical across template-native engines; v0.8.0) ----
+   SPEC.export (optional, all keys optional):
+     width_mm    - journal column width (e.g. 89 = Nature single column). With dpi, sets the
+                   Download PNG raster deterministically: px = mm / 25.4 * dpi (default: 2x screen).
+                   Download SVG then carries width/height in mm units (true print vector).
+     dpi         - raster density for Download PNG (default 300).
+     font_family - overrides the system-ui stack in both exports (journals: "Arial"). */
+(function () {
+  var getSvg = function () { return document.querySelector('#chart svg'); };
+  var baseName = function () {
+    return (document.getElementById('chart-title').textContent || 'chart').replace(/\s+/g, '_');
   };
-  img.src = url;
-});
+  function exportScale(el) {
+    var ex = (SPEC && SPEC.export) || {};
+    var dpi = ex.dpi || 300;
+    if (ex.width_mm) {
+      var cssW = (el.viewBox.baseVal && el.viewBox.baseVal.width) || el.clientWidth || 900;
+      return Math.max(1, (ex.width_mm / 25.4 * dpi) / cssW);
+    }
+    return 2;
+  }
+  function svgXml(print) {
+    var el = getSvg();
+    if (!el) return null;
+    var vb = el.viewBox.baseVal;
+    var w = (vb && vb.width) ? vb.width : el.clientWidth;
+    var h = (vb && vb.height) ? vb.height : el.clientHeight;
+    var clone = el.cloneNode(true);
+    var ex = (SPEC && SPEC.export) || {};
+    if (print && ex.width_mm) {
+      clone.setAttribute('width', ex.width_mm + 'mm');
+      clone.setAttribute('height', (h / w * ex.width_mm).toFixed(2) + 'mm');
+    } else {
+      clone.setAttribute('width', w);
+      clone.setAttribute('height', h);
+    }
+    if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    if (!clone.getAttribute('xmlns:xlink')) clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+    if (ex.font_family) clone.setAttribute('style', 'font-family: ' + ex.font_family + ';');
+    return { xml: new XMLSerializer().serializeToString(clone), w: w, h: h };
+  }
+  function download(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  document.getElementById('dl-svg').addEventListener('click', function () {
+    var r = svgXml(true);
+    if (!r) return;
+    var prolog = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    download(new Blob([prolog + r.xml], { type: 'image/svg+xml;charset=utf-8' }), baseName() + '.svg');
+  });
+  document.getElementById('dl-png').addEventListener('click', function () {
+    var r = svgXml(false);
+    if (!r) return;
+    var scale = exportScale(getSvg());
+    var url = URL.createObjectURL(new Blob([r.xml], { type: 'image/svg+xml;charset=utf-8' }));
+    var img = new Image();
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(r.w * scale);
+      canvas.height = Math.round(r.h * scale);
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function (blob) { download(blob, baseName() + '.png'); });
+    };
+    img.src = url;
+  });
+})();
 </script>
 </body>
 </html>

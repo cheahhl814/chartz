@@ -9,6 +9,8 @@ Loaded from SKILL.md §1 routing when this engine is selected.
 
 **Zero dependencies** like GenomeTracks/ClusterHeat/OncoPrint/SeqLogo — no CDN, works offline, §6.4 skipped.
 
+**Print export** (v0.8.0): the template ships **Download SVG** (true vector; mm-sized when the spec carries `export.width_mm` — journal submission format) and **Download PNG** (deterministic raster: `px = mm / 25.4 · dpi`, default 2× screen / 300 dpi). Optional spec field, all keys optional: `export: { width_mm: 89, dpi: 300, font_family: "Arial" }` — `font_family` overrides the system-ui stack for journals that mandate it. See SKILL.md §6b.
+
 **Spec** (fills `/*__SPEC__*/`):
 
 ```js
