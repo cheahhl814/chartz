@@ -1,6 +1,6 @@
 # chartz
 
-[![Version](https://img.shields.io/badge/version-0.8.0-blue)](#-installation)
+[![Version](https://img.shields.io/badge/version-0.8.1-blue)](#-installation)
 [![Type](https://img.shields.io/badge/type-agent%20skill-blueviolet)](#-installation)
 [![README standard](https://img.shields.io/badge/README%20per-bioinfo--skill--creator-orange)](https://github.com/cheahhl814/bioinfo-skill-creator)
 
@@ -9,7 +9,7 @@ Render charts and graphs as self-contained HTML files from four CDN-pinned engin
 **Repository**: https://github.com/cheahhl814/chartz
 
 > [!NOTE]
-> Current version: **v0.8.0** (updated 2026-09-21). v0.2.0 GenomeTracks (§5b); v0.3.0 ClusterHeat (§5c); v0.4.0 OncoPrint (§5d); v0.5.0 SeqLogo (§5e); v0.6.0 UpSet (§5f); v0.7.0 adds Circos (§5g); v0.8.0 adds **print/vector export** — Download SVG (journal-submission vector, mm-sized) on all template-native engines, deterministic `export: {width_mm, dpi}` PNG raster, and Plotly vector export via `toImageButtonOptions` (SKILL.md §6b).
+> Current version: **v0.8.1** (updated 2026-09-21). v0.8.1 fixes the ECharts sankey/title overlap (S11 — sankey ignores `grid`; set `series.top`). v0.8.0 adds v0.2.0 GenomeTracks (§5b); v0.3.0 ClusterHeat (§5c); v0.4.0 OncoPrint (§5d); v0.5.0 SeqLogo (§5e); v0.6.0 UpSet (§5f); v0.7.0 adds Circos (§5g); v0.8.0 adds **print/vector export** — Download SVG (journal-submission vector, mm-sized) on all template-native engines, deterministic `export: {width_mm, dpi}` PNG raster, and Plotly vector export via `toImageButtonOptions` (SKILL.md §6b).
 
 ## Contents
 

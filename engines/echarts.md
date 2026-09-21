@@ -25,6 +25,7 @@ Loaded from SKILL.md §1 routing when this engine is selected.
 
 **Pitfalls**
 
+- **Chart body overlaps the title** (S11): `sankey`, `tree`, `sunburst`, and `treemap` **ignore `grid`** — they position via their own `top`/`left`/`right`/`bottom`, and `sankey` defaults to `top: 0`. With an in-canvas `title`, set `series.top` (e.g. `"12%"`) so the body clears the title; `grid.top` does nothing for these types. Worked: `examples/echarts.html`, `examples/echarts-alluvial.html`.
 - Sankey: every `link.source/target` must exist in `data` by exact `name` (string-equal, case-sensitive) — the #1 silent-blank-canvas cause.
 - Sankey cycles: ECharts renders nothing on a cyclic graph; verify DAG-ness before emitting.
 - Ribbon color: default link color is gray — set `lineStyle: {"color": "source", "opacity": 0.35}` to color ribbons by origin node (the alluvial convention; references/conventions.md §10.8). `"target"` colors by destination.

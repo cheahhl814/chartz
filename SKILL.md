@@ -1,7 +1,7 @@
 ---
 name: chartz
 description: 'Render charts and graphs as self-contained HTML files from four pinned CDN engines, chosen by chart type. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a file they can open in a browser — "make a bar chart", "plot this data", "heatmap of these values", "draw a network graph", "dashboard of these metrics". Engine router: Chart.js (simple statistical), Plotly.js (scientific/statistical), ECharts (rich/dashboards), Cytoscape.js (nodes + edges). Emits one single-file HTML per chart with pinned CDN versions; no build step, no server. Does NOT do text-to-flowchart/sequence diagrams (use Mermaid/lumen-generate_visual for that) and does NOT analyze data — it renders data you already have.'
-version: 0.8.0
+version: 0.8.1
 updated: "2026-09-21"
 triggers:
   - "make a chart"
@@ -20,7 +20,7 @@ requires:
 
 # chartz — chart & graph rendering skill
 
-> **v0.8.0.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus six template-native SVG engines (GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos — §5b–§5g), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
+> **v0.8.1.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus six template-native SVG engines (GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos — §5b–§5g), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
 
 ## 0. Workflow (always all five steps)
 
@@ -96,6 +96,7 @@ export: { width_mm: 89, dpi: 300, font_family: "Arial" }
 | S8  | Page renders but chart is 0px tall                      | Template container edited, or spec emitted before `DOMContentLoaded`                   | Use template verbatim; the container and init order are pre-wired          |
 | S9  | Cytoscape: a node or edge silently absent               | Duplicate `id` across the whole `elements` set (ids are global across nodes AND edges) | De-duplicate ids across all elements; regenerate with counter suffix       |
 | S10 | Chart.js chart squashed / wrong height despite 60vh box | `maintainAspectRatio` left at default `true` (container height ignored)                | Set `options.maintainAspectRatio: false` (engines/chartjs.md)                              |
+| S11 | ECharts: chart body overlaps the title text          | `sankey`/`tree`/`sunburst`/`treemap` ignore `grid` — they use their own `top` (sankey defaults to 0) | Set `series.top` (e.g. `"12%"`) below the in-canvas title (engines/echarts.md)                    |
 
 ## 7. Engine version pins (single source of truth — update SKILL.md first, then templates)
 
