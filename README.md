@@ -4,7 +4,7 @@
 [![Type](https://img.shields.io/badge/type-agent%20skill-blueviolet)](#-installation)
 [![README standard](https://img.shields.io/badge/README%20per-bioinfo--skill--creator-orange)](https://github.com/cheahhl814/bioinfo-skill-creator)
 
-Render charts and graphs as self-contained HTML files from four CDN-pinned engines plus eight template-native engines, chosen by chart type. One request → one portable HTML file: simple statistical charts via Chart.js, scientific/statistical plots via Plotly.js, rich interactive dashboards via ECharts, nodes+edges network graphs via Cytoscape.js, genome-browser track figures via the zero-dependency GenomeTracks SVG renderer, clustered-heatmap composites via ClusterHeat, OncoPrint mutation matrices via OncoPrint, sequence logos via SeqLogo, set-intersection plots via UpSet, circular genome plots via Circos, metacoder-style taxonomy heat trees via HeatTree, and Newick phylogenies (phylograms with bootstrap circles, scale bars, and clade ranges) via PhyloTree — all template-native SVG — plus geographic site maps via GeoMap (raster tile basemaps from OSM/Esri/Carto, embedded offline). No build step, no server, no inline third-party library code.
+Render charts and graphs as self-contained HTML files from four CDN-pinned engines plus ten template-native engines, chosen by chart type. One request → one portable HTML file: simple statistical charts via Chart.js, scientific/statistical plots via Plotly.js (Manhattan, volcano, PCA, forest, lollipop, violin/box, ANI heatmap, relative-abundance bars), rich interactive dashboards via ECharts (alluvial, treemap, sunburst, dual-axis), nodes+edges network graphs via Cytoscape.js, genome-browser track figures via the zero-dependency GenomeTracks SVG renderer, clustered-heatmap composites via ClusterHeat, OncoPrint mutation matrices via OncoPrint, sequence logos via SeqLogo, set-intersection plots via UpSet, circular genome plots via Circos, metacoder-style taxonomy heat trees via HeatTree, Newick phylogenies (phylograms with bootstrap circles, scale bars, and clade ranges) via PhyloTree, IQ-TREE gCF-vs-sCF concordance scatters via Concordance — all template-native SVG — plus geographic site maps via GeoMap (raster tile basemaps from OSM/Esri/Carto, embedded offline). No build step, no server, no inline third-party library code.
 
 **Repository**: https://github.com/cheahhl814/chartz
 
@@ -14,6 +14,7 @@ Render charts and graphs as self-contained HTML files from four CDN-pinned engin
 ## Contents
 
 - [Installation](#-installation)
+- [Demo gallery](#-demo-gallery)
 - [Usage](#-usage)
 - [Engine routing overview](#-engine-routing-overview)
 - [Engines](#-engines)
@@ -22,6 +23,18 @@ Render charts and graphs as self-contained HTML files from four CDN-pinned engin
 - [Repository layout](#-repository-layout)
 - [Hard guarantees](#-hard-guarantees)
 - [Provenance](#provenance)
+
+## 📸 Demo gallery
+
+Every one of the [59 example figures](examples/) is a self-contained HTML file — click through to any demo, or browse [`examples/screenshots/`](examples/screenshots). A sample:
+
+| | |
+|:--- |:--- |
+| ![Chart.js bar chart](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/chartjs.png)<br>**Chart.js** · sequencing yield by month | ![Chart.js scatter](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/chartjs-scatter.png)<br>**Chart.js** · PCA of transcriptomes (PC1 vs PC2) |
+| ![ClusterHeat](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/clusterheat-simple.png)<br>**ClusterHeat** · clustered heatmap, 16 features × 6 samples | ![ECharts alluvial](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/echarts-alluvial.png)<br>**ECharts** · cell-state transitions across timepoints (alluvial) |
+| ![ECharts dual-axis](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/echarts-dual-axis.png)<br>**ECharts** · sequencing dashboard, volume vs quality | ![ECharts treemap](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/echarts-treemap.png)<br>**ECharts** · metagenome relative abundance by taxonomy |
+| ![PhyloTree](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/phylotree-rect.png)<br>**PhyloTree** · 16S rRNA phylogram, bootstrap circles + scale bar | ![Plotly box+strip](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/plotly-boxstrip.png)<br>**Plotly.js** · box + raw points, dose response (exact p shown) |
+| ![Plotly Manhattan](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/plotly-manhattan.png)<br>**Plotly.js** · GWAS Manhattan plot | ![Plotly violin](https://raw.githubusercontent.com/cheahhl814/chartz/master/examples/screenshots/plotly-violin-signif.png)<br>**Plotly.js** · violin by genotype with significance brackets |
 
 ## 🚀 Installation
 
@@ -63,6 +76,12 @@ plot this data as a box plot per condition
 draw a network graph of these protein interactions
 build me a sankey of this budget flow
 heatmap of these values with labels
+phylogenetic tree from this Newick string
+Manhattan plot of these GWAS results
+volcano plot of this DE table
+oncoprint of this mutation matrix
+sequence logo of this motif
+map of my sampling sites on satellite imagery
 ```
 
 ### Manual execution
