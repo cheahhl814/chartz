@@ -26,7 +26,7 @@ Render charts and graphs as self-contained HTML files from four CDN-pinned engin
 
 ## 📸 Demo gallery
 
-Every one of the [59 example figures](examples/) is a self-contained HTML file — click through to any demo, or browse [`examples/screenshots/`](examples/screenshots). A sample:
+Every one of the [60 example figures](examples/) is a self-contained HTML file — click through to any demo, or browse [`examples/screenshots/`](examples/screenshots). A sample:
 
 | | |
 |:--- |:--- |
