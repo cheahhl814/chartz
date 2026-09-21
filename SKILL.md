@@ -20,7 +20,7 @@ requires:
 
 # chartz — chart & graph rendering skill
 
-> **v0.13.2.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus eleven template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos, PlotlyGeo, GeoMap — §5b–§5l), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
+> **v0.13.2.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus ten template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos, GeoMap — §5b–§5k), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
 
 ## 0. Workflow (always all five steps)
 
@@ -50,8 +50,7 @@ requires:
 | 12  | Treemap, sankey, sunburst, dendrogram (topology-only `tree`), large series (>10k points), dataZoom scrubbing, mixed multi-chart dashboards                                                | **ECharts**                      | `templates/echarts.html`          | §4            | `engines/echarts.md`     |
 | 13  | Simple bar / line / pie / doughnut / radar / scatter / bubble (few series, shared category axis)                                                                                          | **Chart.js**                     | `templates/chartjs.html`          | §2            | `engines/chartjs.md`     |
 | 14  | Anything else                                                                                                                                                                             | **ECharts** (broadest catch-all) | `templates/echarts.html`          | §4            | `engines/echarts.md`     |
-| 15  | Geographic figures from lon/lat — site maps, regional choropleths, global context maps (built-in Natural Earth 50m basemap, no GeoJSON needed)                                            | **PlotlyGeo**                    | `templates/plotly-geo.html`       | §5k           | `engines/plotlygeo.md`   |
-| 16  | Local-scale maps with real-world context — raster tile basemaps (OSM/Esri/Carto, offline after build) + GeoJSON overlays (coverage polygons, labeled sites)                                | **GeoMap**                       | `templates/geomap.html`           | §5l           | `engines/geomap.md`      |
+| 15  | Local-scale maps with real-world context — raster tile basemaps (OSM/Esri/Carto, offline after build) + GeoJSON overlays (coverage polygons, labeled sites)                                | **GeoMap**                       | `templates/geomap.html`           | §5k           | `engines/geomap.md`      |
 
 **Read engines/<name>.md for the full spec contract before emitting.**
 
@@ -122,7 +121,6 @@ export: { width_mm: 89, dpi: 300, font_family: "Arial" }
 | HeatTree     | 1 (template-native) | none — vanilla-JS SVG in `templates/heattree.html`                    | n/a        |
 | PhyloTree    | 1 (template-native) | none — vanilla-JS SVG in `templates/phylotree.html`                   | n/a        |
 | Concordance  | 1 (template-native) | none — vanilla-JS SVG in `templates/concordance.html`                 | n/a        |
-| PlotlyGeo    | Plotly.js 4.1.1     | same pin as Plotly.js + vendored `assets/world_50m.json` topology inlined in the template | MIT / PD (NE) |
 | GeoMap       | d3-geo 3.1.1        | `https://cdn.jsdelivr.net/npm/d3-geo@3.1.1/dist/d3-geo.min.js` (+ `d3-array@3.2.4`; optional raster tiles via `bin/tile_basemap.py`) | ISC       |
 
 Bump procedure: verify the new version on the npm registry, update the table here, then `sed` the same version string into every template, run §6, then bump this skill's version and add a README changelog line. Never float (`@latest`/`@^`) — reproducibility beats freshness.
