@@ -1,6 +1,6 @@
 {
   "skill_name": "chartz",
-  "skill_version": "0.11.0",
+  "skill_version": "0.11.1",
   "skill_updated": "2026-09-21",
   "skill_short_description": "Render charts and graphs as self-contained HTML files from four pinned CDN engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus six template-native SVG engines (GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos), chosen by chart type. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a portable HTML file. No build step, no server, no pixi/conda/npm.",
   "skill_description": "Render charts and graphs as self-contained HTML files from four pinned CDN engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus six template-native SVG engines (GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos), chosen by chart type. One request → one portable HTML file. The agent classifies the request against SKILL.md §1, emits the engine's JSON spec per engines/<name>.md, fills the template's /*__SPEC__*/ slot, runs the §6 self-check, and delivers the absolute path. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a portable HTML file. No build step, no server, no inline third-party library code. Does NOT do text-to-flowchart/sequence diagrams (use Mermaid/lumen-generate_visual) and does NOT analyze data.",

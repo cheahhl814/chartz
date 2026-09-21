@@ -234,25 +234,19 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Phylogenetic
       leaves.forEach(function (n) {
         var p = pt(n);
         var right = Math.cos(p.th * Math.PI / 180) >= 0;
-        var t = el('text', { x: p.x + (right ? 6 : -6), y: p.y + 4,
-          'text-anchor': right ? 'start' : 'end', 'font-size': tl.font_size, fill: '#222' });
+        // label rotated to the tip direction; left-half labels flipped 180 deg to stay readable
+        var rot = right ? p.th : p.th - 180;
+        var t = el('text', { x: p.x, y: p.y,
+          'text-anchor': right ? 'start' : 'end', 'font-size': tl.font_size, fill: '#222',
+          transform: 'rotate(' + rot + ' ' + p.x + ' ' + p.y + ')',
+          dy: tl.font_size * 0.33 });
         t.textContent = n.name;
         if (tl.italic) t.setAttribute('font-style', 'italic');
         leafLabelEls.push({ name: n.name, el: t });
       });
     }
-    if (sb) {
-      // horizontal scale bar, bottom-left corner (same convention as rect layout)
-      var nice = Math.pow(10, Math.floor(Math.log10(totalLen / 2)));
-      var cands2 = [1, 2, 5, 10].map(function (m) { return m * nice; });
-      var barLen2 = cands2.filter(function (v) { return v <= totalLen / 2; }).pop() || cands2[0];
-      var bx2 = 30, by2 = H - 18;
-      el('line', { x1: bx2, y1: by2, x2: bx2 + barLen2 * rScale, y2: by2, stroke: '#333', 'stroke-width': 2 });
-      el('line', { x1: bx2, y1: by2 - 4, x2: bx2, y2: by2 + 2, stroke: '#333', 'stroke-width': 1.5 });
-      el('line', { x1: bx2 + barLen2 * rScale, y1: by2 - 2, x2: bx2 + barLen2 * rScale, y2: by2 + 2, stroke: '#333', 'stroke-width': 1.5 });
-      var lt = el('text', { x: bx2 + barLen2 * rScale / 2, y: by2 - 8, 'text-anchor': 'middle', 'font-size': 11, fill: '#555' });
-      lt.textContent = fmt(barLen2) + ' ' + (sb.label || 'substitutions/site');
-    }
+    // scale bar for circular layout is drawn in the tail (content-bbox bottom-left corner,
+    // outside the ring — see overlay section)
   } else {
     throw new Error('phylotree: layout.mode must be "rect" or "circular"');
   }
@@ -283,8 +277,7 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Phylogenetic
         var x = maxRight + 12 + k * (stripW + stripGap);
         el('rect', { x: x, y: y0, width: stripW, height: y1 - y0,
                      fill: r.color, rx: 3, 'fill-opacity': 0.9 });
-        var lt = el('text', { x: x, y: y0 - 5 - k * 14, 'font-size': 10, fill: '#555' });
-        lt.textContent = r.label || '';
+        // no per-band label: the figure legend (top-left) identifies the colours
       });
     } else {
       // circular: concentric arcs beyond the outermost tip label
@@ -308,9 +301,27 @@ document.getElementById('chart-title').textContent = SPEC.title || 'Phylogenetic
           fill: 'none', stroke: r.color, 'stroke-width': 12, 'stroke-opacity': 0.9, 'stroke-linecap': 'butt' });
       });
     }
-    // range legend (top-left, both layouts)
+    // circular scale bar: content-bbox bottom-left corner, OUTSIDE the ring (no overlap with strips)
+    if (mode === 'circular' && sb && typeof rScale === 'number') {
+      var nice = Math.pow(10, Math.floor(Math.log10(totalLen / 2)));
+      var cands2 = [1, 2, 5, 10].map(function (m) { return m * nice; });
+      var barLen2 = cands2.filter(function (v) { return v <= totalLen / 2; }).pop() || cands2[0];
+      var cb = svg.getBBox();
+      var bx2 = cb.x + 8, by2 = cb.y + cb.height - 12;
+      el('line', { x1: bx2, y1: by2, x2: bx2 + barLen2 * rScale, y2: by2, stroke: '#333', 'stroke-width': 2 });
+      el('line', { x1: bx2, y1: by2 - 4, x2: bx2, y2: by2 + 2, stroke: '#333', 'stroke-width': 1.5 });
+      el('line', { x1: bx2 + barLen2 * rScale, y1: by2 - 2, x2: bx2 + barLen2 * rScale, y2: by2 + 2, stroke: '#333', 'stroke-width': 1.5 });
+      var lt = el('text', { x: bx2, y: by2 - 8, 'text-anchor': 'start', 'font-size': 11, fill: '#555' });
+      lt.textContent = fmt(barLen2) + ' ' + (sb.label || 'substitutions/site');
+    }
+    // range legend: circular places it in the content-bbox top-left corner (outside the ring);
+    // rect keeps the fixed top-left position
     if (SPEC.legend === undefined || SPEC.legend) {
-      var lx = 24, ly = 24;
+      var lx, ly;
+      if (mode === 'circular') {
+        var cb = svg.getBBox();
+        lx = cb.x + 8; ly = cb.y + 8;
+      } else { lx = 24; ly = 24; }
       ranges.forEach(function (r, k) {
         el('rect', { x: lx, y: ly + k * 20, width: 12, height: 12, fill: r.color, rx: 2 });
         var t = el('text', { x: lx + 18, y: ly + k * 20 + 10, 'font-size': 11, fill: '#333' });

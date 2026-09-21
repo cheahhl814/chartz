@@ -35,6 +35,7 @@ Loaded from SKILL.md §1 routing when this engine is selected.
   ],                              // layer: strip column index (rect) / concentric ring index (circular);
                                   // default 0. Use successive layers for higher taxonomic levels.
   tip_labels: { show: true, font_size: 14, italic: true, align: false },
+                                // circular: labels are ROTATED to the tip direction (readable on both halves)
   legend: true,                   // legend for ranges (default on when ranges exist)
   export: { width_mm: 183, dpi: 300 }   // see SKILL.md §6b
 }
@@ -48,8 +49,10 @@ Loaded from SKILL.md §1 routing when this engine is selected.
 - **Bootstrap circles appear only for internal nodes with a numeric label** — if your Newick carries support as e.g. `)100:0.041` it works; if support lives in a separate table, re-emit the Newick with labels inlined. Strings like `"high"` become clade names, not supports.
 - **`ranges[].tips` are tip-name exact matches** (underscores included). A range with an unknown tip throws. Ranges render as a vertical band lane (rect) or an outer arc (circular) spanning the member leaves' extent — the members must form a monophyletic clade or the band will visually mislead; check monophyly upstream and say so in the delivery message if uncertain.
 - **Cladogram vs phylogram**: with `style: "cladogram"` branch lengths are stripped before parsing (equidistant depths) — never present a cladogram where the substitution distances are the message.
-- **Range strips**: rect draws one strip column per `layer` on the RIGHT of the tip labels (staggered band labels); circular draws concentric arcs beyond the outermost tip label (never over the tree). Ranges spanning > 180° (e.g. a root-level layer) get the SVG large-arc flag automatically. Ranges are rect-only for labels-above-band; circular bands rely on the legend.
+- **Range strips**: rect draws one UNLABELED strip column per `layer` on the RIGHT of the tip labels (the figure legend identifies colours); circular draws concentric arcs beyond the outermost tip label (never over the tree). Ranges spanning > 180° (e.g. a root-level layer) get the SVG large-arc flag automatically.
 - **Bootstrap text vs balloon**: `mode: "text"` prints the support value beside the internal node; `mode: "balloon"` draws a support-scaled circle. Both honour `threshold`. TBE trees on a 0-1 scale are rescaled ×100 automatically.
+- **Circular legend/scale-bar placement**: both are drawn into the content-bbox corners (top-left legend, bottom-left scale bar) AFTER the strips, so they always sit outside the ring — never overlapping the colour strips or the tree.
+- **Circular tip-label rotation**: labels rotate with the tip direction; left-half labels flip 180° to stay readable. Horizontal circular labels are not available in this version.
 - **No midpoint/outgroup rerooting in v1** — root the tree upstream (gotree/IQ-TREE/nj) and emit the rooted Newick; the template draws the root where the Newick roots it.
 - **Label cap**: none by default (tip labels auto-fit via the viewBox), but >200 tips make labels unreadable at journal widths — collapse clades upstream (gotree collapse) and represent them with a range.
 - **Dataset annotation strips** (iTOL heatmaps/bars aligned to tips) are NOT in v1 — for those, use `phylogenetics-agent → visualize/phylo-itol`, or compose the value table as a separate ClusterHeat figure with matching tip order. Clade colour ranges (solid strips/arcs) ARE supported, multi-layer.
