@@ -1,9 +1,9 @@
 {
   "skill_name": "chartz",
-  "skill_version": "0.14.1",
-  "skill_updated": "2026-09-21",
-  "skill_short_description": "Render charts and graphs as self-contained HTML files from four pinned CDN engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus nine template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos), chosen by chart type. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a portable HTML file. No build step, no server, no pixi/conda/npm.",
-  "skill_description": "Render charts and graphs as self-contained HTML files from four pinned CDN engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus nine template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos), chosen by chart type. One request → one portable HTML file. The agent classifies the request against SKILL.md §1, emits the engine's JSON spec per engines/<name>.md, fills the template's /*__SPEC__*/ slot, runs the §6 self-check, and delivers the absolute path. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a portable HTML file. No build step, no server, no inline third-party library code. Does NOT do text-to-flowchart/sequence diagrams (use Mermaid/lumen-generate_visual) and does NOT analyze data.",
+  "skill_version": "0.15.0",
+  "skill_updated": "2026-09-24",
+  "skill_short_description": "Render charts and graphs as self-contained HTML files from four pinned CDN engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus twelve template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos, GeoMap, Msaview, GeneArrows), chosen by chart type. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a portable HTML file. No build step, no server, no pixi/conda/npm.",
+  "skill_description": "Render charts and graphs as self-contained HTML files from four pinned CDN engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus twelve template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos, GeoMap, Msaview, GeneArrows), chosen by chart type. One request \u2192 one portable HTML file. The agent classifies the request against SKILL.md \u00a71, emits the engine's JSON spec per engines/<name>.md, fills the template's /*__SPEC__*/ slot, runs the \u00a76 self-check, and delivers the absolute path. Use when the user asks for a chart, plot, dashboard, heatmap, network/graph diagram, or any data visualization as a portable HTML file. No build step, no server, no inline third-party library code. Does NOT do text-to-flowchart/sequence diagrams (use Mermaid/lumen-generate_visual). Requires recomputation or a package-native analysis object (.h5ad, Seurat .rds, .cool, FCS, PDB/mmCIF)? Use the owning analysis pipeline skill (or general package knowledge) \u2014 chartz renders figures from data you already have: every plotted value must be nameable as a column in your input (the named-column check).",
   "skill_triggers": [
     "make a chart",
     "plot this data",
@@ -13,7 +13,9 @@
     "network graph / node-link diagram",
     "dashboard from these numbers",
     "render a chart to html",
-    "visualize this csv/json"
+    "visualize this csv/json",
+    "multiple sequence alignment viewer / MSA plot",
+    "gene arrow map / synteny plot"
   ],
   "github_repo": "github.com/cheahhl814/chartz",
   "skill_title": "chartz",
@@ -27,12 +29,12 @@
   "with_docs_corpus": false,
   "with_pixi": false,
   "docs_corpus_rationale": "Wraps no upstream CLI tools; engine spec contracts in engines/*.md + references/ + render-verified examples/ serve as the grounding corpus (stronger than --help captures).",
-  "pixi_rationale": "Local runtime is python3 (stdlib only); browser engines are version-pinned via the SKILL.md §7 CDN table + template <script> tags, which pixi/conda cannot pin.",
+  "pixi_rationale": "Local runtime is python3 (stdlib only); browser engines are version-pinned via the SKILL.md \u00a77 CDN table + template <script> tags, which pixi/conda cannot pin.",
   "tool_inventory": [
     {
       "name": "python3",
       "version": ">=3.10",
-      "role": "stdlib only — spec JSON validation and the update check"
+      "role": "stdlib only \u2014 spec JSON validation and the update check"
     }
   ],
   "sub_skills": [],

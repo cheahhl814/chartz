@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Plotly.js 4.1.1</title>
+<script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  #chart { width: 100%; height: 65vh; }
+  footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card"><div id="chart"></div></div>
+  <footer>chartz · Plotly.js 4.1.1 · single-file, CDN-pinned · enrichment dotplot recipe (engines/plotly.md)</footer>
+</div>
+<script>
+const SPEC = {
+  "data": [
+    {
+      "type": "scatter",
+      "mode": "markers",
+      "x": [0.184, 0.151, 0.128, 0.097, 0.088, 0.074, 0.069, 0.061, 0.052, 0.045],
+      "y": ["Antigen processing and presentation", "Cytokine-cytokine receptor interaction", "T cell receptor signaling pathway", "Chemokine signaling pathway", "NF-kappa B signaling pathway", "Apoptosis", "JAK-STAT signaling pathway", "Toll-like receptor signaling pathway", "Cell adhesion molecules", "Natural killer cell mediated cytotoxicity"],
+      "marker": {
+        "size": [22, 19, 18, 15, 14, 13, 12, 11, 10, 9],
+        "color": [8.42, 7.15, 6.88, 6.21, 5.74, 5.12, 4.87, 4.31, 3.95, 3.58],
+        "colorscale": "Viridis",
+        "reversescale": true,
+        "cmin": 3,
+        "cmax": 9,
+        "showscale": true,
+        "colorbar": { "title": { "text": "−log10(p.adj)" }, "thickness": 14, "len": 0.85 },
+        "line": { "color": "#333333", "width": 0.8 },
+        "opacity": 0.9
+      },
+      "text": ["42/228", "39/258", "26/203", "21/216", "18/204", "17/230", "15/217", "14/229", "12/231", "11/244"],
+      "hovertemplate": "%{y}<br>Gene ratio %{x:.3f} (%{text})<br>−log10(p.adj) %{marker.color}<extra></extra>"
+    }
+  ],
+  "layout": {
+    "title": { "text": "KEGG enrichment — differentially expressed genes (clusterProfiler, BH-adjusted) · dot area ∝ gene count" },
+    "xaxis": { "title": { "text": "Gene ratio" }, "showgrid": false, "showline": true, "ticks": "outside", "zeroline": false },
+    "yaxis": { "title": { "text": null }, "autorange": "reversed", "tickfont": { "size": 11 } },
+    "font": { "size": 13 },
+    "plot_bgcolor": "#ffffff",
+    "margin": { "l": 290, "r": 30, "t": 80, "b": 60 }
+  },
+  "config": { "responsive": true, "displaylogo": false },
+  "export": { "format": "svg", "scale": 2 }
+};
+const cfg = SPEC.config || { responsive: true, displaylogo: false };
+cfg.responsive = true;
+/* Print export (v0.8.0): optional spec-level export field wires the modebar camera to
+   true-vector SVG (journal submission format) with deterministic PNG raster scale.
+   See engines/plotly.md - Print export. */
+if (SPEC.export) {
+  var __t = (SPEC.layout && SPEC.layout.title)
+    ? (typeof SPEC.layout.title === 'string' ? SPEC.layout.title : SPEC.layout.title.text)
+    : null;
+  cfg.toImageButtonOptions = Object.assign({
+    format: SPEC.export.format || 'svg',
+    filename: ((__t || 'chart') + '').replace(/\s+/g, '_'),
+    scale: SPEC.export.scale || 2
+  }, cfg.toImageButtonOptions || {});
+}
+Plotly.newPlot('chart', SPEC.data, SPEC.layout || {}, cfg);
+</script>
+</body>
+</html>

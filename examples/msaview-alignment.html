@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · Msaview (template-native SVG)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1040px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0; font-weight: 600; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .dl-btn { font: inherit; font-size: 0.75rem; padding: 0.35rem 0.7rem; border: 1px solid #d0d4d9; border-radius: 6px; background: #fff; color: #333; cursor: pointer; flex-shrink: 0; }
+  .dl-btn:hover { background: #f1f3f5; }
+  #chart { width: 100%; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="card-head">
+      <h1 id="chart-title"></h1>
+      <button id="dl-png" class="dl-btn" type="button">Download PNG</button>
+      <button id="dl-svg" class="dl-btn" type="button">Download SVG</button>
+    </div>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · Msaview (engine 14) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "RecA N-terminal domain MSA (10 taxa; alignment cols 1–72, residues 1–72 of E. coli RecA frame)",
+  "sequences": [
+    {
+      "name": "Escherichia_coli_K12",
+      "seq": "MAIDENKQKVLAAALGQIWKQFGKGSIMRLGEDRSMDVETFSTGSLSLDIACGAGGLPMGRIVEIYGPESSG"
+    },
+    {
+      "name": "Salmonella_enterica",
+      "seq": "MAIDENKQKALALALGQIEKQFGKGSIMRLGEDRSMDDETISTGSLSLDILLGAGGLPMGRIVEIYGPESSG"
+    },
+    {
+      "name": "Vibrio_cholerae",
+      "seq": "MAIDENKRKALAAALGQIEKQFGKGSIMRLGEDRQMDVETISTGSLSLQIALTAGGLPMGRIVEIYGPESSG"
+    },
+    {
+      "name": "Pseudomonas_aeruginosa",
+      "seq": "MAIDENKQKALAAALGQIYAQFGKGSIMRLGEDRSMDVHTKSTGSLSLEIALGAGGLPMGRIVEIYGPESSG"
+    },
+    {
+      "name": "Bacillus_subtilis",
+      "seq": "MAIDENKQKALAKALGQIEKQFGKGSIMRLGEDRSMDIETISTASLYLDIALGAGHLPMGRIVEIYGPESSG"
+    },
+    {
+      "name": "Staphylococcus_aureus",
+      "seq": "MAIDENKQKNLEAALGMPEKQFGKGSIMRLGEDRGFWVEYISTGALSFDIAKTAGGLPMGRIVEIYGPESSG"
+    },
+    {
+      "name": "Mycobacterium_tuberculosis",
+      "seq": "MAIDENKNKA---AFGRIEKQFGKGSIMRLGEDRFMDVETISVHSLSLDIALGAGGLPMGRIVEIYGPESSG"
+    },
+    {
+      "name": "Deinococcus_radiodurans",
+      "seq": "MAIDENKQKA---AREQIEKQFGKGSIMRLGEDRLMDNFTESTGSQSLDINVGAGGLPMGRIVEIYGPESSG"
+    },
+    {
+      "name": "Thermus_thermophilus",
+      "seq": "MAIDENDIKK---ALGQIEKQFGKGSIMRLGEDRSGDAETIETGSLFIDIGLGARGLPMGRIVEIYGPESSG"
+    },
+    {
+      "name": "Helicobacter_pylori",
+      "seq": "MAIDENNQKA---RQGQIEHQFGKGSIMRLGEDRSFDCEKIPTG--GRNIALLGPKLPMGRIVEIYGPESSG"
+    }
+  ],
+  "start": 1,
+  "colorscheme": "clustal",
+  "show_consensus": true,
+  "show_conservation": true,
+  "export": {
+    "width_mm": 183,
+    "dpi": 300,
+    "font_family": "Arial"
+  }
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Multiple sequence alignment';
+
+/* Msaview renderer — template-native SVG, no external library.
+   Spec: { title, sequences: [{name, seq}...] (pre-aligned, equal length), start?: 1,
+           colorscheme?: "auto"|"nucleotide"|"clustal"|"none",
+           show_conservation?: true, show_consensus?: true, cell?: 11 }
+   Rows render top-to-bottom in spec order. The engine does NOT align —
+   ragged input is refused with console.error + an in-figure message. */
+(function render() {
+  const NS = "http://www.w3.org/2000/svg";
+  const CW = SPEC.cell || 11, RH = Math.round(CW * 1.3), GUTTER = 130, RULER_H = 24,
+        CONS_H = SPEC.show_conservation === false ? 0 : 34, PAD = 16;
+  const seqs = (SPEC.sequences || []).map(s => ({name: String(s.name), seq: String(s.seq).toUpperCase()}));
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("style", "font-family: system-ui, sans-serif;");
+  const el = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    svg.appendChild(n);
+    return n;
+  };
+  const L = seqs.length ? seqs[0].seq.length : 0;
+  const ragged = seqs.filter(s => s.seq.length !== L);
+  if (!seqs.length || ragged.length) {
+    const msg = !seqs.length ? "Msaview: no sequences in spec"
+      : `Msaview: ragged alignment — expected ${L} columns, got ` +
+        ragged.map(s => `${s.name}=${s.seq.length}`).join(", ") + ". Pre-trim/pad before emitting.";
+    console.error(msg);
+    svg.setAttribute("viewBox", "0 0 900 40");
+    el("text", {x: 8, y: 24, "font-size": 12, fill: "#B00"}, msg);
+    document.getElementById("chart").appendChild(svg);
+    return;
+  }
+  const isGap = c => c === "-" || c === ".";
+  // colour scheme
+  let scheme = SPEC.colorscheme || "auto";
+  if (scheme === "auto") {
+    let nt = 0, all = 0;
+    for (const s of seqs) for (const c of s.seq) { all++; if ("ACGTU-.".includes(c)) nt++; }
+    scheme = nt / all > 0.9 ? "nucleotide" : "clustal";
+  }
+  const NUC = {A: "#009E73", C: "#0072B2", G: "#E69F00", T: "#D55E00", U: "#D55E00"};
+  const CLUSTAL = {};
+  [["AILMFWVC", "#80A0F0"], ["KR", "#F01505"], ["DE", "#C048C0"], ["NQST", "#15C015"],
+   ["G", "#F09048"], ["P", "#C0C000"], ["HY", "#15A4A4"]]
+    .forEach(([aa, col]) => { for (const c of aa) CLUSTAL[c] = col; });
+  const bg = c => isGap(c) ? null
+    : scheme === "nucleotide" ? (NUC[c] || "#BBBBBB")
+    : scheme === "clustal" ? (CLUSTAL[c] || "#DDDDDD")
+    : "#E0E0E0";
+  const fg = () => scheme === "none" ? "#222" : (scheme === "nucleotide" ? "#fff" : "#111");
+  // per-column majority + identity
+  const cols = [];
+  for (let j = 0; j < L; j++) {
+    const cnt = {};
+    for (const s of seqs) cnt[s.seq[j]] = (cnt[s.seq[j]] || 0) + 1;
+    let best = "-", bestN = 0;
+    for (const c in cnt) if (cnt[c] > bestN || (cnt[c] === bestN && isGap(best))) { best = c; bestN = cnt[c]; }
+    let resN = 0;
+    for (const c in cnt) if (!isGap(c)) resN = Math.max(resN, cnt[c]);
+    cols.push({cons: isGap(best) ? "-" : best, ident: resN / seqs.length});
+  }
+  const showCons = SPEC.show_consensus !== false;
+  const x0 = GUTTER, top = PAD + CONS_H + RULER_H;
+  const H = top + seqs.length * RH + (showCons ? RH + 8 : 0) + PAD;
+  const W = GUTTER + L * CW + PAD;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.style.maxWidth = W * 1.4 + "px";  // short alignments: don't blow glyphs up to card width
+  const fs = Math.max(7, CW * 0.82);
+  // conservation bar (fraction identity of the majority residue, gaps count against)
+  if (CONS_H) {
+    const barMax = CONS_H - 10, base = PAD + CONS_H - 4;
+    el("text", {x: x0 - 8, y: base - 2, "text-anchor": "end", "font-size": 10, fill: "#666"}, "Conservation");
+    cols.forEach((c, j) => {
+      const h = c.ident * barMax;
+      if (h > 0) el("rect", {x: x0 + j * CW + 0.5, y: base - h, width: CW - 1, height: h,
+                             fill: c.ident === 1 ? "#444" : "#999"});
+    });
+  }
+  // sparse ruler: first column + every multiple of 10 (skipped if it would crowd the first label)
+  const START = SPEC.start == null ? 1 : SPEC.start, rulerY = PAD + CONS_H + RULER_H - 6;
+  el("line", {x1: x0, x2: x0 + L * CW, y1: rulerY, y2: rulerY, stroke: "#333"});
+  for (let j = 0; j < L; j++) {
+    const pos = START + j;
+    if (j !== 0 && (pos % 10 !== 0 || j < 4)) continue;
+    const x = x0 + j * CW + CW / 2;
+    el("line", {x1: x, x2: x, y1: rulerY - 4, y2: rulerY, stroke: "#333"});
+    el("text", {x, y: rulerY - 7, "text-anchor": "middle", "font-size": 10, fill: "#333"}, pos);
+  }
+  // rows
+  const maxChars = Math.floor((GUTTER - 14) / 6.2);
+  const trunc = n => n.length > maxChars ? n.slice(0, maxChars - 1) + "…" : n;
+  const drawRow = (name, seq, y, bold) => {
+    const t = el("text", {x: x0 - 8, y: y + RH * 0.72, "text-anchor": "end", "font-size": 10.5,
+                          fill: "#222", "font-weight": bold ? 700 : 400}, trunc(name));
+    if (trunc(name) !== name) t.appendChild(Object.assign(document.createElementNS(NS, "title"), {textContent: name}));
+    for (let j = 0; j < L; j++) {
+      const c = seq[j], x = x0 + j * CW, b = bg(c);
+      if (b) el("rect", {x, y, width: CW, height: RH, fill: b});
+      el("text", {x: x + CW / 2, y: y + RH * 0.74, "text-anchor": "middle", "font-size": fs,
+                  fill: b ? fg() : "#AAA"}, isGap(c) ? "-" : c);
+    }
+  };
+  seqs.forEach((s, i) => drawRow(s.name, s.seq, top + i * RH, false));
+  if (showCons) {
+    const y = top + seqs.length * RH + 8;
+    el("line", {x1: x0, x2: x0 + L * CW, y1: y - 4, y2: y - 4, stroke: "#CCC"});
+    drawRow("Consensus", cols.map(c => c.cons).join(""), y, true);
+  }
+  document.getElementById("chart").appendChild(svg);
+})();
+/* ---- chartz print-export module (identical across template-native engines; v0.8.0) ----
+   SPEC.export (optional, all keys optional):
+     width_mm    - journal column width (e.g. 89 = Nature single column). With dpi, sets the
+                   Download PNG raster deterministically: px = mm / 25.4 * dpi (default: 2x screen).
+                   Download SVG then carries width/height in mm units (true print vector).
+     dpi         - raster density for Download PNG (default 300).
+     font_family - overrides the system-ui stack in both exports (journals: "Arial"). */
+(function () {
+  var getSvg = function () { return document.querySelector('#chart svg'); };
+  var baseName = function () {
+    return (document.getElementById('chart-title').textContent || 'chart').replace(/\s+/g, '_');
+  };
+  function exportScale(el) {
+    var ex = (SPEC && SPEC.export) || {};
+    var dpi = ex.dpi || 300;
+    if (ex.width_mm) {
+      var cssW = (el.viewBox.baseVal && el.viewBox.baseVal.width) || el.clientWidth || 900;
+      return Math.max(1, (ex.width_mm / 25.4 * dpi) / cssW);
+    }
+    return 2;
+  }
+  function svgXml(print) {
+    var el = getSvg();
+    if (!el) return null;
+    var vb = el.viewBox.baseVal;
+    var w = (vb && vb.width) ? vb.width : el.clientWidth;
+    var h = (vb && vb.height) ? vb.height : el.clientHeight;
+    var clone = el.cloneNode(true);
+    var ex = (SPEC && SPEC.export) || {};
+    if (print && ex.width_mm) {
+      clone.setAttribute('width', ex.width_mm + 'mm');
+      clone.setAttribute('height', (h / w * ex.width_mm).toFixed(2) + 'mm');
+    } else {
+      clone.setAttribute('width', w);
+      clone.setAttribute('height', h);
+    }
+    if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    if (!clone.getAttribute('xmlns:xlink')) clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+    if (ex.font_family) clone.setAttribute('style', 'font-family: ' + ex.font_family + ';');
+    return { xml: new XMLSerializer().serializeToString(clone), w: w, h: h };
+  }
+  function download(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  document.getElementById('dl-svg').addEventListener('click', function () {
+    var r = svgXml(true);
+    if (!r) return;
+    var prolog = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    download(new Blob([prolog + r.xml], { type: 'image/svg+xml;charset=utf-8' }), baseName() + '.svg');
+  });
+  document.getElementById('dl-png').addEventListener('click', function () {
+    var r = svgXml(false);
+    if (!r) return;
+    var scale = exportScale(getSvg());
+    var url = URL.createObjectURL(new Blob([r.xml], { type: 'image/svg+xml;charset=utf-8' }));
+    var img = new Image();
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(r.w * scale);
+      canvas.height = Math.round(r.h * scale);
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function (blob) { download(blob, baseName() + '.png'); });
+    };
+    img.src = url;
+  });
+})();
+</script>
+</body>
+</html>

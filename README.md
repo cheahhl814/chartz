@@ -1,15 +1,15 @@
 # chartz
 
-[![Version](https://img.shields.io/badge/version-0.14.1-blue)](#-installation)
+[![Version](https://img.shields.io/badge/version-0.15.0-blue)](#-installation)
 [![Type](https://img.shields.io/badge/type-agent%20skill-blueviolet)](#-installation)
 [![README standard](https://img.shields.io/badge/README%20per-bioinfo--skill--creator-orange)](https://github.com/cheahhl814/bioinfo-skill-creator)
 
-Render charts and graphs as self-contained HTML files from four CDN-pinned engines plus ten template-native engines, chosen by chart type. One request → one portable HTML file: simple statistical charts via Chart.js, scientific/statistical plots via Plotly.js (Manhattan, volcano, PCA, forest, lollipop, violin/box, ANI heatmap, relative-abundance bars), rich interactive dashboards via ECharts (alluvial, treemap, sunburst, dual-axis), nodes+edges network graphs via Cytoscape.js, genome-browser track figures via the zero-dependency GenomeTracks SVG renderer, clustered-heatmap composites via ClusterHeat, OncoPrint mutation matrices via OncoPrint, sequence logos via SeqLogo, set-intersection plots via UpSet, circular genome plots via Circos, metacoder-style taxonomy heat trees via HeatTree, Newick phylogenies (phylograms with bootstrap circles, scale bars, and clade ranges) via PhyloTree, IQ-TREE gCF-vs-sCF concordance scatters via Concordance — all template-native SVG — plus geographic site maps via GeoMap (raster tile basemaps from OSM/Esri/Carto, embedded offline). No build step, no server, no inline third-party library code.
+Render charts and graphs as self-contained HTML files from four CDN-pinned engines plus twelve template-native engines, chosen by chart type. One request → one portable HTML file: simple statistical charts via Chart.js, scientific/statistical plots via Plotly.js (Manhattan, volcano, PCA, forest, lollipop, violin/box, ANI heatmap, relative-abundance bars), rich interactive dashboards via ECharts (alluvial, treemap, sunburst, dual-axis), nodes+edges network graphs via Cytoscape.js, genome-browser track figures via the zero-dependency GenomeTracks SVG renderer, clustered-heatmap composites via ClusterHeat, OncoPrint mutation matrices via OncoPrint, sequence logos via SeqLogo, set-intersection plots via UpSet, circular genome plots via Circos, metacoder-style taxonomy heat trees via HeatTree, Newick phylogenies (phylograms with bootstrap circles, scale bars, and clade ranges) via PhyloTree, IQ-TREE gCF-vs-sCF concordance scatters via Concordance, multiple sequence alignment viewers (color-by-conservation, consensus + conservation bar) via Msaview, gene-arrow / synteny feature maps via GeneArrows — all template-native SVG — plus geographic site maps via GeoMap (raster tile basemaps from OSM/Esri/Carto, embedded offline). No build step, no server, no inline third-party library code.
 
 **Repository**: https://github.com/cheahhl814/chartz
 
 > [!TIP]
-> Full change history: see the [commit log](https://github.com/cheahhl814/chartz/commits/master) — each release is tagged in the message header (v0.14.1 current).
+> Full change history: see the [commit log](https://github.com/cheahhl814/chartz/commits/master) — each release is tagged in the message header (v0.15.0 current).
 
 ## Contents
 
@@ -139,6 +139,8 @@ All libraries are loaded from pinned CDN URLs at render time — no local instal
 | [Circos](#-engines)                         | template v1    | Circular genome plots (SVG, no CDN)                             | n/a        |
 | [HeatTree](#-engines)                       | template v1    | Metacoder-style taxonomy heat trees (SVG, no CDN)               | n/a        |
 | [PhyloTree](#-engines)                      | template v1    | Phylogenetic trees, Newick (SVG, no CDN)                        | n/a        |
+| [Msaview](#-engines)                        | template v1    | Multiple sequence alignment viewers (SVG, no CDN)               | n/a        |
+| [GeneArrows](#-engines)                     | template v1    | Gene-arrow / synteny feature maps (SVG, no CDN)                 | n/a        |
 
 Engine version pins are single-sourced in `SKILL.md` §7 and mirrored into every template. Never float (`@latest`).
 
@@ -202,9 +204,24 @@ Example naming convention: `<engine>-<charttype>.html`; the four base-named demo
 - **Explicit stop points** — ambiguous requests surface *Evidence + Recommend + Options*, not auto-picked choices.
 - **No machine-specific paths** — output goes to the working directory; the skill ships no local dependencies and no user-specific configuration.
 - **Print/vector export** — template-native engines export true-vector SVG (mm-sized at journal column widths) and a deterministic PNG raster via the spec-level `export: {width_mm, dpi, font_family}` field; Plotly exports vector SVG via `toImageButtonOptions` (SKILL.md §6b).
-- **Render-verified examples** — all fifty-six example demos were executed in headless Chrome, verified non-blank with zero console errors (see `examples/screenshots/`, 2× element-cropped chart renders).
+- **Render-verified examples** — all example demos were executed in headless Chrome, verified non-blank with zero console errors (see `examples/screenshots/`, 2× element-cropped chart renders).
 - **Offline-capable template-native engines** — HeatTree (1), PhyloTree (2), GenomeTracks (4), ClusterHeat (5), OncoPrint (6), SeqLogo (7), Circos (8), and UpSet (9) are template-native SVG with no CDN dependency; they render even with no network (the only engines whose §6.4 reachability probe is skipped).
-- **Battle-test equivalent, stated honestly** — chartz is a hand-authored workflow-skill and carries no preflight/skill-built/battle-test evidence chain; the de-facto battle-test is the 53 headless-Chrome-verified demos plus the §6 self-check run on every delivery (see `params.json: battle_test_note`).
+- **Named-column dispatch guardrail** — chartz renders figures from data the agent already holds: every plotted value must be nameable as a column in the input. Requests requiring recomputation or a package-native analysis object (.h5ad, Seurat .rds, .cool, FCS, PDB/mmCIF) route to the owning analysis pipeline skill instead (SKILL.md description, v0.15.0).
+- **Battle-test equivalent, stated honestly** — chartz is a hand-authored workflow-skill and carries no preflight/skill-built/battle-test evidence chain; the de-facto battle-test is the headless-Chrome-verified demos plus the §6 self-check run on every delivery (see `params.json: battle_test_note`).
+
+## 📜 Changelog
+
+### v0.15.0 (2026-09-24) — brainstorm work order (2-seat herdr-skill+ §8 brainstorm; user tie-break)
+
+- **Fixed** — §1 routing: GeoMap was unreachable (the row-14 "Anything else → ECharts" catch-all preceded it); GeoMap now sits above the catch-all.
+- **Fixed** — engine-count drift (frontmatter said 15/11-zero-dependency, §0 said ten, §8 said 13/9; §7 table has the truth): reconciled to **14 engines = 4 pinned CDN + 10 template-native** (audit note: GeoMap is template-native SVG but pulls pinned d3-geo/d3-array — it is *not* zero-dependency).
+- **Fixed** — §6.4 CDN skip-list now names all zero-CDN engines (added Msaview, GeneArrows) and states that GeoMap's d3-geo/d3-array tags are probed like any CDN engine.
+- **Added** — **Msaview** engine (§5l): MSA viewer with per-residue coloring, conservation bar, consensus row (ggmsa/pymsaviz intent).
+- **Added** — **GeneArrows** engine (§5m): gene-arrow / synteny feature maps with group coloring and optional synteny ribbons (gggenes/gggenomes/pyGenomeViz intent).
+- **Added** — two Plotly **recipes, not engines** (engines/plotly.md "Recipes"): Kaplan–Meier survival curves (`plotly-km-survival.html`) and enrichment dotplots (`plotly-enrichment-dotplot.html`) from already-computed tables — the estimation is an analysis and stays out of chartz.
+- **Added** — named-column dispatch guardrail in the skill description (v0.15.0 header + README hard-guarantee bullet).
+- **Dropped (decided, do not build)** — karyotype ideograms (covered by Circos/GenomeTracks; extend one of those first if a gap appears); Hi-C contact-matrix engine (a derived contact matrix is a ClusterHeat annotated-heatmap spec, not an engine); Venn diagrams (UpSet already covers set intersections; survey pairs UpSetR with ggVennDiagram as alternatives); MA plots and ridgeline (already expressible as Plotly scatter/violin-density recipes, row 11); 3D molecular viewer as a chartz engine (REJECTED on contract grounds: input is PDB/mmCIF — not tabular; needs a new CDN lib — 3Dmol.js/NGL not in the §7 pin table; it is a viewer, not a chart — §6b mm-unit SVG export does not apply).
+- **Dissent (preserved)** — the four orphan categories (single-cell/spatial: Seurat/scanpy/squidpy; Hi-C: HiGlass/cooler; cytometry: flowViz/ggcyto; 3D structure: py3Dmol/NGLView) have no owner skill in AIx-BIO today. If these requests recur in practice, that is the agreed trigger to revisit a scoped meta-skill (orphans only, with an ownership table).
 
 ## Provenance
 

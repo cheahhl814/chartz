@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chartz · GeneArrows (template-native SVG)</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; }
+  .wrap { max-width: 1040px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 1.25rem; }
+  h1 { font-size: 1rem; color: #333; margin: 0; font-weight: 600; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .dl-btn { font: inherit; font-size: 0.75rem; padding: 0.35rem 0.7rem; border: 1px solid #d0d4d9; border-radius: 6px; background: #fff; color: #333; cursor: pointer; flex-shrink: 0; }
+  .dl-btn:hover { background: #f1f3f5; }
+  #chart { width: 100%; }
+  footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="card-head">
+      <h1 id="chart-title"></h1>
+      <button id="dl-png" class="dl-btn" type="button">Download PNG</button>
+      <button id="dl-svg" class="dl-btn" type="button">Download SVG</button>
+    </div>
+    <div id="chart"></div>
+  </div>
+  <footer>chartz · GeneArrows (engine 15) · template-native SVG, zero dependencies</footer>
+</div>
+<script>
+const SPEC = {
+  "title": "Prophage region comparison (3 regions, coordinates re-based to region start; terL + capsid synteny)",
+  "contigs": [
+    {
+      "name": "Phage_A (contig_12)",
+      "length": 16450,
+      "genes": [
+        {
+          "name": "int",
+          "start": 800,
+          "end": 1900,
+          "strand": "-",
+          "group": "integration"
+        },
+        {
+          "name": "rep",
+          "start": 2150,
+          "end": 3050,
+          "strand": "+",
+          "group": "replication"
+        },
+        {
+          "name": "ssb",
+          "start": 3300,
+          "end": 3750,
+          "strand": "+",
+          "group": "replication"
+        },
+        {
+          "name": "hyp1",
+          "start": 4000,
+          "end": 4350,
+          "strand": "+"
+        },
+        {
+          "name": "terS",
+          "start": 4600,
+          "end": 5100,
+          "strand": "+",
+          "group": "packaging"
+        },
+        {
+          "name": "terL",
+          "start": 5350,
+          "end": 7000,
+          "strand": "+",
+          "group": "packaging"
+        },
+        {
+          "name": "portal",
+          "start": 7250,
+          "end": 8750,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "capsid",
+          "start": 9000,
+          "end": 10200,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "tail_tube",
+          "start": 10450,
+          "end": 11150,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "tape",
+          "start": 11400,
+          "end": 13800,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "holin",
+          "start": 14050,
+          "end": 14350,
+          "strand": "+",
+          "group": "lysis"
+        },
+        {
+          "name": "endolysin",
+          "start": 14600,
+          "end": 15400,
+          "strand": "+",
+          "group": "lysis"
+        },
+        {
+          "name": "orfX",
+          "start": 5750,
+          "end": 6250,
+          "strand": "-"
+        }
+      ]
+    },
+    {
+      "name": "Phage_B (contig_3)",
+      "length": 16100,
+      "genes": [
+        {
+          "name": "int",
+          "start": 800,
+          "end": 1950,
+          "strand": "-",
+          "group": "integration"
+        },
+        {
+          "name": "hyp2",
+          "start": 2200,
+          "end": 2600,
+          "strand": "-"
+        },
+        {
+          "name": "rep",
+          "start": 2850,
+          "end": 3800,
+          "strand": "+",
+          "group": "replication"
+        },
+        {
+          "name": "terS",
+          "start": 4050,
+          "end": 4530,
+          "strand": "+",
+          "group": "packaging"
+        },
+        {
+          "name": "terL",
+          "start": 4780,
+          "end": 6480,
+          "strand": "+",
+          "group": "packaging"
+        },
+        {
+          "name": "portal",
+          "start": 6730,
+          "end": 8180,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "scaffold",
+          "start": 8430,
+          "end": 9030,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "capsid",
+          "start": 9280,
+          "end": 10530,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "tape",
+          "start": 10780,
+          "end": 13380,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "holin",
+          "start": 13630,
+          "end": 13950,
+          "strand": "+",
+          "group": "lysis"
+        },
+        {
+          "name": "endolysin",
+          "start": 14200,
+          "end": 15050,
+          "strand": "+",
+          "group": "lysis"
+        }
+      ]
+    },
+    {
+      "name": "Phage_C (contig_41)",
+      "length": 15430,
+      "genes": [
+        {
+          "name": "int",
+          "start": 800,
+          "end": 1880,
+          "strand": "-",
+          "group": "integration"
+        },
+        {
+          "name": "terS",
+          "start": 2130,
+          "end": 2650,
+          "strand": "+",
+          "group": "packaging"
+        },
+        {
+          "name": "terL",
+          "start": 2900,
+          "end": 4500,
+          "strand": "+",
+          "group": "packaging"
+        },
+        {
+          "name": "portal",
+          "start": 4750,
+          "end": 6230,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "capsid",
+          "start": 6480,
+          "end": 7660,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "hyp3",
+          "start": 7910,
+          "end": 8210,
+          "strand": "-"
+        },
+        {
+          "name": "hyp4",
+          "start": 8460,
+          "end": 8740,
+          "strand": "-"
+        },
+        {
+          "name": "tape",
+          "start": 8990,
+          "end": 11190,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "tail_fiber",
+          "start": 11440,
+          "end": 13340,
+          "strand": "+",
+          "group": "structural"
+        },
+        {
+          "name": "endolysin",
+          "start": 13590,
+          "end": 14380,
+          "strand": "+",
+          "group": "lysis"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "from_contig": "Phage_A (contig_12)",
+      "from": [
+        5350,
+        7000
+      ],
+      "to_contig": "Phage_B (contig_3)",
+      "to": [
+        4780,
+        6480
+      ],
+      "id": "terL"
+    },
+    {
+      "from_contig": "Phage_A (contig_12)",
+      "from": [
+        9000,
+        10200
+      ],
+      "to_contig": "Phage_B (contig_3)",
+      "to": [
+        9280,
+        10530
+      ],
+      "id": "capsid"
+    },
+    {
+      "from_contig": "Phage_B (contig_3)",
+      "from": [
+        4780,
+        6480
+      ],
+      "to_contig": "Phage_C (contig_41)",
+      "to": [
+        2900,
+        4500
+      ],
+      "id": "terL"
+    },
+    {
+      "from_contig": "Phage_B (contig_3)",
+      "from": [
+        9280,
+        10530
+      ],
+      "to_contig": "Phage_C (contig_41)",
+      "to": [
+        6480,
+        7660
+      ],
+      "id": "capsid"
+    }
+  ],
+  "link_by": "group",
+  "arrow_palette": "okabeito",
+  "show_axis": true,
+  "unit": "kb",
+  "export": {
+    "width_mm": 183,
+    "dpi": 300,
+    "font_family": "Arial"
+  }
+};
+document.getElementById('chart-title').textContent = SPEC.title || 'Gene arrow map';
+
+/* GeneArrows renderer — template-native SVG, no external library.
+   Spec: { title, contigs: [{name, length, genes: [{name, start, end, strand, group?, lane?}]}],
+           links?: [{from_contig, from: [s,e], to_contig, to: [s,e], id?, group?}],
+           link_by?: "group", arrow_palette?: "okabeito" | {group: "#hex"},
+           show_axis?: true, unit?: "kb"|"Mb"|null }
+   Contigs render top-to-bottom in spec order on ONE shared bp->px scale (longest contig = full width).
+   Shared top axis iff every contig.length is equal; otherwise a mini-axis under each row. */
+(function render() {
+  const NS = "http://www.w3.org/2000/svg";
+  const GUTTER = 130, PLOT_W = 820, PAD = 12, AH = 16, LABEL_H = 13, LANE_H = AH + LABEL_H + 4,
+        AXIS_H = 30, MINI_H = 18, LEGEND_H = 26;
+  const contigs = SPEC.contigs || [];
+  const maxLen = Math.max(...contigs.map(c => c.length), 1);
+  const px = p => GUTTER + (p / maxLen) * PLOT_W;
+  const sharedAxis = contigs.every(c => c.length === contigs[0].length);
+  const showAxis = SPEC.show_axis !== false;
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("style", "font-family: system-ui, sans-serif;");
+  const el = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    svg.appendChild(n);
+    return n;
+  };
+  // group colours: Okabe-Ito in order of first appearance; ungrouped genes neutral grey
+  const OKABE = ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999933"];
+  const custom = typeof SPEC.arrow_palette === "object" && SPEC.arrow_palette ? SPEC.arrow_palette : {};
+  const groups = [];
+  for (const c of contigs) for (const g of c.genes) if (g.group != null && !groups.includes(g.group)) groups.push(g.group);
+  const colour = grp => grp == null ? "#BBBBBB" : (custom[grp] || OKABE[groups.indexOf(grp) % OKABE.length]);
+  // unit formatting
+  const unit = SPEC.unit === undefined ? "kb" : SPEC.unit;
+  const div = unit === "kb" ? 1e3 : unit === "Mb" ? 1e6 : 1;
+  const fmt = v => div === 1 ? Math.round(v).toLocaleString("en-US") : String(+(v / div).toFixed(3));
+  const step = (() => {
+    const raw = maxLen / 6, mag = 10 ** Math.floor(Math.log10(raw));
+    return [1, 2, 5, 10].map(m => m * mag).find(s => s >= raw);
+  })();
+  // lane assignment: greedy by start; explicit gene.lane wins
+  const rows = contigs.map(c => {
+    const laneEnd = [], placed = [];
+    [...c.genes].sort((a, b) => Math.min(a.start, a.end) - Math.min(b.start, b.end)).forEach(g => {
+      const s = Math.min(g.start, g.end), e = Math.max(g.start, g.end);
+      let lane = g.lane;
+      if (lane == null) { lane = laneEnd.findIndex(end => end < s); if (lane < 0) lane = laneEnd.length; }
+      laneEnd[lane] = Math.max(laneEnd[lane] || 0, e);
+      placed.push({g, s, e, lane});
+    });
+    return {c, placed, lanes: Math.max(1, laneEnd.length)};
+  });
+  // links: explicit array wins; else link_by "group" pairs same-group genes on adjacent contigs (k-th with k-th)
+  let links = Array.isArray(SPEC.links) && SPEC.links.length ? SPEC.links : [];
+  if (!links.length && SPEC.link_by === "group") {
+    for (let i = 0; i + 1 < rows.length; i++) for (const grp of groups) {
+      const a = rows[i].placed.filter(p => p.g.group === grp), b = rows[i + 1].placed.filter(p => p.g.group === grp);
+      for (let k = 0; k < Math.min(a.length, b.length); k++)
+        links.push({from_contig: rows[i].c.name, from: [a[k].s, a[k].e], to_contig: rows[i + 1].c.name,
+                    to: [b[k].s, b[k].e], group: grp});
+    }
+  }
+  const GAP = links.length ? 60 : 22;
+  // vertical layout
+  let y = PAD + (showAxis && sharedAxis ? AXIS_H : 0);
+  for (const r of rows) {
+    r.top = y;
+    r.arrowTop = y + LABEL_H;
+    r.bottom = y + r.lanes * LANE_H + (showAxis && !sharedAxis ? MINI_H : 0);
+    y = r.bottom + GAP;
+  }
+  const H = y - GAP + (groups.length ? LEGEND_H + 8 : 0) + PAD;
+  svg.setAttribute("viewBox", `0 0 ${GUTTER + PLOT_W + 40} ${H}`);
+  const byName = {};
+  rows.forEach(r => { byName[r.c.name] = r; });
+  const axis = (len, yy, big) => {
+    el("line", {x1: px(0), x2: px(len), y1: yy, y2: yy, stroke: "#333"});
+    for (let v = 0; v <= len + 1e-9; v += step) {
+      el("line", {x1: px(v), x2: px(v), y1: big ? yy - 4 : yy, y2: big ? yy : yy + 3, stroke: "#333"});
+      el("text", {x: px(v), y: big ? yy - 7 : yy + 12, "text-anchor": "middle", "font-size": big ? 10 : 8.5,
+                  fill: "#333"}, fmt(v));
+    }
+    if (unit) el("text", {x: px(len) + 6, y: big ? yy + 3 : yy + 12, "font-size": big ? 10 : 8.5, fill: "#666"}, unit);
+  };
+  if (showAxis && sharedAxis) axis(maxLen, PAD + AXIS_H - 10, true);
+  // synteny ribbons first, so rows paint over them
+  for (const L of links) {
+    const A = byName[L.from_contig], B = byName[L.to_contig];
+    if (!A || !B) { console.error("GeneArrows: link references unknown contig", L); continue; }
+    const [up, dn, iu, id] = A.top <= B.top ? [A, B, L.from, L.to] : [B, A, L.to, L.from];
+    const ya = up.bottom + 2, yb = dn.arrowTop - 2, ym = (ya + yb) / 2;
+    const [a0, a1] = [px(Math.min(...iu)), px(Math.max(...iu))], [b0, b1] = [px(Math.min(...id)), px(Math.max(...id))];
+    let grp = L.group;
+    if (grp == null) {
+      const hit = A.placed.find(p => (L.id != null && p.g.name === L.id) || (p.s <= Math.max(...L.from) && p.e >= Math.min(...L.from)));
+      grp = hit ? hit.g.group : null;
+    }
+    el("path", {d: `M ${a0} ${ya} L ${a1} ${ya} C ${a1} ${ym} ${b1} ${ym} ${b1} ${yb} L ${b0} ${yb} C ${b0} ${ym} ${a0} ${ym} ${a0} ${ya} Z`,
+                fill: grp == null ? "#999" : colour(grp), "fill-opacity": 0.3, stroke: "none"});
+  }
+  // contig rows
+  for (const r of rows) {
+    el("text", {x: GUTTER - 10, y: r.arrowTop + AH * 0.72, "text-anchor": "end", "font-size": 11,
+                "font-weight": 600, fill: "#333"}, r.c.name);
+    for (let l = 0; l < r.lanes; l++) {
+      const mid = r.arrowTop + l * LANE_H + AH / 2;
+      el("line", {x1: px(0), x2: px(r.c.length), y1: mid, y2: mid, stroke: l ? "#E3E3E3" : "#888", "stroke-width": 1});
+    }
+    for (const {g, s, e, lane} of r.placed) {
+      const x0 = px(s), x1 = px(e), w = x1 - x0, t = r.arrowTop + lane * LANE_H, b = t + AH, m = t + AH / 2;
+      const head = Math.min(w * 0.45, AH * 0.75);
+      const d = g.strand === "-"
+        ? `M ${x1} ${t} L ${x0 + head} ${t} L ${x0} ${m} L ${x0 + head} ${b} L ${x1} ${b} Z`
+        : `M ${x0} ${t} L ${x1 - head} ${t} L ${x1} ${m} L ${x1 - head} ${b} L ${x0} ${b} Z`;
+      const p = el("path", {d, fill: colour(g.group), stroke: "#333", "stroke-width": 0.6});
+      p.appendChild(Object.assign(document.createElementNS(NS, "title"),
+        {textContent: `${g.name} ${s}-${e} (${g.strand || "+"})${g.group != null ? " · " + g.group : ""}`}));
+      if (w >= 14 && g.name) el("text", {x: (x0 + x1) / 2, y: t - 3, "text-anchor": "middle", "font-size": 9,
+                                         "font-style": "italic", fill: "#222"}, g.name);
+    }
+    if (showAxis && !sharedAxis) axis(r.c.length, r.bottom - MINI_H + 2, false);
+  }
+  // legend
+  if (groups.length) {
+    let lx = GUTTER, ly = H - PAD - LEGEND_H / 2;
+    for (const grp of groups) {
+      el("rect", {x: lx, y: ly - 6, width: 14, height: 12, fill: colour(grp), stroke: "#333", "stroke-width": 0.6});
+      el("text", {x: lx + 19, y: ly + 4, "font-size": 10.5, fill: "#333"}, grp);
+      lx += 30 + String(grp).length * 6.2;
+    }
+  }
+  document.getElementById("chart").appendChild(svg);
+})();
+/* ---- chartz print-export module (identical across template-native engines; v0.8.0) ----
+   SPEC.export (optional, all keys optional):
+     width_mm    - journal column width (e.g. 89 = Nature single column). With dpi, sets the
+                   Download PNG raster deterministically: px = mm / 25.4 * dpi (default: 2x screen).
+                   Download SVG then carries width/height in mm units (true print vector).
+     dpi         - raster density for Download PNG (default 300).
+     font_family - overrides the system-ui stack in both exports (journals: "Arial"). */
+(function () {
+  var getSvg = function () { return document.querySelector('#chart svg'); };
+  var baseName = function () {
+    return (document.getElementById('chart-title').textContent || 'chart').replace(/\s+/g, '_');
+  };
+  function exportScale(el) {
+    var ex = (SPEC && SPEC.export) || {};
+    var dpi = ex.dpi || 300;
+    if (ex.width_mm) {
+      var cssW = (el.viewBox.baseVal && el.viewBox.baseVal.width) || el.clientWidth || 900;
+      return Math.max(1, (ex.width_mm / 25.4 * dpi) / cssW);
+    }
+    return 2;
+  }
+  function svgXml(print) {
+    var el = getSvg();
+    if (!el) return null;
+    var vb = el.viewBox.baseVal;
+    var w = (vb && vb.width) ? vb.width : el.clientWidth;
+    var h = (vb && vb.height) ? vb.height : el.clientHeight;
+    var clone = el.cloneNode(true);
+    var ex = (SPEC && SPEC.export) || {};
+    if (print && ex.width_mm) {
+      clone.setAttribute('width', ex.width_mm + 'mm');
+      clone.setAttribute('height', (h / w * ex.width_mm).toFixed(2) + 'mm');
+    } else {
+      clone.setAttribute('width', w);
+      clone.setAttribute('height', h);
+    }
+    if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    if (!clone.getAttribute('xmlns:xlink')) clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+    if (ex.font_family) clone.setAttribute('style', 'font-family: ' + ex.font_family + ';');
+    return { xml: new XMLSerializer().serializeToString(clone), w: w, h: h };
+  }
+  function download(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  document.getElementById('dl-svg').addEventListener('click', function () {
+    var r = svgXml(true);
+    if (!r) return;
+    var prolog = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    download(new Blob([prolog + r.xml], { type: 'image/svg+xml;charset=utf-8' }), baseName() + '.svg');
+  });
+  document.getElementById('dl-png').addEventListener('click', function () {
+    var r = svgXml(false);
+    if (!r) return;
+    var scale = exportScale(getSvg());
+    var url = URL.createObjectURL(new Blob([r.xml], { type: 'image/svg+xml;charset=utf-8' }));
+    var img = new Image();
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(r.w * scale);
+      canvas.height = Math.round(r.h * scale);
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function (blob) { download(blob, baseName() + '.png'); });
+    };
+    img.src = url;
+  });
+})();
+</script>
+</body>
+</html>
