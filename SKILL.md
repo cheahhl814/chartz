@@ -1,6 +1,6 @@
 ---
 name: chartz
-description: 'Render charts and graphs as self-contained HTML files from 16 engines (4 pinned CDN + 12 template-native SVG; GeoMap additionally pulls pinned d3-geo), chosen by chart type. Use when the user asks for any chart, plot, dashboard, map or data visualization as a file they can open in a browser — "make a bar chart", "plot this data", "heatmap of these values", "draw a network graph", "dashboard of these metrics", "phylogenetic tree from this Newick string", "Manhattan plot", "volcano plot", "multiple sequence alignment viewer", "gene arrow map / synteny plot", "map of my sampling sites". Engine router: Chart.js (simple statistical), Plotly.js (scientific/statistical: Manhattan, volcano, PCA, forest, lollipop, violin/box, ANI heatmap, relative-abundance bars), ECharts (rich/dashboards: alluvial, treemap, sunburst, dual-axis), Cytoscape.js (nodes + edges: PPI, pathway, dependency, consortium), plus template-native SVG engines — GenomeTracks (genome-browser loci), ClusterHeat (annotated clustered heatmaps), OncoPrint (cohort mutation matrices), SeqLogo (motif logos), UpSet (set intersections), Circos (circular genome/chord), HeatTree (metacoder taxonomy trees), PhyloTree (Newick phylograms, rect/circular), Concordance (IQ-TREE gCF-vs-sCF scatter), Msaview (multiple sequence alignment viewer with color-by-conservation), GeneArrows (gene-arrow / synteny feature maps), GeoMap (site maps on offline tile basemaps). Emits one single-file HTML per chart with pinned CDN versions; no build step, no server. Does NOT do text-to-flowchart/sequence diagrams (use Mermaid/lumen-generate_visual for that), does NOT route GIS map figures to chart engines (GeoMap only; other GIS → cartopy/tmap/folium). Requires recomputation or a package-native analysis object (.h5ad, Seurat .rds, .cool, FCS, PDB/mmCIF)? Use the owning analysis pipeline skill (or general package knowledge) — chartz renders figures from data you already have: every plotted value must be nameable as a column in your input (the named-column check).'
+description: 'Render charts and graphs as self-contained HTML files from 16 engines, chosen by chart type. Use when the user asks for any chart, plot, dashboard, map or data visualization — "make a bar chart", "plot this data", "heatmap of these values", "draw a network graph", "dashboard of these metrics", "phylogenetic tree from this Newick string", "Manhattan plot", "volcano plot", "multiple sequence alignment viewer", "gene arrow map / synteny plot", "map of my sampling sites". Engine router: Chart.js, Plotly.js (Manhattan, volcano, PCA, violin/box, ANI heatmap), ECharts (alluvial, treemap, sunburst), Cytoscape.js (networks), plus SVG engines: GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos, HeatTree, PhyloTree, Concordance, Msaview, GeneArrows, GeoMap (offline tile site maps). Emits one single-file HTML per chart. Not for flowchart/sequence diagrams (use Mermaid) or non-GeoMap GIS figures. Renders figures from data you already have — every plotted value must be nameable as a column in your input.'
 version: 0.15.0
 updated: "2026-09-24"
 triggers:
@@ -8,7 +8,7 @@ triggers:
   - "plot this data"
   - "bar chart / line chart / pie chart / doughnut / radar / area"
   - "scatter plot / scree plot / UMAP / t-SNE plot"
-  - "heatmap" / "clustered heatmap with annotations"
+  - "heatmap / clustered heatmap with annotations"
   - "box plot / violin plot / strip plot / raincloud / histogram / density"
   - "significance brackets / adjusted p-values on a plot"
   - "GWAS Manhattan plot / Miami plot / QQ plot / locus zoom"
@@ -18,7 +18,7 @@ triggers:
   - "alluvial / Sankey / treemap / sunburst / dual-axis dashboard"
   - "network graph / node-link diagram / PPI network / pathway network / consortium diagram / dependency tree"
   - "dashboard from these numbers"
-  - "render a chart to html" / "visualize this csv/json"
+  - "render a chart to html / visualize this csv/json"
   - "phylogenetic tree from a Newick string / phylogram / cladogram / bootstrap circles"
   - "taxonomy heat tree (metacoder style)"
   - "gCF vs sCF concordance scatter / IQ-TREE concordance factors"
