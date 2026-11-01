@@ -1,7 +1,7 @@
 ---
 name: chartz
 description: 'Render charts and graphs as self-contained HTML files from 16 engines, chosen by chart type. Use when the user asks for any chart, plot, dashboard, map or data visualization — "make a bar chart", "plot this data", "heatmap of these values", "draw a network graph", "dashboard of these metrics", "phylogenetic tree from this Newick string", "Manhattan plot", "volcano plot", "multiple sequence alignment viewer", "gene arrow map / synteny plot", "map of my sampling sites". Engine router: Chart.js, Plotly.js (Manhattan, volcano, PCA, violin/box, ANI heatmap), ECharts (alluvial, treemap, sunburst), Cytoscape.js (networks), plus SVG engines: GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos, HeatTree, PhyloTree, Concordance, Msaview, GeneArrows, GeoMap (offline tile site maps). Emits one single-file HTML per chart. Not for flowchart/sequence diagrams (use Mermaid) or non-GeoMap GIS figures. Renders figures from data you already have — every plotted value must be nameable as a column in your input.'
-version: 0.16.0
+version: 0.16.1
 updated: "2026-11-01"
 triggers:
   - "make a chart"
@@ -37,13 +37,13 @@ requires:
 
 # chartz — chart & graph rendering skill
 
-> **v0.15.0.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus twelve template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos, GeoMap, Msaview, GeneArrows — §5b–§5m), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, fill a template slot, write the HTML, deliver the path. No build step.
+> **v0.16.1.** Renders one self-contained HTML file per chart from four CDN-pinned engines (Chart.js, Plotly.js, ECharts, Cytoscape.js) plus twelve template-native SVG engines (Concordance, HeatTree, PhyloTree, GenomeTracks, ClusterHeat, OncoPrint, SeqLogo, UpSet, Circos, GeoMap, Msaview, GeneArrows — §5b–§5m; GeoMap is template-native SVG but pulls pinned d3-geo/d3-array, so it is not zero-CDN), each pinned to an exact version. This SKILL.md is a **router + spec contract**: pick the engine from §1, emit the engine's JSON spec per that engine's file, render via the companion extension (`render_chart`), deliver the path. No build step.
 
 ## 0. Workflow (always all steps)
 
 1. **Classify the request** against the routing table (§1). If two engines could work, prefer the higher row.
 2. **Emit the spec** — read `engines/<name>.md` per the routing table and build that engine's spec object.
-3. **Render via the companion extension** — call the `render_chart` tool (companion extension, deployed at `~/.pi/agent/extensions/chartz-renderer.ts`): it validates the spec strictly (rejects NaN/±Infinity/undefined that JSON.stringify would silently mangle), fills the single `/*__SPEC__*/` slot exactly once, verifies the engine's render call (§6 5b-2 guard), probes the template's pinned CDN tags (parsed from the template itself, so version bumps need no extension edit; offline degrades to a warning, never a refusal), and writes `<workdir>/charts/<name>.html`. Report the tool's verdict path plus one sentence on what the chart shows. `list_chartz_engines` lists the registry on demand.
+3. **Render via the companion extension** — call the `render_chart` tool (companion extension, deployed at `~/.pi/agent/extensions/chartz-renderer.ts`): it enforces the engine's required keys and title per `engines/<name>.md` (an incomplete spec would render a blank page — the §6 5b-2 failure class), escapes `</script>` breakouts from spec strings, fills the single `/*__SPEC__*/` slot exactly once, verifies the engine's render call **on the template pre-fill** (§6 5b-2 guard), probes the template's pinned CDN tags (parsed from the template itself, so version bumps need no extension edit; offline or rejected probes degrade to a warning, never a refusal), and writes `<workdir>/charts/<name>.html`. Report the tool's verdict path plus one sentence on what the chart shows. `list_chartz_engines` lists the registry (and flags template drift) on demand.
 4. **Manual fallback (extension not loaded)** — copy `templates/<engine>.html`, replace **only** the `/*__SPEC__*/` placeholder with the strict-JSON literal (templates carry pinned CDN `<script>` tags; do not edit the script tags, and do **not** re-emit `const SPEC =` — the template already declares it), run **every line** of the §6 self-check, then write to `<workdir>/charts/<name>.html` (create the dir if needed) and report the absolute path.
 
 **Never** inline the library code into the HTML; the pinned CDN tags are the delivery mechanism. **Never** ship an HTML file with the `/*__SPEC__*/` slot still unfilled.
@@ -78,7 +78,7 @@ Worked, render-verified specs live in `examples/` named `<engine>-<charttype>.ht
 
 ## 6. Self-check (run before every delivery)
 
-**The `render_chart` companion extension enforces checks 1, 3, 5, 5b-2 and 6 in code and prints them in its tool verdict — re-run this manual list only on the fallback path (extension not loaded).**
+**The `render_chart` companion extension enforces in code: per-engine required keys + title (§6 check 6), strict serialization (check 1), `</script>`-breakout escaping, the single-slot contract pre-fill (check 3), the render-call guard on the template pre-fill (check 5b-2), the CDN probe with ranged-GET fallback (check 4), and output-path sanitization. NOT tool-enforced: check 2 (template pin vs §7 — verify on the fallback path) and 5b-1 (engine docs carry their Spec block — guard rail for authoring, not rendering). Re-run the manual list only on the fallback path (extension not loaded).**
 
 ```text
 [ ] 1. Spec is STRICT JSON (quote every key) and parses: python3 -c "import json; json.load(open('/tmp/spec.json'))" — the slot fill must be pure JSON, not JS-literal notation (unquoted keys fail this check; strict JSON is valid JS everywhere, the reverse is not)

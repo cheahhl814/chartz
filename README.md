@@ -212,6 +212,18 @@ Example naming convention: `<engine>-<charttype>.html`; the four base-named demo
 
 ## 📜 Changelog
 
+### v0.16.1 (2026-11-01) — applied the Claude Code review (5 MAJOR + MINOR batch)
+
+External T3 review (`claude -p --permission-mode plan`, 2026-11-01). No blockers; all findings applied:
+
+- **MAJOR — `</script>` breakout fixed**: the serialized spec is post-processed `.replace(/</g, "\\u003c")` — JSON.stringify does not escape `<`, so a spec string like `"</script><img onerror=…>"` previously broke out of the `<script>` block (valid JSON and JS; §6 check 1 still passes).
+- **MAJOR — slot contract moved to the template, pre-fill**: the old post-fill residue scan (`includes("__SPEC__")`) gave false aborts on legitimate data and protected nothing (`String.replace` is single-pass); slot count is now asserted on the TEMPLATE before fill.
+- **MAJOR — render-call guard moved to the template, pre-fill**: testing the filled output let a spec containing e.g. `"Plotly.newPlot("` pass falsely.
+- **MAJOR — per-engine spec-shape validation added**: a `required` key list per engine (sourced from each `engines/<name>.md` Spec block — e.g. plotly `["data","layout"]`, seqlogo `["title","positions"]`, geomap `["layers","projection"]`) throws on empty/incomplete specs — the real §6 5b-2 blank-page failure class.
+- **MAJOR — title check implemented + doc claims corrected**: `titlePath` per engine (chartjs `options.plugins.title.text`, plotly `layout.title`, native engines `title`; cytoscape optional per `engines/cytoscape.md`); §6 note now lists exactly what the tool does/doesn't enforce (NOT check 2 pin-match, NOT 5b-1); SKILL banner bumped (was still v0.15.0).
+- **MINOR batch** — string-spec recovery (`JSON.parse` + recorded coercion, instead of rejection); structured CDN probe results `{ok,text}` + ranged-GET fallback on HEAD 403/405 + `clearTimeout` in `finally` + tool-abort signal honored; name/workdir validated before network I/O; `~` expansion + case-insensitive `.html` suffix; string-sentinel warnings (`"NaN"/"None"/"undefined"`, §6 check 5); `style`/`deps` derived from template content (no hand-coded native flag — GeoMap now correctly "template-native + pinned CDN"); `countExamples` filters `.html`; unregistered-template drift guard in `list_chartz_engines`; engine union hoisted to module level; header comment corrected (runtime imports rely on pi's jiti package aliasing, verified through symlink load); the NaN/Infinity walk kept as a programmatic-call guard (unreachable via JSON transport, documented).
+- **Verified** — see v0.16.0 verification + fresh negative test: empty-spec render now rejected with the per-engine required-keys error.
+
 ### v0.16.0 (2026-11-01) — companion extension `render_chart` (deterministic template-fill)
 
 - **Added** — `companion/pi-extension.ts`, a Pi extension companion to the skill (deploy symlink `~/.pi/agent/extensions/chartz-renderer.ts`). Exposes two tools:
