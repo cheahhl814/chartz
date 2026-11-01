@@ -171,6 +171,7 @@ python3 bin/skill-update-check.py
 ```text
 chartz/
 ├── SKILL.md                 # Master router — start here (routing table, spec contracts, signature library)
+├── companion/               # Pi extension companion (render_chart + list_chartz_engines tools; see companion/README.md)
 ├── README.md                # This file
 ├── params.json              # Machine-readable build flags (with_docs_corpus/with_pixi/with_nextflow_runner = false)
 ├── templates/               # One self-contained HTML template per engine (CDN-pinned or template-native SVG)
@@ -210,6 +211,15 @@ Example naming convention: `<engine>-<charttype>.html`; the four base-named demo
 - **Battle-test equivalent, stated honestly** — chartz is a hand-authored workflow-skill and carries no preflight/skill-built/battle-test evidence chain; the de-facto battle-test is the headless-Chrome-verified demos plus the §6 self-check run on every delivery (see `params.json: battle_test_note`).
 
 ## 📜 Changelog
+
+### v0.16.0 (2026-11-01) — companion extension `render_chart` (deterministic template-fill)
+
+- **Added** — `companion/pi-extension.ts`, a Pi extension companion to the skill (deploy symlink `~/.pi/agent/extensions/chartz-renderer.ts`). Exposes two tools:
+  - **`render_chart(engine, spec, name, workdir?, probeCdn?)`** — executes the template-fill flow deterministically: strict spec validation (recursive walk rejecting NaN/±Infinity/undefined/BigInt that JSON.stringify would silently mangle), fills the template's single `/*__SPEC__*/` slot exactly once (fails on 0 or >1), verifies the engine render call (§6 5b-2 guard), probes the template's pinned `<script src>` CDN URLs (regex-extracted from the template, so §7 version bumps need no extension edit; offline degrades to a warning, never a refusal — user decision 2026-11-01), and overwrites `<workdir>/charts/<name>.html` (overwrite silently — user decision).
+  - **`list_chartz_engines()`** — registry of the 16 engines × template × CDN dependence × example counts.
+- **Changed** — SKILL.md §0: step 3 is now "render via the companion extension"; manual template-fill + full §6 self-check demoted to the documented fallback (step 4). §6 header notes the extension enforces checks 1/3/5/5b-2/6 in code. Templates/engine contracts stay in the skill repo (single source of truth) — the extension reads them via `~/.agents/skills/chartz` (override: `CHARTZ_SKILL_DIR`).
+- **Verified** — extension loads through the symlink (`pi -e … -p` runs clean); smoke tests pass end-to-end: `list_chartz_engines` (16 engines, no missing templates) and two real renders (seqlogo + phylotree) with 4/4 checks, zero slot residue, SPEC blocks parse as strict JSON (verified by an independent line-based extractor).
+- **Decisions locked (2026-11-01)** — all 16 engines in v1; write + warn on CDN failure; overwrite existing output; companion lives inside `@skills/chartz/companion/` (one git repo owns skill + extension).
 
 ### v0.15.0 (2026-09-24) — brainstorm work order (2-seat herdr-skill+ §8 brainstorm; user tie-break)
 
