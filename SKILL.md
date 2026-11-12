@@ -33,6 +33,7 @@ triggers:
 requires:
   - "python3 (stdlib only) — for data formatting and the update check"
   - "a browser (user-side) — output is a self-contained HTML file"
+disable-model-invocation: true
 ---
 
 # chartz — chart & graph rendering skill
